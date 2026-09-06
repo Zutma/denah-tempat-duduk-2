@@ -6,9 +6,6 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-<?php if (isset($_SESSION['user_name'])): ?>
-    <div style="background:#2c3e50; color:white; padding:10px 20px; display:flex; justify-content:space-between;">
-        <span>Halo, <?= htmlspecialchars($_SESSION['user_name']) ?></span>
-        <a href="/logout.php" style="color:white;">Logout</a>
-    </div>
-<?php endif; ?>
+    <?php if (isset($_SESSION['user_name'])): ?>
+        <?php require __DIR__ . '/sidebar.php'; ?>
+    <?php endif; ?>
