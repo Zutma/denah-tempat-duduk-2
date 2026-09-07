@@ -1,15 +1,15 @@
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <p>
-    <a href="/graduation-events.php">Wisuda</a> &gt;
+    <a href="/graduation-events">Wisuda</a> &gt;
     Sesi <?= htmlspecialchars($session['date']) ?> &gt;
     Data Wisudawan
 </p>
 
 <h1>Data Wisudawan — Sesi <?= htmlspecialchars($session['date']) ?></h1>
 
-<a href="/graduate-form.php?session_id=<?= $sessionId ?>" class="button">+ Tambah Wisudawan</a>
-<a href="/import-form.php?session_id=<?= $sessionId ?>" class="button">Import Excel</a>
+<a href="/graduates/create?session_id=<?= $sessionId ?>" class="button">+ Tambah Wisudawan</a>
+<a href="/imports/create?session_id=<?= $sessionId ?>" class="button">Import Excel</a>
 
 <?php if (isset($_GET['success'])): ?>
     <p style="color:green"><?= htmlspecialchars($_GET['success']) ?></p>
@@ -32,7 +32,7 @@
         <td><?= htmlspecialchars($g['position'] ?? '-') ?></td>
         <td><?= htmlspecialchars($g['number'] ?? '-') ?></td>
         <td>
-            <a href="/graduate-delete.php?id=<?= $g['id'] ?>&session_id=<?= $sessionId ?>"
+            <a href="/graduates/delete?id=<?= $g['id'] ?>&session_id=<?= $sessionId ?>"
                class="delete" onclick="return confirm('Yakin hapus?')">Hapus</a>
         </td>
     </tr>

@@ -123,4 +123,4 @@ function highlightSeat(seatId) {
 }
 </script>
 
-<?php require __DIR__ . '/../partials/footer.php'; ?>
+<?php require __DIR__ . '/../public/header.php'; ?>

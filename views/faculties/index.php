@@ -1,7 +1,7 @@
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <h1>Daftar Fakultas</h1>
-<a href="/faculty-form.php" class="button">+ Tambah Fakultas</a>
+<a href="/faculties/create" class="button">+ Tambah Fakultas</a>
 
 <table>
     <tr>
@@ -13,8 +13,8 @@
         <td><?= htmlspecialchars($faculty['name']) ?></td>
         <td><?= htmlspecialchars($faculty['color']) ?></td>
         <td>
-            <a href="/faculty-form.php?id=<?= $faculty['id'] ?>">Edit</a>
-            <a href="/faculty-delete.php?id=<?= $faculty['id'] ?>" class="delete" onclick="return confirm('Yakin hapus?')">Hapus</a>
+            <a href="/faculties/edit?id=<?= $faculty['id'] ?>">Edit</a>
+            <a href="/faculties/delete?id=<?= $faculty['id'] ?>" class="delete" onclick="return confirm('Yakin hapus?')">Hapus</a>
         </td>
     </tr>
     <?php endforeach; ?>

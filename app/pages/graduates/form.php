@@ -1,9 +1,9 @@
 <?php
-require __DIR__ . '/../includes/db.php';
-require __DIR__ . '/../includes/auth-check.php';
-require __DIR__ . '/../models/Graduate.php';
-require __DIR__ . '/../models/Faculty.php';
-require __DIR__ . '/../models/StudyProgram.php';
+require __DIR__ . '/../../../includes/db.php';
+require __DIR__ . '/../../../includes/auth-check.php';
+require __DIR__ . '/../../../models/Graduate.php';
+require __DIR__ . '/../../../models/Faculty.php';
+require __DIR__ . '/../../../models/StudyProgram.php';
 
 $sessionId = $_GET['session_id'] ?? $_POST['session_id'] ?? null;
 $faculties = getAllFaculties($conn);
@@ -25,10 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         createGraduate($conn, $sessionId, $facultyId, $studyProgramId, $nrp, $name, $seatId);
-        header("Location: /graduates.php?session_id=" . $sessionId);
+        header("Location: /graduates?session_id=" . $sessionId);
         exit;
     }
 }
 
 $pageTitle = 'Tambah Wisudawan';
-require __DIR__ . '/../views/graduates/form.php';
+require __DIR__ . '/../../../views/graduates/form.php';

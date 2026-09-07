@@ -1,11 +1,11 @@
 <?php
-require __DIR__ . '/../includes/db.php';
-require __DIR__ . '/../includes/auth-check.php';
-require __DIR__ . '/../models/SeatRow.php';
-require __DIR__ . '/../models/GraduationSession.php';
+require __DIR__ . '/../../../includes/db.php';
+require __DIR__ . '/../../../includes/auth-check.php';
+require __DIR__ . '/../../../models/SeatRow.php';
+require __DIR__ . '/../../../models/GraduationSession.php';
 
 if (!isset($_GET['session_id'])) {
-    header("Location: /graduation-events.php");
+    header("Location: /graduation-events");
     exit;
 }
 
@@ -46,4 +46,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $seatRows = getSeatRowsBySession($conn, $sessionId);
 $pageTitle = 'Kelola Kursi — ' . $session['date'];
 
-require __DIR__ . '/../views/seat-rows/index.php';
+require __DIR__ . '/../../../views/seat-rows/index.php';

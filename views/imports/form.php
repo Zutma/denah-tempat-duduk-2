@@ -5,7 +5,7 @@
 <p><strong>Catatan:</strong> Excel harus di-export ke format CSV dulu (File &gt; Save As &gt; CSV).</p>
 <p>Kolom wajib (baris pertama file): <code>fakultas,prodi,jenjang,kursi,sisi,nomor,nrp,nama</code></p>
 
-<form method="POST" action="/import-process.php" enctype="multipart/form-data">
+<form method="POST" action="/imports/process" enctype="multipart/form-data">
     <input type="hidden" name="session_id" value="<?= $sessionId ?>">
     <input type="file" name="file" accept=".csv"><br><br>
     <button type="submit">Upload &amp; Import</button>

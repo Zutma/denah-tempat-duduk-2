@@ -1,7 +1,7 @@
 <?php
-require __DIR__ . '/../includes/db.php';
-require __DIR__ . '/../includes/auth-check.php';
-require __DIR__ . '/../models/GraduationSession.php';
+require __DIR__ . '/../../../includes/db.php';
+require __DIR__ . '/../../../includes/auth-check.php';
+require __DIR__ . '/../../../models/GraduationSession.php';
 
 $session = null;
 $eventId = $_GET['event_id'] ?? null;
@@ -27,11 +27,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             createSession($conn, $eventId, $date, $sessionNumber, $status);
         }
-        header("Location: /graduation-sessions.php?event_id=" . $eventId);
+        header("Location: /graduation-sessions?event_id=" . $eventId);
         exit;
     }
     $session = ['id' => $_POST['id'] ?? null, 'date' => $date, 'session' => $sessionNumber, 'status' => $status];
 }
 
 $pageTitle = $session ? 'Edit Sesi' : 'Tambah Sesi';
-require __DIR__ . '/../views/graduation-sessions/form.php';
+require __DIR__ . '/../../../views/graduation-sessions/form.php';

@@ -1,7 +1,7 @@
 <?php
-require __DIR__ . '/../includes/db.php';
-require __DIR__ . '/../includes/auth-check.php';
-require __DIR__ . '/../models/Graduate.php';
+require __DIR__ . '/../../../includes/db.php';
+require __DIR__ . '/../../../includes/auth-check.php';
+require __DIR__ . '/../../../models/Graduate.php';
 
 $sessionId = $_POST['session_id'];
 $success = 0;
@@ -54,5 +54,5 @@ if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
 $_SESSION['import_success'] = $success;
 $_SESSION['import_failed'] = $failed;
 
-header("Location: /graduates.php?session_id=$sessionId&success=" . urlencode("$success data berhasil diimport."));
+header("Location: /graduates?session_id=$sessionId&success=" . urlencode("$success data berhasil diimport."));
 exit;

@@ -1,8 +1,8 @@
 <?php
-require __DIR__ . '/../includes/db.php';
-require __DIR__ . '/../includes/auth-check.php';
-require __DIR__ . '/../models/StudyProgram.php';
-require __DIR__ . '/../models/Faculty.php';
+require __DIR__ . '/../../../includes/db.php';
+require __DIR__ . '/../../../includes/auth-check.php';
+require __DIR__ . '/../../../models/StudyProgram.php';
+require __DIR__ . '/../../../models/Faculty.php';
 
 $faculties = getAllFaculties($conn);
 
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             createStudyProgram($conn, $facultyId, $name, $degreeLevel);
         }
-        header("Location: /study-programs.php");
+        header("Location: /study-programs");
         exit;
     }
     $studyProgram = [
@@ -39,4 +39,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = $studyProgram ? 'Edit Program Studi' : 'Tambah Program Studi';
-require __DIR__ . '/../views/study-programs/form.php';
+require __DIR__ . '/../../../views/study-programs/form.php';

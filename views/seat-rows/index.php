@@ -1,7 +1,7 @@
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <p>
-    <a href="/graduation-events.php">Wisuda</a> &gt;
+    <a href="/graduation-events">Wisuda</a> &gt;
     Sesi <?= htmlspecialchars($session['date']) ?> &gt;
     Kelola Kursi
 </p>
@@ -54,7 +54,7 @@
         <td><?= $row['capacity'] ?></td>
         <td><?= $row['seat_count'] ?></td>
         <td>
-            <a href="/seat-row-delete.php?id=<?= $row['id'] ?>&session_id=<?= $session['id'] ?>"
+            <a href="/seat-rows/delete?id=<?= $row['id'] ?>&session_id=<?= $session['id'] ?>"
                class="delete"
                onclick="return confirm('Menghapus baris ini akan menghapus semua kursi di dalamnya. Yakin?')">Hapus</a>
         </td>

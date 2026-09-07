@@ -1,7 +1,7 @@
 <?php
-require __DIR__ . '/../includes/db.php';
-require __DIR__ . '/../includes/auth-check.php';
-require __DIR__ . '/../models/Faculty.php';
+require __DIR__ . '/../../../includes/db.php';
+require __DIR__ . '/../../../includes/auth-check.php';
+require __DIR__ . '/../../../models/Faculty.php';
 
 $faculty = null;
 if (isset($_GET['id'])) {
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             createFaculty($conn, $code, $name, $color);
         }
-        header("Location: /faculties.php");
+        header("Location: /faculties");
         exit;
     }
     // Kalau ada error, data yg diketik user tetap ditampilkan lagi di form
@@ -32,4 +32,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = $faculty ? 'Edit Fakultas' : 'Tambah Fakultas';
-require __DIR__ . '/../views/faculties/form.php';
+require __DIR__ . '/../../../views/faculties/form.php';

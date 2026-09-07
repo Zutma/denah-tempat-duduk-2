@@ -1,12 +1,12 @@
 <?php
-require __DIR__ . '/../includes/db.php';
-require __DIR__ . '/../includes/auth-check.php';
-require __DIR__ . '/../models/Graduate.php';
-require __DIR__ . '/../models/GraduationSession.php';
+require __DIR__ . '/../../../includes/db.php';
+require __DIR__ . '/../../../includes/auth-check.php';
+require __DIR__ . '/../../../models/Graduate.php';
+require __DIR__ . '/../../../models/GraduationSession.php';
 
 $sessionId = $_GET['session_id'] ?? null;
 if (!$sessionId) {
-    header("Location: /graduation-events.php");
+    header("Location: /graduation-events");
     exit;
 }
 
@@ -22,4 +22,4 @@ $totalPages = (int) ceil($total / $perPage);
 
 $pageTitle = 'Data Wisudawan — ' . $session['date'];
 
-require __DIR__ . '/../views/graduates/index.php';
+require __DIR__ . '/../../../views/graduates/index.php';
