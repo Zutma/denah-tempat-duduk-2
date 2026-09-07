@@ -2,7 +2,12 @@
 
 class GraduationEvent {
     public static function all($conn) {
-        $result = $conn->query("SELECT * FROM graduation_events ORDER BY id DESC");
+        $result = $conn->query("
+            SELECT ge.*,
+                   (SELECT COUNT(*) FROM graduation_sessions gs WHERE gs.graduation_event_id = ge.id) AS session_count
+            FROM graduation_events ge
+            ORDER BY ge.id DESC
+        ");
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 

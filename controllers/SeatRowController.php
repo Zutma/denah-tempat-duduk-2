@@ -17,14 +17,16 @@ class SeatRowController extends BaseController {
         $messages = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $barisList = $_POST['baris'] ?? [];
+            // Support both new Alpine format (rows[]) and legacy format (baris[])
+            $rowsList = $_POST['rows'] ?? $_POST['baris'] ?? [];
 
             $conn->begin_transaction();
             try {
-                foreach ($barisList as $item) {
+                foreach ($rowsList as $item) {
                     $rowLabel = strtoupper(trim($item['row'] ?? ''));
-                    $kapasitasKiri = (int) ($item['kapasitas_kiri'] ?? 0);
-                    $kapasitasKanan = (int) ($item['kapasitas_kanan'] ?? 0);
+                    // Alpine format: left_capacity/right_capacity; legacy: kapasitas_kiri/kapasitas_kanan
+                    $kapasitasKiri  = (int) ($item['left_capacity']  ?? $item['kapasitas_kiri']  ?? 0);
+                    $kapasitasKanan = (int) ($item['right_capacity'] ?? $item['kapasitas_kanan'] ?? 0);
 
                     if ($rowLabel === '' || $kapasitasKiri < 1 || $kapasitasKanan < 1) {
                         $errors[] = "Baris '$rowLabel' dilewati karena data tidak lengkap.";
@@ -53,16 +55,20 @@ class SeatRowController extends BaseController {
         }
 
 
-        $seatRows = SeatRow::getBySession($conn, $sessionId);
-        $pageTitle = 'Kelola Kursi — ' . ($session['date'] ?? '');
+        $seatRows   = SeatRow::getBySession($conn, $sessionId);
+        $allLetters = range('A', 'Z');
+        $usedLetters = array_values(array_unique(array_column($seatRows, 'row')));
+        $pageTitle  = 'Kelola Kursi — ' . ($session['date'] ?? '');
 
         $this->render('seat-rows/index', [
-            'sessionId' => $sessionId,
-            'session' => $session,
-            'seatRows' => $seatRows,
-            'errors' => $errors,
-            'messages' => $messages,
-            'pageTitle' => $pageTitle
+            'sessionId'   => $sessionId,
+            'session'     => $session,
+            'seatRows'    => $seatRows,
+            'allLetters'  => $allLetters,
+            'usedLetters' => $usedLetters,
+            'errors'      => $errors,
+            'messages'    => $messages,
+            'pageTitle'   => $pageTitle
         ]);
     }
 

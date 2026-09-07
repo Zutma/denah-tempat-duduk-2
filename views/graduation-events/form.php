@@ -1,22 +1,49 @@
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
-<h1><?= $event ? 'Edit' : 'Tambah' ?> Event Wisuda</h1>
+<h1 class="text-xl font-bold text-gray-800 mb-6"><?= !empty($event['id']) ? 'Edit Event Wisuda' : 'Tambah Periode' ?></h1>
 
-<?php if (!empty($errors)): ?>
-    <ul class="error-list">
-        <?php foreach ($errors as $error): ?><li><?= htmlspecialchars($error) ?></li><?php endforeach; ?>
-    </ul>
-<?php endif; ?>
+<div class="p-6 rounded-xl shadow-sm border border-gray-200 bg-white">
+    <form method="POST" class="flex flex-col gap-4">
+        <?php if (!empty($event['id'])): ?>
+            <input type="hidden" name="id" value="<?= $event['id'] ?>">
+        <?php endif; ?>
 
-<form method="POST">
-    <?php if (!empty($event['id'])): ?>
-        <input type="hidden" name="id" value="<?= $event['id'] ?>">
-    <?php endif; ?>
+        <div>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-1"><?= !empty($event['id']) ? 'Nama Event' : 'Periode Wisuda' ?></label>
+            <input type="text" id="name" name="name" value="<?= htmlspecialchars($event['name'] ?? '') ?>"
+                placeholder="Contoh: Wisuda ke-133"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+        </div>
 
-    <label>Nama Event:</label><br>
-    <input type="text" name="name" value="<?= htmlspecialchars($event['name'] ?? '') ?>" placeholder="Contoh: Wisuda ke-133"><br>
+        <?php if (!empty($errors)): ?>
+            <div class="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg">
+                <ul class="list-disc list-inside">
+                    <?php foreach ($errors as $error): ?>
+                        <li><?= htmlspecialchars($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
 
-    <button type="submit">Simpan</button>
-</form>
+        <div class="flex justify-end gap-3 pt-2">
+            <a href="/graduation-events"
+                class="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+                Batal
+            </a>
+            <button type="submit"
+                class="inline-flex items-center gap-1.5 px-6 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
+                <?= !empty($event['id']) ? 'Update' : 'Simpan' ?>
+            </button>
+        </div>
+    </form>
+</div>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
