@@ -26,21 +26,25 @@ $routes = [
     'faculties/create' => [FacultyController::class, 'form'],
     'faculties/edit' => [FacultyController::class, 'form'],
     'faculties/delete' => [FacultyController::class, 'delete'],
+    'faculties/bulk-delete' => [FacultyController::class, 'bulkDelete'],
 
     'study-programs' => [StudyProgramController::class, 'index'],
     'study-programs/create' => [StudyProgramController::class, 'form'],
     'study-programs/edit' => [StudyProgramController::class, 'form'],
     'study-programs/delete' => [StudyProgramController::class, 'delete'],
+    'study-programs/bulk-delete' => [StudyProgramController::class, 'bulkDelete'],
 
     'graduation-events' => [GraduationEventController::class, 'index'],
     'graduation-events/create' => [GraduationEventController::class, 'form'],
     'graduation-events/edit' => [GraduationEventController::class, 'form'],
     'graduation-events/delete' => [GraduationEventController::class, 'delete'],
+    'graduation-events/bulk-delete' => [GraduationEventController::class, 'bulkDelete'],
 
     'graduation-sessions' => [GraduationSessionController::class, 'index'],
     'graduation-sessions/create' => [GraduationSessionController::class, 'form'],
     'graduation-sessions/edit' => [GraduationSessionController::class, 'form'],
     'graduation-sessions/delete' => [GraduationSessionController::class, 'delete'],
+    'graduation-sessions/bulk-delete' => [GraduationSessionController::class, 'bulkDelete'],
 
     'seat-rows' => [SeatRowController::class, 'index'],
     'seat-rows/delete' => [SeatRowController::class, 'delete'],
@@ -48,9 +52,11 @@ $routes = [
     'graduates' => [GraduateController::class, 'index'],
     'graduates/create' => [GraduateController::class, 'form'],
     'graduates/delete' => [GraduateController::class, 'delete'],
+    'graduates/bulk-delete' => [GraduateController::class, 'bulkDelete'],
 
     'imports/create' => [ImportController::class, 'form'],
     'imports/process' => [ImportController::class, 'process'],
+    'imports/template' => [ImportController::class, 'downloadTemplate'],
 ];
 
 if (array_key_exists($uri, $routes)) {

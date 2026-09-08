@@ -61,4 +61,15 @@ class FacultyController extends BaseController {
 
         $this->redirect('/faculties');
     }
+
+    public function bulkDelete($conn) {
+        $this->checkAuth();
+
+        $ids = $_POST['ids'] ?? [];
+        if (!empty($ids) && is_array($ids)) {
+            Faculty::bulkDelete($conn, array_map('intval', $ids));
+        }
+
+        $this->redirect('/faculties');
+    }
 }

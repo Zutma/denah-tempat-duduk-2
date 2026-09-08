@@ -81,4 +81,21 @@ class GraduationSessionController extends BaseController {
 
         $this->redirect('/graduation-events');
     }
+
+    public function bulkDelete($conn) {
+        $this->checkAuth();
+
+        $eventId = $_POST['event_id'] ?? $_GET['event_id'] ?? null;
+        $ids = $_POST['ids'] ?? [];
+
+        if (!empty($ids) && is_array($ids)) {
+            GraduationSession::bulkDelete($conn, array_map('intval', $ids));
+        }
+
+        if ($eventId) {
+            $this->redirect("/graduation-sessions?event_id=" . $eventId);
+        }
+
+        $this->redirect('/graduation-events');
+    }
 }

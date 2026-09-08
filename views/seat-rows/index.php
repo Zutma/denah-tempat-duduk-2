@@ -4,7 +4,7 @@
 <nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
     <a href="/graduation-events" class="hover:text-sky-600 transition-colors">Wisuda</a>
     <span class="text-gray-300">/</span>
-    <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?>" class="hover:text-sky-600 transition-colors">
+    <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>" class="hover:text-sky-600 transition-colors">
         <?= htmlspecialchars($session['event_name'] ?? 'Detail Event') ?>
     </a>
     <span class="text-gray-300">/</span>
@@ -12,9 +12,12 @@
 </nav>
 
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-xl font-bold text-gray-800">
-        Kelola Kursi — Sesi <?= date('d F Y', strtotime($session['date'])) ?>
-    </h1>
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800 tracking-tight">
+            Kelola Kursi — Sesi <?= !empty($session['date']) ? date('d F Y', strtotime($session['date'])) : '' ?>
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">Pengaturan baris dan kapasitas kursi untuk sesi ini.</p>
+    </div>
 </div>
 
 <?php if (!empty($_SESSION['success'])): ?>
@@ -26,7 +29,7 @@
 
 <?php if (!empty($errors)): ?>
     <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
-        <ul class="list-disc pl-5">
+        <ul class="list-disc pl-5 space-y-1">
             <?php foreach ($errors as $e): ?>
                 <li><?= htmlspecialchars($e) ?></li>
             <?php endforeach; ?>
@@ -35,12 +38,12 @@
 <?php endif; ?>
 
 <!-- FORM BATCH GENERATE (Alpine.js) -->
-<div x-data="batchSeatManager()" class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6">
+<div x-data="batchSeatManager()" class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6">
     <div class="flex items-center justify-between gap-4 mb-4">
         <h3 class="text-base font-bold text-gray-800">Buat Baris Kursi</h3>
 
         <button type="button" @click="addRow()"
-            class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-sky-500 hover:bg-sky-600 rounded-lg shadow-sm transition-colors cursor-pointer">
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-sky-500 hover:bg-sky-600 rounded-xl shadow-sm transition-colors cursor-pointer">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -48,10 +51,24 @@
         </button>
     </div>
 
-    <form method="POST" action="/seat-rows/store" x-show="rows.length > 0" x-cloak>
+    <form method="POST" action="/seat-rows?session_id=<?= $session['id'] ?>" x-show="rows.length > 0" x-cloak>
         <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
 
-        <div class="overflow-x-auto mb-4 border border-gray-200 rounded-lg">
+<div class="px-5 py-4 bg-white border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+  <div class="relative flex-1 max-w-xs">
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    </div>
+    <input type="text" id="searchInput" placeholder="Cari baris atau kapasitas..."
+      class="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-800 placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all outline-none"/>
+  </div>
+  <div class="flex items-center gap-2">
+    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200/60">
+      Total: <?= count($seatRows ?? []) ?> Baris
+    </span>
+  </div>
+</div>
+        <div class="overflow-x-auto mb-4 border border-gray-200 rounded-xl">
             <table class="w-full text-sm text-left border-collapse">
                 <thead class="bg-gray-50 text-gray-700 uppercase text-[11px] font-bold tracking-wider border-b border-gray-200">
                     <tr>
@@ -61,12 +78,12 @@
                         <th class="px-4 py-3 text-center w-24">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 bg-white">
+                <tbody class="divide-y divide-gray-100 bg-white">
                     <template x-for="(item, index) in rows" :key="index">
                         <tr class="hover:bg-gray-50/50 transition-colors">
                             <td class="p-3">
                                 <select :name="`rows[${index}][row]`" x-model="item.row"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-800 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold text-gray-800 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
                                     required>
                                     <option value="" disabled>Pilih Baris</option>
                                     <?php foreach ($allLetters as $letter): ?>
@@ -93,7 +110,7 @@
                             </td>
                             <td class="p-3 text-center whitespace-nowrap">
                                 <button type="button" @click="removeRow(index)"
-                                    class="inline-flex items-center text-xs font-semibold text-red-600 hover:text-red-800 hover:underline transition-colors">
+                                    class="inline-flex items-center text-xs font-semibold text-red-600 hover:text-red-800 hover:underline transition-colors cursor-pointer">
                                     Hapus
                                 </button>
                             </td>
@@ -105,7 +122,7 @@
 
         <div class="flex justify-end pt-3 border-t border-gray-100">
             <button type="submit"
-                class="px-4 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors">
+                class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors cursor-pointer">
                 Simpan Semua Baris
             </button>
         </div>
@@ -113,43 +130,54 @@
 </div>
 
 <!-- TABEL DAFTAR BARIS YANG SUDAH TER-GENERATE -->
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-    <table class="w-full text-sm text-left text-gray-900">
-        <thead class="bg-gray-50 border-b border-gray-200 text-gray-700 uppercase font-bold text-xs tracking-wider">
-            <tr>
-                <th class="px-6 py-3 text-left">Baris</th>
-                <th class="px-6 py-3 text-center">Sisi</th>
-                <th class="px-6 py-3 text-center">Kapasitas</th>
-                <th class="px-6 py-3 text-center">Kursi Ter-generate</th>
-                <th class="px-6 py-3 text-right">Aksi</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-            <?php if (empty($seatRows)): ?>
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="p-4 border-b border-gray-100 bg-gray-50/50">
+        <h3 class="text-sm font-bold text-gray-800">Daftar Baris Kursi</h3>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-900">
+            <thead class="bg-gray-50 border-b border-gray-200 text-gray-700 uppercase font-bold text-[11px] tracking-wider">
                 <tr>
-                    <td colspan="5" class="px-6 py-8 text-center text-xs text-gray-400 italic">Belum ada baris kursi.</td>
+                    <th class="px-6 py-3 text-left">Baris</th>
+                    <th class="px-6 py-3 text-center">Sisi</th>
+                    <th class="px-6 py-3 text-center">Kapasitas</th>
+                    <th class="px-6 py-3 text-center">Kursi Ter-generate</th>
+                    <th class="px-6 py-3 text-right">Aksi</th>
                 </tr>
-            <?php else: ?>
-                <?php foreach ($seatRows as $row): ?>
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 font-bold text-gray-900"><?= htmlspecialchars($row['row']) ?></td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-md border <?= $row['side'] == 'left' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-purple-50 text-purple-700 border-purple-200' ?>">
-                                <?= $row['side'] == 'left' ? 'Kiri' : 'Kanan' ?>
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-center text-gray-600 font-medium"><?= $row['capacity'] ?></td>
-                        <td class="px-6 py-4 text-center font-semibold text-gray-800"><?= $row['seat_count'] ?></td>
-                        <td class="px-6 py-4 text-right whitespace-nowrap">
-                            <a href="/seat-rows/delete?id=<?= $row['id'] ?>&session_id=<?= $session['id'] ?>"
-                                onclick="return confirm('Yakin hapus? Semua kursi di baris ini akan terhapus.')"
-                                class="text-xs font-semibold text-red-600 hover:text-red-800 transition-colors">Hapus</a>
-                        </td>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                <?php if (empty($seatRows)): ?>
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-xs text-gray-400 italic">Belum ada baris kursi.</td>
                     </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                <?php else: ?>
+                    <?php foreach ($seatRows as $row): ?>
+                        <tr class="hover:bg-gray-50/80 transition-colors">
+                            <td class="px-6 py-4 font-bold text-gray-900"><?= htmlspecialchars($row['row']) ?></td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-md border <?= $row['side'] == 'left' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-purple-50 text-purple-700 border-purple-200' ?>">
+                                    <?= $row['side'] == 'left' ? 'Kiri' : 'Kanan' ?>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center text-gray-600 font-medium"><?= $row['capacity'] ?></td>
+                            <td class="px-6 py-4 text-center font-semibold text-gray-800"><?= $row['seat_count'] ?></td>
+                            <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <a href="/seat-rows/delete?id=<?= $row['id'] ?>&session_id=<?= $session['id'] ?>"
+                                    onclick="return confirm('Yakin hapus? Semua kursi di baris ini akan terhapus.')"
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/60">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Hapus
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
@@ -179,6 +207,15 @@
             removeRow(index) { this.rows.splice(index, 1); }
         }
     }
+</script>
+<script>
+  document.getElementById('searchInput').addEventListener('input', function(){
+    const term = this.value.toLowerCase();
+    document.querySelectorAll('table tbody tr').forEach(row => {
+      const text = row.innerText.toLowerCase();
+      row.style.display = text.includes(term) ? '' : 'none';
+    });
+  });
 </script>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
