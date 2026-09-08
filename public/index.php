@@ -1,56 +1,62 @@
 <?php
-require __DIR__ . '/../includes/db.php';
-require __DIR__ . '/../includes/auth-check.php';
+require_once __DIR__ . '/../includes/db.php';
+
+// Load All Controllers
+require_once __DIR__ . '/../controllers/PublicController.php';
+require_once __DIR__ . '/../controllers/AuthController.php';
+require_once __DIR__ . '/../controllers/DashboardController.php';
+require_once __DIR__ . '/../controllers/FacultyController.php';
+require_once __DIR__ . '/../controllers/StudyProgramController.php';
+require_once __DIR__ . '/../controllers/GraduationEventController.php';
+require_once __DIR__ . '/../controllers/GraduationSessionController.php';
+require_once __DIR__ . '/../controllers/SeatRowController.php';
+require_once __DIR__ . '/../controllers/GraduateController.php';
+require_once __DIR__ . '/../controllers/ImportController.php';
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = trim($uri, '/');
 
 $routes = [
-    '' => '__PUBLIC__',
+    '' => [PublicController::class, 'denah'],
+    'login' => [AuthController::class, 'login'],
+    'logout' => [AuthController::class, 'logout'],
+    'dashboard' => [DashboardController::class, 'index'],
 
-    // '' => 'dashboard.php',
-    'dashboard' => 'dashboard.php',
+    'faculties' => [FacultyController::class, 'index'],
+    'faculties/create' => [FacultyController::class, 'form'],
+    'faculties/edit' => [FacultyController::class, 'form'],
+    'faculties/delete' => [FacultyController::class, 'delete'],
 
-    'faculties' => 'faculties/index.php',
-    'faculties/create' => 'faculties/form.php',
-    'faculties/edit' => 'faculties/form.php',
-    'faculties/delete' => 'faculties/delete.php',
+    'study-programs' => [StudyProgramController::class, 'index'],
+    'study-programs/create' => [StudyProgramController::class, 'form'],
+    'study-programs/edit' => [StudyProgramController::class, 'form'],
+    'study-programs/delete' => [StudyProgramController::class, 'delete'],
 
-    'study-programs' => 'study-programs/index.php',
-    'study-programs/create' => 'study-programs/form.php',
-    'study-programs/edit' => 'study-programs/form.php',
-    'study-programs/delete' => 'study-programs/delete.php',
+    'graduation-events' => [GraduationEventController::class, 'index'],
+    'graduation-events/create' => [GraduationEventController::class, 'form'],
+    'graduation-events/edit' => [GraduationEventController::class, 'form'],
+    'graduation-events/delete' => [GraduationEventController::class, 'delete'],
 
-    'graduation-events' => 'graduation-events/index.php',
-    'graduation-events/create' => 'graduation-events/form.php',
-    'graduation-events/edit' => 'graduation-events/form.php',
-    'graduation-events/delete' => 'graduation-events/delete.php',
+    'graduation-sessions' => [GraduationSessionController::class, 'index'],
+    'graduation-sessions/create' => [GraduationSessionController::class, 'form'],
+    'graduation-sessions/edit' => [GraduationSessionController::class, 'form'],
+    'graduation-sessions/delete' => [GraduationSessionController::class, 'delete'],
 
-    'graduation-sessions' => 'graduation-sessions/index.php',
-    'graduation-sessions/create' => 'graduation-sessions/form.php',
-    'graduation-sessions/edit' => 'graduation-sessions/form.php',
-    'graduation-sessions/delete' => 'graduation-sessions/delete.php',
+    'seat-rows' => [SeatRowController::class, 'index'],
+    'seat-rows/delete' => [SeatRowController::class, 'delete'],
 
-    'seat-rows' => 'seat-rows/index.php',
-    'seat-rows/delete' => 'seat-rows/delete.php',
+    'graduates' => [GraduateController::class, 'index'],
+    'graduates/create' => [GraduateController::class, 'form'],
+    'graduates/delete' => [GraduateController::class, 'delete'],
 
-    'graduates' => 'graduates/index.php',
-    'graduates/create' => 'graduates/form.php',
-    'graduates/delete' => 'graduates/delete.php',
-
-    'imports/create' => 'imports/form.php',
-    'imports/process' => 'imports/process.php',
+    'imports/create' => [ImportController::class, 'form'],
+    'imports/process' => [ImportController::class, 'process'],
 ];
 
-if ($uri === '') {
-    require __DIR__ . '/../app/public-pages/denah.php';
-    exit;
-}
-
-require __DIR__ . '/../includes/auth-check.php';
-
 if (array_key_exists($uri, $routes)) {
-    require __DIR__ . '/../app/pages/' . $routes[$uri];
+    [$controllerClass, $method] = $routes[$uri];
+    $controller = new $controllerClass();
+    $controller->$method($conn);
 } else {
     http_response_code(404);
     echo "404 - Halaman tidak ditemukan";
