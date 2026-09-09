@@ -30,9 +30,7 @@
     <aside class="w-64 bg-[#0f172a] text-white flex flex-col justify-between hidden sm:flex flex-shrink-0">
         <div>
             <div class="h-20 flex items-center px-6 border-b border-slate-800">
-                <div class="w-10 h-10 mr-3 bg-white rounded-full flex items-center justify-center text-slate-800 font-bold text-lg flex-shrink-0">
-                    🎓
-                </div>
+                <img src="/images/logo.png" alt="Logo" class="w-10 h-10 mr-3 object-contain flex-shrink-0">
                 <div>
                     <h1 class="font-bold text-sm tracking-wide">Sistem Wisuda</h1>
                     <p class="text-xs text-slate-400">Admin Portal</p>
