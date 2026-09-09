@@ -13,14 +13,14 @@
                 <label for="code" class="block text-sm font-medium text-gray-700 mb-1">Kode</label>
                 <input type="text" id="code" name="code" value="<?= htmlspecialchars($faculty['code'] ?? '') ?>"
                     placeholder="Contoh: FSAD"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 uppercase placeholder:normal-case font-semibold">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light uppercase placeholder:normal-case font-semibold">
             </div>
 
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
                 <input type="text" id="name" name="name" value="<?= htmlspecialchars($faculty['name'] ?? '') ?>"
                     placeholder="Contoh: Fakultas Sains dan Analitika Data"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light">
             </div>
         </div>
 
@@ -30,7 +30,7 @@
                 <input type="color" x-model="hexColor"
                     class="h-9 w-10 p-0.5 border border-gray-300 rounded-lg cursor-pointer bg-white">
                 <input type="text" id="color" name="color" x-model="hexColor" placeholder="#ffffff"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light">
             </div>
         </div>
 
@@ -43,7 +43,7 @@
                 Batal
             </a>
             <button type="submit"
-                class="inline-flex items-center gap-1.5 px-6 py-2 bg-sky-500 hover:bg-sky-600 text-white font-medium text-sm rounded-lg shadow-sm transition-colors">
+                class="inline-flex items-center gap-1.5 px-6 py-2 bg-its-blue-light hover:bg-its-blue text-white font-medium text-sm rounded-lg shadow-sm transition-colors cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>

@@ -2,10 +2,10 @@
 
 <!-- Breadcrumb -->
 <nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
-    <a href="/graduation-events" class="hover:text-sky-600 transition-colors">Wisuda</a>
+    <a href="/graduation-events" class="hover:text-its-blue-light transition-colors">Wisuda</a>
     <span class="text-gray-300">/</span>
     <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? $eventId ?>"
-        class="hover:text-sky-600 transition-colors">
+        class="hover:text-its-blue-light transition-colors">
         <?= htmlspecialchars($event['name'] ?? 'Detail Event') ?>
     </a>
     <span class="text-gray-300">/</span>
@@ -26,20 +26,20 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
                 <input type="date" name="date" value="<?= htmlspecialchars($session['date'] ?? '') ?>"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light bg-white"
                     required>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Sesi Ke- (boleh kosong)</label>
                 <input type="number" name="session" value="<?= htmlspecialchars($session['session'] ?? '') ?>"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light">
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <select name="status"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light bg-white">
                     <option value="draft" <?= ($session['status'] ?? 'draft') == 'draft' ? 'selected' : '' ?>>Draft</option>
                     <option value="published" <?= ($session['status'] ?? 'draft') == 'published' ? 'selected' : '' ?>>Published</option>
                     <option value="archived" <?= ($session['status'] ?? 'draft') == 'archived' ? 'selected' : '' ?>>Archived</option>
@@ -65,7 +65,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>Batal</a>
             <button type="submit"
-                class="inline-flex items-center gap-1.5 px-6 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors shadow-sm"><svg
+                class="inline-flex items-center gap-1.5 px-6 py-2 bg-its-blue-light hover:bg-its-blue text-white rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer"><svg
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                     stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />

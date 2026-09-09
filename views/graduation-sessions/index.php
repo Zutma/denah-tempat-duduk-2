@@ -2,7 +2,7 @@
 
 <!-- Breadcrumb -->
 <nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
-    <a href="/graduation-events" class="hover:text-sky-600 transition-colors">Wisuda</a>
+    <a href="/graduation-events" class="hover:text-its-blue-light transition-colors">Wisuda</a>
     <span class="text-gray-300">/</span>
     <span class="text-gray-800 font-semibold"><?= htmlspecialchars($event['name']) ?></span>
 </nav>
@@ -13,7 +13,7 @@
         <p class="text-sm text-gray-500 mt-1">Daftar sesi pelaksanaan wisuda untuk event ini.</p>
     </div>
     <a href="/graduation-sessions/create?event_id=<?= $event['id'] ?>"
-        class="inline-flex items-center gap-2 px-4 py-2.5 bg-sky-500 text-white rounded-xl text-sm font-semibold hover:bg-sky-600 active:bg-sky-700 transition-all shadow-sm hover:shadow-md cursor-pointer whitespace-nowrap self-start sm:self-auto">
+        class="inline-flex items-center gap-2 px-4 py-2.5 bg-its-blue-light text-white rounded-xl text-sm font-semibold hover:bg-its-blue transition-all shadow-sm hover:shadow-md cursor-pointer whitespace-nowrap self-start sm:self-auto">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
             <path fill-rule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
         </svg>
@@ -36,7 +36,7 @@
 <!-- Floating Bulk Action Bar (Tanpa Menggeser Layout Tabel) -->
 <div id="bulkToolbar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white rounded-full shadow-2xl px-5 py-3 border border-slate-700 hidden items-center gap-4 z-50 transition-all transform duration-200">
     <div class="flex items-center gap-2 text-xs font-medium text-slate-300">
-        <span id="selectedCount" class="bg-sky-500 text-white px-2 py-0.5 rounded-full font-bold text-xs">0</span>
+        <span id="selectedCount" class="bg-its-blue-light text-white px-2 py-0.5 rounded-full font-bold text-xs">0</span>
         <span>item terpilih</span>
     </div>
     <div class="h-4 w-px bg-slate-700"></div>
@@ -61,10 +61,10 @@
                 </svg>
             </div>
             <input type="text" id="searchInput" placeholder="Cari tanggal atau status..."
-                class="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-800 placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all outline-none">
+                class="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-800 placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light transition-all outline-none">
         </div>
         <div class="flex items-center gap-2">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200/60">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-its-blue/5 text-its-blue border border-its-blue/15">
                 Total: <?= count($sessions ?? []) ?> Sesi
             </span>
         </div>
@@ -72,10 +72,10 @@
 
     <div class="overflow-x-auto">
         <table class="w-full text-sm text-left text-gray-900">
-            <thead class="bg-gray-50 border-b border-gray-200 text-gray-700 uppercase font-bold text-[11px] tracking-wider">
+            <thead class="bg-its-blue/5 border-b border-its-blue/10 text-its-blue uppercase font-bold text-[11px] tracking-wider">
                 <tr>
                     <th class="px-4 py-3 text-center w-10">
-                        <input type="checkbox" id="selectAll" class="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500 cursor-pointer">
+                        <input type="checkbox" id="selectAll" class="w-4 h-4 text-its-blue-light border-gray-300 rounded focus:ring-its-blue-light cursor-pointer">
                     </th>
                     <th class="px-6 py-3 text-left">Tanggal</th>
                     <th class="px-6 py-3 text-center">Sesi Ke-</th>
@@ -99,7 +99,7 @@
                         ?>
                         <tr class="hover:bg-gray-50/80 transition-colors">
                             <td class="px-4 py-4 text-center">
-                                <input type="checkbox" class="rowCheckbox w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500 cursor-pointer" value="<?= $session['id'] ?>">
+                                <input type="checkbox" class="rowCheckbox w-4 h-4 text-its-blue-light border-gray-300 rounded focus:ring-its-blue-light cursor-pointer" value="<?= $session['id'] ?>">
                             </td>
                             <td class="px-6 py-4 font-semibold text-gray-900">
                                 <?= date('d F Y', strtotime($session['date'])) ?>
@@ -114,7 +114,7 @@
                                 <a href="/seat-rows?session_id=<?= $session['id'] ?>" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200">🪑 Kursi</a>
                                 <a href="/graduates?session_id=<?= $session['id'] ?>" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200">🎓 Wisudawan</a>
                                 <a href="/graduation-sessions/edit?id=<?= $session['id'] ?>"
-                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-colors border border-sky-200/60">
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                     </svg>

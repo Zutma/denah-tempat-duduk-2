@@ -2,14 +2,14 @@
 
 <!-- Breadcrumb -->
 <nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
-    <a href="/graduation-events" class="hover:text-sky-600 transition-colors">Wisuda</a>
+    <a href="/graduation-events" class="hover:text-its-blue-light transition-colors">Wisuda</a>
     <span class="text-gray-300">/</span>
     <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>"
-        class="hover:text-sky-600 transition-colors">
+        class="hover:text-its-blue-light transition-colors">
         <?= htmlspecialchars($session['event_name'] ?? 'Detail Event') ?>
     </a>
     <span class="text-gray-300">/</span>
-    <a href="/graduates?session_id=<?= $sessionId ?>" class="hover:text-sky-600 transition-colors">Data Wisudawan</a>
+    <a href="/graduates?session_id=<?= $sessionId ?>" class="hover:text-its-blue-light transition-colors">Data Wisudawan</a>
     <span class="text-gray-300">/</span>
     <span class="text-gray-800 font-semibold">Tambah</span>
 </nav>
@@ -36,7 +36,7 @@
             <label for="nrp" class="block text-sm font-medium text-gray-700 mb-1">NRP</label>
             <input type="text" id="nrp" name="nrp" value="<?= htmlspecialchars($_POST['nrp'] ?? '') ?>"
                 placeholder="Contoh: 5025211001"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 outline-none"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light outline-none"
                 required>
         </div>
 
@@ -44,14 +44,14 @@
             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
             <input type="text" id="name" name="name" value="<?= htmlspecialchars($_POST['name'] ?? '') ?>"
                 placeholder="Nama: Malik Gntg"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 outline-none"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light outline-none"
                 required>
         </div>
 
         <div class="mb-4">
             <label for="faculty_id" class="block text-sm font-medium text-gray-700 mb-1">Fakultas</label>
             <select id="faculty_id" name="faculty_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 outline-none"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light outline-none"
                 required>
                 <option value="">-- Pilih Fakultas --</option>
                 <?php foreach ($faculties as $faculty): ?>
@@ -65,7 +65,7 @@
         <div class="mb-4">
             <label for="study_program_id" class="block text-sm font-medium text-gray-700 mb-1">Program Studi</label>
             <select id="study_program_id" name="study_program_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 outline-none"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light outline-none"
                 required>
                 <option value="">-- Pilih Prodi --</option>
                 <?php foreach ($studyPrograms as $sp): ?>
@@ -79,7 +79,7 @@
         <div class="mb-6">
             <label for="seat_id" class="block text-sm font-medium text-gray-700 mb-1">Kursi (Opsional)</label>
             <select id="seat_id" name="seat_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 outline-none">
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light outline-none">
                 <option value="">-- Belum Ditentukan --</option>
                 <?php foreach ($seats as $seat): ?>
                     <option value="<?= $seat['id'] ?>" <?= ($_POST['seat_id'] ?? '') == $seat['id'] ? 'selected' : '' ?>>
@@ -99,7 +99,7 @@
                 Batal
             </a>
             <button type="submit"
-                class="inline-flex items-center gap-1.5 px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors shadow-sm">
+                class="inline-flex items-center gap-1.5 px-4 py-2 bg-its-blue-light hover:bg-its-blue text-white rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                     stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />

@@ -2,9 +2,9 @@
 
 <!-- Breadcrumb -->
 <nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
-    <a href="/graduation-events" class="hover:text-sky-600 transition-colors">Wisuda</a>
+    <a href="/graduation-events" class="hover:text-its-blue-light transition-colors">Wisuda</a>
     <span class="text-gray-300">/</span>
-    <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>" class="hover:text-sky-600 transition-colors">
+    <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>" class="hover:text-its-blue-light transition-colors">
         <?= htmlspecialchars($session['event_name'] ?? 'Detail Event') ?>
     </a>
     <span class="text-gray-300">/</span>
@@ -43,7 +43,7 @@
         <h3 class="text-base font-bold text-gray-800">Buat Baris Kursi</h3>
 
         <button type="button" @click="addRow()"
-            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-sky-500 hover:bg-sky-600 rounded-xl shadow-sm transition-colors cursor-pointer">
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-its-blue-light hover:bg-its-blue rounded-xl shadow-sm transition-colors cursor-pointer">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -60,17 +60,17 @@
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
     </div>
     <input type="text" id="searchInput" placeholder="Cari baris atau kapasitas..."
-      class="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-800 placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all outline-none"/>
+      class="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-800 placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light transition-all outline-none"/>
   </div>
   <div class="flex items-center gap-2">
-    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200/60">
+    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-its-blue/5 text-its-blue border border-its-blue/15">
       Total: <?= count($seatRows ?? []) ?> Baris
     </span>
   </div>
 </div>
         <div class="overflow-x-auto mb-4 border border-gray-200 rounded-xl">
             <table class="w-full text-sm text-left border-collapse">
-                <thead class="bg-gray-50 text-gray-700 uppercase text-[11px] font-bold tracking-wider border-b border-gray-200">
+                <thead class="bg-its-blue/5 text-its-blue uppercase text-[11px] font-bold tracking-wider border-b border-its-blue/10">
                     <tr>
                         <th class="px-4 py-3 w-44">Baris</th>
                         <th class="px-4 py-3">Kapasitas Kiri</th>
@@ -83,7 +83,7 @@
                         <tr class="hover:bg-gray-50/50 transition-colors">
                             <td class="p-3">
                                 <select :name="`rows[${index}][row]`" x-model="item.row"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold text-gray-800 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold text-gray-800 focus:ring-2 focus:ring-its-blue-light outline-none transition-all"
                                     required>
                                     <option value="" disabled>Pilih Baris</option>
                                     <?php foreach ($allLetters as $letter): ?>
@@ -99,13 +99,13 @@
                             <td class="p-3">
                                 <input type="number" :name="`rows[${index}][left_capacity]`"
                                     x-model.number="item.left_capacity" placeholder="20" min="0" max="100"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-its-blue-light outline-none transition-all"
                                     required>
                             </td>
                             <td class="p-3">
                                 <input type="number" :name="`rows[${index}][right_capacity]`"
                                     x-model.number="item.right_capacity" placeholder="20" min="0" max="100"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-800 focus:ring-2 focus:ring-its-blue-light outline-none transition-all"
                                     required>
                             </td>
                             <td class="p-3 text-center whitespace-nowrap">
@@ -122,7 +122,7 @@
 
         <div class="flex justify-end pt-3 border-t border-gray-100">
             <button type="submit"
-                class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors cursor-pointer">
+                class="px-4 py-2 bg-its-blue-light hover:bg-its-blue text-white text-sm font-semibold rounded-lg shadow-sm transition-colors cursor-pointer">
                 Simpan Semua Baris
             </button>
         </div>
@@ -137,7 +137,7 @@
 
     <div class="overflow-x-auto">
         <table class="w-full text-sm text-left text-gray-900">
-            <thead class="bg-gray-50 border-b border-gray-200 text-gray-700 uppercase font-bold text-[11px] tracking-wider">
+            <thead class="bg-its-blue/5 border-b border-its-blue/10 text-its-blue uppercase font-bold text-[11px] tracking-wider">
                 <tr>
                     <th class="px-6 py-3 text-left">Baris</th>
                     <th class="px-6 py-3 text-center">Sisi</th>

@@ -2,9 +2,9 @@
 
 <!-- Breadcrumb -->
 <nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
-    <a href="/graduation-events" class="hover:text-sky-600 transition-colors">Wisuda</a>
+    <a href="/graduation-events" class="hover:text-its-blue-light transition-colors">Wisuda</a>
     <span class="text-gray-300">/</span>
-    <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>" class="hover:text-sky-600 transition-colors">
+    <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>" class="hover:text-its-blue-light transition-colors">
         <?= htmlspecialchars($session['event_name'] ?? 'Detail Event') ?>
     </a>
     <span class="text-gray-300">/</span>
@@ -20,7 +20,7 @@
     </div>
     <div class="flex items-center gap-2">
         <a href="/graduates/create?session_id=<?= $sessionId ?>"
-            class="inline-flex items-center gap-2 px-4 py-2.5 bg-sky-500 text-white rounded-xl text-sm font-semibold hover:bg-sky-600 active:bg-sky-700 transition-all shadow-sm hover:shadow-md cursor-pointer whitespace-nowrap">
+            class="inline-flex items-center gap-2 px-4 py-2.5 bg-its-blue-light text-white rounded-xl text-sm font-semibold hover:bg-its-blue transition-all shadow-sm hover:shadow-md cursor-pointer whitespace-nowrap">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
                 <path fill-rule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
             </svg>
@@ -143,7 +143,7 @@
 <!-- Floating Bulk Action Bar (Tanpa Menggeser Layout Tabel) -->
 <div id="bulkToolbar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white rounded-full shadow-2xl px-5 py-3 border border-slate-700 hidden items-center gap-4 z-50 transition-all transform duration-200">
     <div class="flex items-center gap-2 text-xs font-medium text-slate-300">
-        <span id="selectedCount" class="bg-sky-500 text-white px-2 py-0.5 rounded-full font-bold text-xs">0</span>
+        <span id="selectedCount" class="bg-its-blue-light text-white px-2 py-0.5 rounded-full font-bold text-xs">0</span>
         <span>item terpilih</span>
     </div>
     <div class="h-4 w-px bg-slate-700"></div>
@@ -168,10 +168,10 @@
                 </svg>
             </div>
             <input type="text" id="searchInput" placeholder="Cari NRP, Nama, Fakultas, Prodi..."
-                class="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-800 placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all outline-none">
+                class="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-800 placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light transition-all outline-none">
         </div>
         <div class="flex items-center gap-2">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200/60">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-its-blue/5 text-its-blue border border-its-blue/15">
                 Total: <?= count($graduates ?? []) ?> Wisudawan
             </span>
         </div>
@@ -179,10 +179,10 @@
 
     <div class="overflow-x-auto">
         <table class="w-full text-sm text-left text-gray-900">
-            <thead class="bg-gray-50 border-b border-gray-200 text-gray-700 uppercase font-bold text-[11px] tracking-wider">
+            <thead class="bg-its-blue/5 border-b border-its-blue/10 text-its-blue uppercase font-bold text-[11px] tracking-wider">
                 <tr>
                     <th class="px-4 py-3 text-center w-10">
-                        <input type="checkbox" id="selectAll" class="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500 cursor-pointer">
+                        <input type="checkbox" id="selectAll" class="w-4 h-4 text-its-blue-light border-gray-300 rounded focus:ring-its-blue-light cursor-pointer">
                     </th>
                     <th class="px-6 py-3 text-left">NRP</th>
                     <th class="px-6 py-3 text-left">Nama</th>
@@ -207,7 +207,7 @@
                     <?php foreach ($graduates as $g): ?>
                         <tr class="hover:bg-gray-50/80 transition-colors">
                             <td class="px-4 py-4 text-center">
-                                <input type="checkbox" class="rowCheckbox w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500 cursor-pointer" value="<?= $g['id'] ?>">
+                                <input type="checkbox" class="rowCheckbox w-4 h-4 text-its-blue-light border-gray-300 rounded focus:ring-its-blue-light cursor-pointer" value="<?= $g['id'] ?>">
                             </td>
                             <td class="px-6 py-4 font-mono text-xs font-bold text-slate-800"><?= htmlspecialchars($g['nrp']) ?></td>
                             <td class="px-6 py-4 font-semibold text-gray-900"><?= htmlspecialchars($g['name']) ?></td>
@@ -252,7 +252,7 @@
         <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center gap-1 flex-wrap">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                 <?php if ($i == $page): ?>
-                    <span class="px-3 py-1.5 text-xs font-bold bg-sky-500 text-white rounded-md"><?= $i ?></span>
+                    <span class="px-3 py-1.5 text-xs font-bold bg-its-blue-light text-white rounded-md"><?= $i ?></span>
                 <?php else: ?>
                     <a href="?session_id=<?= $sessionId ?>&page=<?= $i ?>"
                         class="px-3 py-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">

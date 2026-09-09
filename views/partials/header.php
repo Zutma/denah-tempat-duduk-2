@@ -43,7 +43,7 @@
         function navClass(string ...$prefixes): string {
             return isPathActive(...$prefixes)
                 ? 'font-semibold text-white bg-its-blue-light shadow-md'
-                : 'text-slate-300 hover:bg-slate-800';
+                : 'text-blue-100 hover:bg-its-blue-light/70';
         }
     ?>
     <aside class="w-64 bg-its-blue text-white flex flex-col justify-between hidden sm:flex flex-shrink-0">
@@ -51,7 +51,7 @@
             <div class="h-20 flex items-center px-6">
                 <img src="/images/logo.png" alt="Logo" class="w-10 h-10 mr-3 object-contain flex-shrink-0">
                 <div>
-                    <h1 class="font-bold text-sm tracking-wide">Sistem Wisuda</h1>
+                    <h1 class="font-bold text-sm tracking-wide">Denah Wisuda ITS</h1>
                     <p class="text-xs text-slate-400">Admin Portal</p>
                 </div>
             </div>

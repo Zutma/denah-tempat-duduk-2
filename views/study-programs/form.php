@@ -12,7 +12,7 @@
             <div>
                 <label for="faculty_id" class="block text-sm font-medium text-gray-700 mb-1">Fakultas</label>
                 <select id="faculty_id" name="faculty_id"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light bg-white">
                     <option value="">-- Pilih Fakultas --</option>
                     <?php foreach ($faculties as $faculty): ?>
                         <option value="<?= $faculty['id'] ?>"
@@ -27,7 +27,7 @@
                 <label for="degree_level" class="block text-sm font-medium text-gray-700 mb-1">Jenjang (S1/S2/S3/D4)</label>
                 <input type="text" id="degree_level" name="degree_level" value="<?= htmlspecialchars($studyProgram['degree_level'] ?? '') ?>"
                     placeholder="Contoh: S1"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 uppercase placeholder:normal-case">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light uppercase placeholder:normal-case">
             </div>
         </div>
 
@@ -35,7 +35,7 @@
             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Program Studi</label>
             <input type="text" id="name" name="name" value="<?= htmlspecialchars($studyProgram['name'] ?? '') ?>"
                 placeholder="Contoh: Informatika"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light">
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
@@ -47,7 +47,7 @@
                 Batal
             </a>
             <button type="submit"
-                class="inline-flex items-center gap-1.5 px-6 py-2 bg-sky-500 hover:bg-sky-600 text-white font-medium text-sm rounded-lg shadow-sm transition-colors">
+                class="inline-flex items-center gap-1.5 px-6 py-2 bg-its-blue-light hover:bg-its-blue text-white font-medium text-sm rounded-lg shadow-sm transition-colors cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
