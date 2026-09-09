@@ -1,6 +1,6 @@
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
-<h1 class="text-xl font-bold text-gray-800 mb-6"><?= !empty($event['id']) ? 'Edit Event Wisuda' : 'Tambah Periode' ?></h1>
+<h1 class="text-xl font-bold text-gray-800 mb-6"><?= !empty($event['id']) ? 'Edit Periode Wisuda' : 'Tambah Periode Wisuda' ?></h1>
 
 <div class="p-6 rounded-xl shadow-sm border border-gray-200 bg-white">
     <form method="POST" class="flex flex-col gap-4">
@@ -9,7 +9,7 @@
         <?php endif; ?>
 
         <div>
-            <label for="name" class="block text-sm font-medium text-gray-700 mb-1"><?= !empty($event['id']) ? 'Nama Event' : 'Periode Wisuda' ?></label>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-1"><?= !empty($event['id']) ? 'Nama Periode' : 'Periode Wisuda' ?></label>
             <input type="text" id="name" name="name" value="<?= htmlspecialchars($event['name'] ?? '') ?>"
                 placeholder="Contoh: Wisuda ke-133"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light">

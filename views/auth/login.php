@@ -54,7 +54,7 @@
 
                     <div class="flex items-center justify-end pt-1">
                         <button type="submit"
-                            class="px-6 py-2.5 bg-[#0f172a] hover:bg-slate-800 text-white font-semibold text-sm rounded-lg shadow-sm transition-colors">
+                            class="px-6 py-2.5 bg-[#127BBE] hover:bg-[#75BDE0] active:bg-[#233F7C] text-white font-semibold text-sm rounded-lg shadow-sm transition-colors">
                             Log In
                         </button>
                     </div>
