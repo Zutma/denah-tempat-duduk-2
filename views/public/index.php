@@ -71,6 +71,41 @@
             </div>
         <?php endif; ?>
 
+
+        <?php
+    $seatMapInfo = [];
+    $globalCounter = 1;
+    $rowLabels = [];
+    foreach ($leftRows as $lr) { $rowLabels[$lr['row']] = true; }
+    foreach ($rightRows as $rr) { $rowLabels[$rr['row']] = true; }
+    ksort($rowLabels);
+
+    $leftByRow = [];
+    foreach ($leftRows as $lr) { $leftByRow[$lr['row']] = $lr; }
+    $rightByRow = [];
+    foreach ($rightRows as $rr) { $rightByRow[$rr['row']] = $rr; }
+
+    foreach (array_keys($rowLabels) as $label) {
+        if (!empty($leftByRow[$label]['seats'])) {
+            foreach ($leftByRow[$label]['seats'] as $s) {
+                $num = $globalCounter++;
+                $seatMapInfo[$s['id']] = [
+                    'code' => $label . sprintf('%03d', $num),
+                    'num' => $num
+                ];
+            }
+        }
+        if (!empty($rightByRow[$label]['seats'])) {
+            foreach ($rightByRow[$label]['seats'] as $s) {
+                $num = $globalCounter++;
+                $seatMapInfo[$s['id']] = [
+                    'code' => $label . sprintf('%03d', $num),
+                    'num' => $num
+                ];
+            }
+        }
+    }
+?>
         <!-- SEARCH BAR & CARD HASIL PENCARIAN -->
         <?php if ($activeSession): ?>
             <div class="mb-8 max-w-lg mx-auto w-full">
@@ -97,7 +132,7 @@
                                 <?php
                                     $searchData = [
                                         'seat_id' => $result['seat_id'],
-                                        'seat_code' => $result['row'] ? $result['row'] . sprintf('%02d', $result['number']) : '-',
+                                        'seat_code' => isset($seatMapInfo[$result['seat_id']]) ? $seatMapInfo[$result['seat_id']]['code'] : '-',
                                         'name' => $result['name'],
                                         'nrp' => $result['nrp'],
                                         'prodi' => $result['prodi_name'] ?? '-'
@@ -114,7 +149,7 @@
                                     </div>
                                     <span
                                         class="px-2.5 py-1 bg-sky-100 text-sky-700 text-xs font-bold rounded-lg group-hover:bg-sky-500 group-hover:text-white transition-colors whitespace-nowrap">
-                                        <?= $result['row'] ? 'Kursi ' . $result['row'] . sprintf('%02d', $result['number']) : 'Belum ada kursi' ?>
+                                        <?= isset($seatMapInfo[$result['seat_id']]) ? 'Kursi ' . $seatMapInfo[$result['seat_id']]['code'] : 'Belum ada kursi' ?>
                                     </span>
                                 </button>
                             <?php endforeach; ?>
@@ -192,7 +227,7 @@
                                                     $graduateData = $hasGraduate
                                                         ? [
                                                             'seat_id' => $seat['id'],
-                                                            'seat_code' => $row['row'] . sprintf('%02d', $seat['number']),
+                                                            'seat_code' => $seatMapInfo[$seat['id']]['code'] ?? '-',
                                                             'name' => $seat['graduate_name'],
                                                             'nrp' => $seat['nrp'],
                                                             'prodi' => $seat['prodi_name'] ?? '-',
@@ -208,13 +243,25 @@
                                                         :class="{ 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> }"
                                                         class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
                                                         style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#e2e8f0' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>;">
-                                                        <?= htmlspecialchars($row['row']) ?><?= sprintf('%02d', $seat['number']) ?>
+                                                        <?= htmlspecialchars($seatMapInfo[$seat['id']]['code'] ?? '-') ?>
                                                     </button>
 
-                                                    <span
-                                                        class="text-[10px] mt-1.5 text-slate-700 font-medium truncate w-14 text-center">
-                                                        <?= $hasGraduate ? htmlspecialchars(explode(' ', trim($seat['graduate_name']))[0]) : '-' ?>
-                                                    </span>
+                                                    <?php if ($hasGraduate): ?>
+                                                        <?php
+                                                            $facCode = !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-');
+                                                            $prodiName = $seat['prodi_name'] ?? '-';
+                                                        ?>
+                                                        <div class="mt-1 flex flex-col items-center leading-tight w-14 md:w-16 cursor-default" title="<?= htmlspecialchars($facCode . ' - ' . $prodiName) ?>">
+                                                            <span class="text-[10px] font-bold text-slate-800 truncate w-full text-center">
+                                                                <?= htmlspecialchars($facCode) ?>
+                                                            </span>
+                                                            <span class="text-[9px] font-medium text-slate-500 truncate w-full text-center">
+                                                                <?= htmlspecialchars($prodiName) ?>
+                                                            </span>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <span class="text-[10px] mt-1 text-slate-400 font-medium text-center">-</span>
+                                                    <?php endif; ?>
                                                 </div>
                                             <?php endforeach; ?>
                                         </div>
@@ -252,7 +299,7 @@
                                                     $graduateData = $hasGraduate
                                                         ? [
                                                             'seat_id' => $seat['id'],
-                                                            'seat_code' => $row['row'] . sprintf('%02d', $seat['number']),
+                                                            'seat_code' => $seatMapInfo[$seat['id']]['code'] ?? '-',
                                                             'name' => $seat['graduate_name'],
                                                             'nrp' => $seat['nrp'],
                                                             'prodi' => $seat['prodi_name'] ?? '-',
@@ -268,13 +315,25 @@
                                                         :class="{ 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> }"
                                                         class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
                                                         style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#e2e8f0' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>;">
-                                                        <?= htmlspecialchars($row['row']) ?><?= sprintf('%02d', $seat['number']) ?>
+                                                        <?= htmlspecialchars($seatMapInfo[$seat['id']]['code'] ?? '-') ?>
                                                     </button>
 
-                                                    <span
-                                                        class="text-[10px] mt-1.5 text-slate-700 font-medium truncate w-14 text-center">
-                                                        <?= $hasGraduate ? htmlspecialchars(explode(' ', trim($seat['graduate_name']))[0]) : '-' ?>
-                                                    </span>
+                                                    <?php if ($hasGraduate): ?>
+                                                        <?php
+                                                            $facCode = !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-');
+                                                            $prodiName = $seat['prodi_name'] ?? '-';
+                                                        ?>
+                                                        <div class="mt-1 flex flex-col items-center leading-tight w-14 md:w-16 cursor-default" title="<?= htmlspecialchars($facCode . ' - ' . $prodiName) ?>">
+                                                            <span class="text-[10px] font-bold text-slate-800 truncate w-full text-center">
+                                                                <?= htmlspecialchars($facCode) ?>
+                                                            </span>
+                                                            <span class="text-[9px] font-medium text-slate-500 truncate w-full text-center">
+                                                                <?= htmlspecialchars($prodiName) ?>
+                                                            </span>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <span class="text-[10px] mt-1 text-slate-400 font-medium text-center">-</span>
+                                                    <?php endif; ?>
                                                 </div>
                                             <?php endforeach; ?>
                                         </div>
