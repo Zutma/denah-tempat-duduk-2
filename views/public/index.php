@@ -105,6 +105,15 @@
             }
         }
     }
+
+    if (!empty($searchQuery) && !empty($searchResults)) {
+        $searchResults = array_values(array_filter($searchResults, function($r) use ($searchQuery, $seatMapInfo) {
+            $code = isset($r['seat_id'], $seatMapInfo[$r['seat_id']]) ? $seatMapInfo[$r['seat_id']]['code'] : '';
+            return (stripos($r['name'], $searchQuery) !== false)
+                || (stripos($r['nrp'], $searchQuery) !== false)
+                || ($code !== '' && stripos($code, $searchQuery) !== false);
+        }));
+    }
 ?>
         <!-- SEARCH BAR & CARD HASIL PENCARIAN -->
         <?php if ($activeSession): ?>
