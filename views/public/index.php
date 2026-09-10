@@ -7,7 +7,7 @@
     <title>Denah Tempat Duduk Wisuda ITS - Interaktif</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -15,8 +15,7 @@
                 extend: {
                     fontFamily: {
                         sans: ['Work Sans', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
-                        friz: ['Friz Quadrata Std','serif']
+                        friz: ['Friz Quadrata Std', 'serif']
                     },
                     colors: {
                         'its-blue': '#233F7C',
@@ -42,14 +41,33 @@
             display: none !important;
         }
 
-        /* Key Graphic Pattern ITS (Background Garis Gerigi Menyudut Halus) */
-        .its-key-graphic-bg {
+        /* Set Body agar mendukung Pseudo-element */
+        body {
+            position: relative;
             background-color: #f8fafc;
-            background-image: repeating-linear-gradient(45deg, rgba(35, 63, 124, 0.035) 0, rgba(35, 63, 124, 0.035) 1px, transparent 1px, transparent 14px);
         }
 
-        .judul-its-wordmark {
-            font-family: 'Friz Quadrata Std','Playfair Display', serif;
+        /* Background Pattern Batik PNG */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('/images/Vector.svg'); 
+            background-repeat: repeat;
+            background-position: center top;
+            background-size: 380px auto;
+            opacity: 0.12; /* Opasitas 4% (pas & tidak pusing) */
+            pointer-events: none;
+            z-index: 1; /* Dinaikkan ke 1 agar tidak tertutup background body */
+        }
+
+        /* Pastikan Konten Utama Berada Di Atas Layer Pattern (z-index > 1) */
+        header, main, footer, div[x-data] {
+            position: relative;
+            z-index: 2;
         }
 
         /* Ring Highlight saat kursi dipilih */
@@ -101,120 +119,131 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #127BBE;
         }
-    </style>
+</style>
 </head>
 
 <body class="its-key-graphic-bg font-sans antialiased text-slate-800 min-h-screen w-full flex flex-col" x-data="seatMapApp()">
 
 <?php
     $seatMapInfo = [];
-    $globalCounter = 1;
-    $rowLabels = [];
-    foreach ($leftRows as $lr) { $rowLabels[$lr['row']] = true; }
-    foreach ($rightRows as $rr) { $rowLabels[$rr['row']] = true; }
-    ksort($rowLabels);
-
-    $leftByRow = [];
-    foreach ($leftRows as $lr) { $leftByRow[$lr['row']] = $lr; }
-    $rightByRow = [];
-    foreach ($rightRows as $rr) { $rightByRow[$rr['row']] = $rr; }
-
-    foreach (array_keys($rowLabels) as $label) {
-        if (!empty($leftByRow[$label]['seats'])) {
-            foreach ($leftByRow[$label]['seats'] as $s) {
-                $num = $globalCounter++;
-                $seatMapInfo[$s['id']] = [
-                    'code' => $label . sprintf('%03d', $num),
-                    'num' => $num
-                ];
-            }
-        }
-        if (!empty($rightByRow[$label]['seats'])) {
-            foreach ($rightByRow[$label]['seats'] as $s) {
-                $num = $globalCounter++;
-                $seatMapInfo[$s['id']] = [
-                    'code' => $label . sprintf('%03d', $num),
-                    'num' => $num
-                ];
-            }
-        }
-    }
-
     $allGraduatesList = [];
-    $collectGraduates = function($rows) use (&$allGraduatesList, $seatMapInfo) {
-        foreach ($rows as $r) {
-            if (!empty($r['seats'])) {
-                foreach ($r['seats'] as $s) {
-                    if (!empty($s['graduate_name'])) {
-                        $facCode = !empty($s['faculty_code']) ? $s['faculty_code'] : ($s['faculty_name'] ?? '-');
-                        $allGraduatesList[] = [
-                            'seat_id' => (int)$s['id'],
-                            'seat_code' => $seatMapInfo[$s['id']]['code'] ?? '-',
-                            'name' => $s['graduate_name'],
-                            'nrp' => $s['nrp'],
-                            'prodi' => $s['prodi_name'] ?? '-',
-                            'faculty' => $facCode,
-                            'faculty_name' => $s['faculty_name'] ?? '-',
-                            'color' => $s['faculty_color'] ?? '#cbd5e1'
-                        ];
-                    }
+    $leftRows = $leftRows ?? [];
+    $rightRows = $rightRows ?? [];
+
+    if (!empty($activeSession)) {
+        $globalCounter = 1;
+        $rowLabels = [];
+        foreach ($leftRows as $lr) { $rowLabels[$lr['row']] = true; }
+        foreach ($rightRows as $rr) { $rowLabels[$rr['row']] = true; }
+        ksort($rowLabels);
+
+        $leftByRow = [];
+        foreach ($leftRows as $lr) { $leftByRow[$lr['row']] = $lr; }
+        $rightByRow = [];
+        foreach ($rightRows as $rr) { $rightByRow[$rr['row']] = $rr; }
+
+        foreach (array_keys($rowLabels) as $label) {
+            if (!empty($leftByRow[$label]['seats'])) {
+                foreach ($leftByRow[$label]['seats'] as $s) {
+                    $num = $globalCounter++;
+                    $seatMapInfo[$s['id']] = [
+                        'code' => $label . sprintf('%03d', $num),
+                        'num' => $num
+                    ];
+                }
+            }
+            if (!empty($rightByRow[$label]['seats'])) {
+                foreach ($rightByRow[$label]['seats'] as $s) {
+                    $num = $globalCounter++;
+                    $seatMapInfo[$s['id']] = [
+                        'code' => $label . sprintf('%03d', $num),
+                        'num' => $num
+                    ];
                 }
             }
         }
-    };
-    $collectGraduates($leftRows);
-    $collectGraduates($rightRows);
+
+        $collectGraduates = function($rows) use (&$allGraduatesList, $seatMapInfo) {
+            foreach ($rows as $r) {
+                if (!empty($r['seats'])) {
+                    foreach ($r['seats'] as $s) {
+                        if (!empty($s['graduate_name'])) {
+                            $facCode = !empty($s['faculty_code']) ? $s['faculty_code'] : ($s['faculty_name'] ?? '-');
+                            $allGraduatesList[] = [
+                                'seat_id' => (int)$s['id'],
+                                'seat_code' => $seatMapInfo[$s['id']]['code'] ?? '-',
+                                'name' => $s['graduate_name'],
+                                'nrp' => $s['nrp'],
+                                'prodi' => $s['prodi_name'] ?? '-',
+                                'faculty' => $facCode,
+                                'faculty_name' => $s['faculty_name'] ?? '-',
+                                'color' => $s['faculty_color'] ?? '#cbd5e1'
+                            ];
+                        }
+                    }
+                }
+            }
+        };
+        $collectGraduates($leftRows);
+        $collectGraduates($rightRows);
+    }
 ?>
 
     <!-- TOOLBAR ATAS STICKY -->
     <header class="w-full bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
-        <div class="max-w-[98vw] mx-auto px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap md:flex-nowrap">
+        <div class="max-w-[98vw] mx-auto px-4 py-2.5 flex items-center justify-between gap-3 flex-nowrap">
             
             <!-- Left: Logo & Wordmark Title -->
             <div class="flex items-center gap-3 flex-shrink-0">
-                <img src="/images/logo.png" alt="ITS Logo" class="w-9 h-9 object-contain drop-shadow-xs">
-                <div class="h-8 w-px bg-slate-200"></div>
-                <div>
-                    <p class="font-friz text-[10px] font-extrabold uppercase tracking-widest text-its-blue-light leading-none">
-                        Sistem Informasi Wisuda
+                <img src="/images/logo.png" alt="ITS Logo" class="w-9 h-9 object-contain">
+                <div class="h-10 w-px bg-slate-300"></div>
+                <div class="flex flex-col justify-center leading-none">
+                    <p class="font-friz text-[11px] font-bold uppercase tracking-wider text-its-blue-light mb-1">
+                        SISTEM INFORMASI WISUDA
                     </p>
-                    <h1 class="font-friz text-base md:text-lg font-bold text-its-blue leading-tight tracking-tight">
-                        Denah Tempat Duduk
+                    <h1 class="font-friz text-base md:text-lg font-bold uppercase text-its-blue tracking-tight">
+                        DENAH TEMPAT DUDUK
                     </h1>
                 </div>
             </div>
 
             <!-- Middle-Left: Dropdown Sesi Wisuda -->
-            <?php if (!empty($publishedSessions)): ?>
-                <div class="flex-shrink-0">
-                    <form method="GET" id="sessionForm" class="m-0">
-                        <select name="session_id" id="session_id" onchange="document.getElementById('sessionForm').submit()"
-                            class="px-3.5 py-1.5 bg-slate-50 border border-slate-300 focus:border-its-blue-light focus:bg-white rounded-lg text-xs font-bold text-its-blue focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 transition-all cursor-pointer shadow-2xs">
-                            <option value="" <?= !$activeSession ? 'selected' : '' ?>>
-                                -- Pilih Acara Wisuda --
-                            </option>
+            <div class="flex-shrink-0 w-64 md:w-80">
+                <form method="GET" id="sessionForm" class="m-0">
+                    <select name="session_id" id="session_id" 
+                        onchange="if(this.value === '') { window.location.href = window.location.pathname; } else { document.getElementById('sessionForm').submit(); }"
+                        class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-300 focus:border-its-blue-light focus:bg-white rounded-lg text-xs font-bold text-its-blue focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 transition-all cursor-pointer shadow-2xs">
+                        
+                        <option value="" <?= empty($activeSession) ? 'selected' : '' ?>>
+                            -- Pilih Acara Wisuda --
+                        </option>
+
+                        <?php if (!empty($publishedSessions)): ?>
                             <?php foreach ($publishedSessions as $session): ?>
                                 <option value="<?= $session['id'] ?>"
-                                    <?= $activeSession && $activeSession['id'] == $session['id'] ? 'selected' : '' ?>>
+                                    <?= (!empty($activeSession) && $activeSession['id'] == $session['id']) ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($session['event_name'] ?? 'Event') ?> — Sesi <?= htmlspecialchars($session['session']) ?> (<?= date('d M Y', strtotime($session['date'])) ?>)
                                 </option>
                             <?php endforeach; ?>
-                        </select>
-                    </form>
+                        <?php endif; ?>
+                    </select>
+                </form>
+            </div>
+
+            <!-- Middle-Right: Live Search Input -->
+            <div class="relative flex-1 min-w-[200px] max-w-md">
+                <div class="relative flex items-center">
+                    <span class="absolute left-3 text-slate-400 text-xs">🔍</span>
+                    <input type="text" 
+                        x-model="searchQuery" 
+                        @input="searchedSeatIdClicked = null"
+                        <?= empty($activeSession) ? 'disabled' : '' ?>
+                        placeholder="<?= empty($activeSession) ? 'Pilih acara wisuda terlebih dahulu...' : 'Cari nama wisudawan, NRP, atau kode kursi...' ?>"
+                        class="w-full pl-8 pr-3 py-1.5 border border-slate-300 rounded-lg text-xs font-medium bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all shadow-2xs disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed">
                 </div>
-            <?php endif; ?>
 
-            <!-- Middle-Right: Live Search Input + Floating Card Dropdown -->
-            <?php if ($activeSession): ?>
-                <div class="relative flex-1 min-w-[220px] max-w-md">
-                    <div class="relative flex items-center">
-                        <span class="absolute left-3 text-slate-400 text-xs">🔍</span>
-                        <input type="text" x-model="searchQuery" @input="searchedSeatIdClicked = null"
-                            placeholder="Cari nama wisudawan, NRP, atau kode kursi..."
-                            class="w-full pl-8 pr-3 py-1.5 border border-slate-300 rounded-lg text-xs font-medium bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all shadow-2xs">
-                    </div>
-
-                    <!-- Card Hasil Pencarian Melayang Dropdown -->
+                <!-- Card Hasil Pencarian -->
+                <?php if (!empty($activeSession)): ?>
                     <div x-show="searchQuery.trim() !== ''" x-cloak 
                          class="absolute top-full left-0 right-0 mt-2 bg-white border border-its-blue-sky/40 rounded-xl shadow-xl z-50 p-2.5 text-left max-h-72 overflow-y-auto custom-scrollbar divide-y divide-slate-100">
                         
@@ -249,42 +278,40 @@
                             </div>
                         </template>
                     </div>
-                </div>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
 
             <!-- Right: Zoom Controls -->
-            <?php if ($activeSession): ?>
-                <div class="flex items-center gap-1 flex-shrink-0 bg-slate-100/90 p-1 rounded-lg border border-slate-200 text-xs shadow-2xs">
-                    <button type="button" 
-                        onmousedown="window.startZoomHold(-0.05)" 
-                        onmouseup="window.stopZoomHold()" 
-                        onmouseleave="window.stopZoomHold()"
-                        ontouchstart="window.startZoomHold(-0.05)" 
-                        ontouchend="window.stopZoomHold()"
-                        class="px-2.5 py-1 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-extrabold text-slate-700 transition cursor-pointer select-none" title="Tahan untuk Zoom Out">-</button>
-                    
-                    <span id="zoomIndicator" class="w-12 text-center font-extrabold text-its-blue">100%</span>
-                    
-                    <button type="button" 
-                        onmousedown="window.startZoomHold(0.05)" 
-                        onmouseup="window.stopZoomHold()" 
-                        onmouseleave="window.stopZoomHold()"
-                        ontouchstart="window.startZoomHold(0.05)" 
-                        ontouchend="window.stopZoomHold()"
-                        class="px-2.5 py-1 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-extrabold text-slate-700 transition cursor-pointer select-none" title="Tahan untuk Zoom In">+</button>
-                    
-                    <button type="button" onclick="window.resetZoom()" class="px-2 py-1 text-its-blue-light font-extrabold hover:text-its-blue hover:underline transition cursor-pointer ml-0.5">Reset</button>
-                </div>
-            <?php endif; ?>
+            <div class="flex items-center gap-1 flex-shrink-0 bg-slate-100/90 p-1 rounded-lg border border-slate-200 text-xs shadow-2xs <?= empty($activeSession) ? 'opacity-50 pointer-events-none select-none' : '' ?>">
+                <button type="button" 
+                    onmousedown="window.startZoomHold(-0.05)" 
+                    onmouseup="window.stopZoomHold()" 
+                    onmouseleave="window.stopZoomHold()"
+                    ontouchstart="window.startZoomHold(-0.05)" 
+                    ontouchend="window.stopZoomHold()"
+                    class="px-2.5 py-1 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-extrabold text-slate-700 transition cursor-pointer select-none" title="Tahan untuk Zoom Out">-</button>
+                
+                <span id="zoomIndicator" class="w-12 text-center font-extrabold text-its-blue">100%</span>
+                
+                <button type="button" 
+                    onmousedown="window.startZoomHold(0.05)" 
+                    onmouseup="window.stopZoomHold()" 
+                    onmouseleave="window.stopZoomHold()"
+                    ontouchstart="window.startZoomHold(0.05)" 
+                    ontouchend="window.stopZoomHold()"
+                    class="px-2.5 py-1 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-extrabold text-slate-700 transition cursor-pointer select-none" title="Tahan untuk Zoom In">+</button>
+                
+                <button type="button" onclick="window.resetZoom()" class="px-2 py-1 text-its-blue-light font-extrabold hover:text-its-blue hover:underline transition cursor-pointer ml-0.5">Reset</button>
+            </div>
 
         </div>
     </header>
 
     <!-- AREA KONTEN UTAMA HALAMAN DENAH -->
-    <main class="w-full flex-grow px-3 md:px-6 py-4 flex flex-col items-center">
+    <main class="w-full flex-grow px-3 md:px-6 pt-4 pb-8 flex flex-col items-center justify-start">
 
-        <!-- Tampilan Jika Sesi Kosong / Belum Ada Event -->
-        <?php if (!$activeSession || isset($message)): ?>
+        <!-- Tampilan Jika Sesi Kosong / Belum Ada Event Dipilih -->
+        <?php if (empty($activeSession) || isset($message)): ?>
             <div class="bg-white/95 backdrop-blur-md border border-its-blue-sky/40 text-slate-700 p-8 rounded-3xl max-w-md mx-auto my-auto text-center shadow-xl relative overflow-hidden">
                 <div class="relative w-28 h-28 mx-auto mb-5 flex items-center justify-center bg-its-blue/5 rounded-full border border-its-blue-sky/30 shadow-inner">
                     <img src="/images/logo.png" alt="ITS Logo" class="w-16 h-16 object-contain drop-shadow-md">
@@ -296,17 +323,15 @@
             </div>
         <?php else: ?>
             <!-- PANGGUNG UTAMA -->
-            <div class="bg-its-blue text-white font-bold tracking-widest py-3 px-4 rounded-xl mb-6 shadow-md w-full max-w-[98vw] mx-auto text-xs md:text-sm text-center border-b-4 border-its-yellow">
+            <div class="bg-its-blue text-white font-bold tracking-widest py-3 px-4 rounded-xl mb-4 shadow-md w-full max-w-[98vw] mx-auto text-xs md:text-sm text-center border-b-4 border-its-yellow flex-shrink-0">
                 PANGGUNG UTAMA / REKTORAT
             </div>
 
             <!-- CONTAINER UTAMA DENAH -->
             <div class="w-full max-w-[98vw] mx-auto relative flex-grow flex flex-col items-center overflow-hidden">
                 
-                <!-- AREA SCROLL HORIZONTAL YANG BERSIH -->
                 <div id="denahContainer" class="w-full overflow-auto pb-8 pt-2 cursor-grab active:cursor-grabbing custom-scrollbar">
                     
-                    <!-- WRAPPER UTAMA -->
                     <div id="zoomWrapper" class="inline-block relative transition-all duration-75">
                         
                         <div id="zoomContent" class="flex flex-nowrap p-4 gap-6 md:gap-10 transition-transform duration-75 origin-top-left">
@@ -556,9 +581,6 @@
             }
         }
 
-        // ==========================================
-        // AUTO-CENTER LORONG & ZOOM SCALING PRESISI
-        // ==========================================
         document.addEventListener("DOMContentLoaded", function() {
             const container = document.getElementById('denahContainer');
             const lorong = document.getElementById('lorongTengah');

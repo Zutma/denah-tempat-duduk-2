@@ -12,43 +12,50 @@ class PublicController extends BaseController {
         $searchResults = [];
         $message = null;
 
-        if (isset($_GET['session_id']) && $_GET['session_id'] !== '') {
-            $activeSession = PublicSeat::getPublishedSessionById($conn, $_GET['session_id']);
+        // Cek apakah parameter session_id ada di URL
+        if (array_key_exists('session_id', $_GET)) {
+            $sessionId = trim($_GET['session_id']);
 
-            if ($activeSession) {
-                $leftRows = PublicSeat::getSeatRowsWithSeats($conn, $activeSession['id'], 'left');
-                $rightRows = PublicSeat::getSeatRowsWithSeats($conn, $activeSession['id'], 'right');
-
-                if ($searchQuery !== '') {
-                    $searchResults = PublicSeat::searchGraduates($conn, $activeSession['id'], $searchQuery);
-                }
+            // Jika user memilih opsi kosongan (?session_id=)
+            if ($sessionId === '') {
+                $activeSession = null;
+                $message = "Silakan pilih acara wisuda pada dropdown di atas untuk melihat denah tempat duduk.";
             } else {
-                $message = "Sesi tidak ditemukan atau belum dipublikasikan.";
-            }
-        } elseif (!empty($publishedSessions)) {
-            // Otomatis aktifkan sesi terpublikasi pertama jika user belum memilih di URL
-            $activeSession = $publishedSessions[0];
-            $leftRows = PublicSeat::getSeatRowsWithSeats($conn, $activeSession['id'], 'left');
-            $rightRows = PublicSeat::getSeatRowsWithSeats($conn, $activeSession['id'], 'right');
+                // Jika user memilih ID sesi spesifik
+                $activeSession = PublicSeat::getPublishedSessionById($conn, $sessionId);
 
-            if ($searchQuery !== '') {
-                $searchResults = PublicSeat::searchGraduates($conn, $activeSession['id'], $searchQuery);
+                if ($activeSession) {
+                    $leftRows = PublicSeat::getSeatRowsWithSeats($conn, $activeSession['id'], 'left');
+                    $rightRows = PublicSeat::getSeatRowsWithSeats($conn, $activeSession['id'], 'right');
+
+                    if ($searchQuery !== '') {
+                        $searchResults = PublicSeat::searchGraduates($conn, $activeSession['id'], $searchQuery);
+                    }
+                } else {
+                    $message = "Sesi tidak ditemukan atau belum dipublikasikan.";
+                }
             }
         } else {
-            $message = "Belum ada data sesi wisuda yang tersedia.";
+            // Pertama kali buka halaman tanpa parameter URL sama sekali (denah-duduk.test/)
+            // Jika ingin default-nya KOSONG, biarkan $activeSession = null
+            $activeSession = null;
+            
+            if (empty($publishedSessions)) {
+                $message = "Belum ada data sesi wisuda yang tersedia.";
+            }
         }
 
         $pageTitle = 'Denah Kursi Wisuda';
 
         $this->render('public/index', [
             'publishedSessions' => $publishedSessions,
-            'activeSession' => $activeSession,
-            'leftRows' => $leftRows,
-            'rightRows' => $rightRows,
-            'searchQuery' => $searchQuery,
-            'searchResults' => $searchResults,
-            'message' => $message,
-            'pageTitle' => $pageTitle
+            'activeSession'     => $activeSession,
+            'leftRows'          => $leftRows,
+            'rightRows'         => $rightRows,
+            'searchQuery'       => $searchQuery,
+            'searchResults'     => $searchResults,
+            'message'           => $message,
+            'pageTitle'         => $pageTitle
         ]);
     }
 }
