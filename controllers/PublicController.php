@@ -25,7 +25,16 @@ class PublicController extends BaseController {
             } else {
                 $message = "Sesi tidak ditemukan atau belum dipublikasikan.";
             }
-        } elseif (empty($publishedSessions)) {
+        } elseif (!empty($publishedSessions)) {
+            // Otomatis aktifkan sesi terpublikasi pertama jika user belum memilih di URL
+            $activeSession = $publishedSessions[0];
+            $leftRows = PublicSeat::getSeatRowsWithSeats($conn, $activeSession['id'], 'left');
+            $rightRows = PublicSeat::getSeatRowsWithSeats($conn, $activeSession['id'], 'right');
+
+            if ($searchQuery !== '') {
+                $searchResults = PublicSeat::searchGraduates($conn, $activeSession['id'], $searchQuery);
+            }
+        } else {
             $message = "Belum ada data sesi wisuda yang tersedia.";
         }
 

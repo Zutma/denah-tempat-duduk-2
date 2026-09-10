@@ -4,42 +4,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Denah Kursi Wisuda - Interaktif</title>
+    <title>Denah Kursi Wisuda ITS - Interaktif</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Work Sans', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        'its-blue': '#233F7C',
+                        'its-blue-light': '#127BBE',
+                        'its-blue-sky': '#75BDE0',
+                        'its-yellow': '#FDBB16',
+                    },
+                },
+            },
+        }
+    </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         [x-cloak] {
             display: none !important;
         }
 
+        /* Key Graphic Pattern ITS (Background Garis Gerigi Menyudut Halus) */
+        .its-key-graphic-bg {
+            background-color: #f4f6f9;
+            background-image: repeating-linear-gradient(45deg, rgba(35, 63, 124, 0.04) 0, rgba(35, 63, 124, 0.04) 1px, transparent 1px, transparent 14px);
+        }
+
+        .judul-its-wordmark {
+            font-family: 'Playfair Display', serif;
+        }
+
         /* Ring Highlight saat kursi dipilih */
         .selected-seat-ring {
-            outline: 4px solid #0284c7;
-            outline-offset: 2px;
-            transform: scale(1.1);
+            box-shadow: 0 0 0 3px #127BBE, 0 4px 14px rgba(18, 123, 190, 0.4);
+            transform: scale(1.04);
+            position: relative;
+            z-index: 20 !important;
         }
 
         /* Pulse & Glow Animation saat hasil pencarian */
         @keyframes seatPulse {
             0% {
-                box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.8), 0 0 15px rgba(2, 132, 199, 0.6);
-                transform: scale(1.12);
+                box-shadow: 0 0 0 3px #127BBE, 0 0 8px rgba(18, 123, 190, 0.5);
+                transform: scale(1.03);
             }
             50% {
-                box-shadow: 0 0 0 14px rgba(2, 132, 199, 0), 0 0 25px rgba(2, 132, 199, 0.9);
-                transform: scale(1.22);
+                box-shadow: 0 0 0 4px #127BBE, 0 0 18px rgba(18, 123, 190, 0.85);
+                transform: scale(1.07);
             }
             100% {
-                box-shadow: 0 0 0 0 rgba(2, 132, 199, 0), 0 0 15px rgba(2, 132, 199, 0.6);
-                transform: scale(1.12);
+                box-shadow: 0 0 0 3px #127BBE, 0 0 8px rgba(18, 123, 190, 0.5);
+                transform: scale(1.03);
             }
         }
 
         .search-highlight-seat {
             animation: seatPulse 1.4s infinite ease-in-out;
+            position: relative;
             z-index: 25 !important;
-            outline: 4px solid #0284c7 !important;
-            outline-offset: 3px;
         }
 
         /* Custom Scrollbar Tipis */
@@ -60,41 +91,9 @@
     </style>
 </head>
 
-<body class="bg-slate-50 font-sans min-h-screen w-full flex flex-col items-center py-8" x-data="seatMapApp()">
+<body class="its-key-graphic-bg font-sans min-h-screen w-full flex flex-col" x-data="seatMapApp()">
 
-    <div class="w-full px-4 md:px-8 text-center flex-grow flex flex-col">
-
-        <!-- Header Title -->
-        <h1 class="text-xl md:text-2xl font-bold text-slate-800 mb-6">
-            <?php if ($activeSession): ?>
-                <?= htmlspecialchars($activeSession['event_name']) ?> - Sesi <?= htmlspecialchars($activeSession['session']) ?>
-            <?php else: ?>
-                Denah Wisuda
-            <?php endif; ?>
-        </h1>
-
-        <!-- Dropdown Pilihan Sesi / Event Wisuda -->
-        <?php if (!empty($publishedSessions)): ?>
-            <div class="mb-6 max-w-md mx-auto w-full">
-                <form method="GET" id="sessionForm">
-                    <select name="session_id" id="session_id" onchange="document.getElementById('sessionForm').submit()"
-                        class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl shadow-sm text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                        <option value="" <?= !$activeSession ? 'selected' : '' ?>>
-                            -- Pilih Acara Wisuda --
-                        </option>
-                        <?php foreach ($publishedSessions as $session): ?>
-                            <option value="<?= $session['id'] ?>"
-                                <?= $activeSession && $activeSession['id'] == $session['id'] ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($session['event_name'] ?? 'Event') ?> — Sesi <?= htmlspecialchars($session['session']) ?>
-                                (<?= date('d M Y', strtotime($session['date'])) ?>)
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </form>
-            </div>
-        <?php endif; ?>
-
-        <?php
+<?php
     $seatMapInfo = [];
     $globalCounter = 1;
     $rowLabels = [];
@@ -154,119 +153,158 @@
     $collectGraduates($rightRows);
 ?>
 
-        <!-- SEARCH BAR & CARD HASIL PENCARIAN (LIVE INSTANT SEARCH) -->
-        <?php if ($activeSession): ?>
-            <div class="mb-8 max-w-lg mx-auto w-full">
-                <div class="relative">
-                    <input type="text" x-model="searchQuery" @input="searchedSeatIdClicked = null"
-                        placeholder="🔍 Ketik Nama, NRP, atau No. Kursi..."
-                        class="w-full px-5 py-3 border border-slate-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm text-center font-medium bg-white">
-                </div>
-
-                <div x-show="searchQuery.trim() !== ''" x-cloak class="mt-3">
-                    <div class="flex items-center justify-between text-xs text-slate-500 px-3">
-                        <span>Ditemukan <strong class="text-slate-800" x-text="filteredGraduates.length"></strong> hasil
-                            untuk "<strong x-text="searchQuery"></strong>"</span>
-                        <button type="button" @click="clearSelection()" class="text-sky-600 font-semibold hover:underline cursor-pointer">Reset</button>
-                    </div>
-
-                    <!-- Card List Hasil Pencarian Live -->
-                    <template x-if="filteredGraduates.length > 0">
-                        <div class="mt-3 bg-white border border-slate-200 rounded-2xl shadow-sm p-2 text-left max-h-56 overflow-y-auto custom-scrollbar divide-y divide-slate-100">
-                            <template x-for="g in filteredGraduates" :key="g.seat_id">
-                                <button type="button"
-                                    @click="focusSeat(g.seat_id, g)"
-                                    class="w-full p-2.5 hover:bg-sky-50/80 rounded-xl transition-colors flex items-center justify-between group cursor-pointer focus:outline-none">
-                                    <div>
-                                        <p class="text-xs font-bold text-slate-800 group-hover:text-sky-700" x-text="g.name"></p>
-                                        <p class="text-[11px] text-slate-500">
-                                            NRP: <span x-text="g.nrp"></span> • <span x-text="g.faculty"></span> • <span x-text="g.prodi"></span>
-                                        </p>
-                                    </div>
-                                    <span class="px-2.5 py-1 bg-sky-100 text-sky-700 text-xs font-bold rounded-lg group-hover:bg-sky-500 group-hover:text-white transition-colors whitespace-nowrap"
-                                          x-text="'Kursi ' + g.seat_code">
-                                    </span>
-                                </button>
-                            </template>
-                        </div>
-                    </template>
-
-                    <template x-if="filteredGraduates.length === 0">
-                        <div class="mt-3 bg-white border border-slate-200 rounded-2xl shadow-sm p-4 text-center text-xs text-slate-500">
-                            Tidak ada wisudawan atau kursi yang cocok dengan "<span x-text="searchQuery" class="font-bold"></span>".
-                        </div>
-                    </template>
+    <!-- TOOLBAR ATAS -->
+    <header class="w-full bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap md:flex-nowrap">
+            
+            <!-- Left: Logo & Wordmark Title -->
+            <div class="flex items-center gap-2.5 flex-shrink-0">
+                <img src="/images/logo.png" alt="ITS Logo" class="w-8 h-8 object-contain">
+                <div class="h-7 w-px bg-its-blue-light/30"></div>
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-its-blue-light leading-none">Sistem Informasi</p>
+                    <h1 class="judul-its-wordmark text-sm md:text-base font-bold text-its-blue leading-tight">Denah Wisuda</h1>
                 </div>
             </div>
-        <?php endif; ?>
+
+            <!-- Middle-Left: Dropdown Sesi Wisuda -->
+            <?php if (!empty($publishedSessions)): ?>
+                <div class="flex-shrink-0">
+                    <form method="GET" id="sessionForm" class="m-0">
+                        <select name="session_id" id="session_id" onchange="document.getElementById('sessionForm').submit()"
+                            class="px-3 py-1.5 bg-slate-50 border border-slate-300 focus:border-its-blue-sky rounded-lg text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-its-blue-light transition-all cursor-pointer">
+                            <option value="" <?= !$activeSession ? 'selected' : '' ?>>
+                                -- Pilih Acara Wisuda --
+                            </option>
+                            <?php foreach ($publishedSessions as $session): ?>
+                                <option value="<?= $session['id'] ?>"
+                                    <?= $activeSession && $activeSession['id'] == $session['id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($session['event_name'] ?? 'Event') ?> — Sesi <?= htmlspecialchars($session['session']) ?> (<?= date('d M Y', strtotime($session['date'])) ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+                </div>
+            <?php endif; ?>
+
+            <!-- Middle-Right: Live Search Input + Floating Card Dropdown -->
+            <?php if ($activeSession): ?>
+                <div class="relative flex-1 min-w-[200px] max-w-md">
+                    <input type="text" x-model="searchQuery" @input="searchedSeatIdClicked = null"
+                        placeholder="🔍 Cari nama, NRP, atau kursi..."
+                        class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-medium bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light transition-all">
+
+                    <!-- Card Hasil Pencarian Melayang Dropdown -->
+                    <div x-show="searchQuery.trim() !== ''" x-cloak 
+                         class="absolute top-full left-0 right-0 mt-1.5 bg-white border border-its-blue-sky/60 rounded-xl shadow-xl z-50 p-2 text-left max-h-64 overflow-y-auto custom-scrollbar divide-y divide-slate-100">
+                        
+                        <div class="flex items-center justify-between text-[11px] text-slate-500 px-2 pb-1.5">
+                            <span>Ditemukan <strong class="text-its-blue" x-text="filteredGraduates.length"></strong> hasil</span>
+                            <button type="button" @click="clearSelection()" class="text-its-blue-light font-semibold hover:underline cursor-pointer">Reset</button>
+                        </div>
+
+                        <template x-if="filteredGraduates.length > 0">
+                            <div class="divide-y divide-slate-100">
+                                <template x-for="g in filteredGraduates" :key="g.seat_id">
+                                    <button type="button"
+                                        @click="focusSeat(g.seat_id, g)"
+                                        class="w-full p-2 hover:bg-its-blue/5 rounded-lg transition-colors flex items-center justify-between group cursor-pointer focus:outline-none text-left">
+                                        <div class="pr-2">
+                                            <p class="text-xs font-bold text-slate-800 group-hover:text-its-blue-light" x-text="g.name"></p>
+                                            <p class="text-[10px] text-slate-500">
+                                                NRP: <span x-text="g.nrp"></span> • <span x-text="g.faculty"></span> • <span x-text="g.prodi"></span>
+                                            </p>
+                                        </div>
+                                        <span class="px-2 py-0.5 bg-its-blue/10 text-its-blue border border-its-blue-sky/50 text-[11px] font-bold rounded group-hover:bg-its-blue-light group-hover:text-white transition-colors whitespace-nowrap"
+                                              x-text="'Kursi ' + g.seat_code">
+                                        </span>
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
+
+                        <template x-if="filteredGraduates.length === 0">
+                            <div class="p-3 text-center text-xs text-slate-500">
+                                Tidak ada hasil untuk "<span x-text="searchQuery" class="font-bold"></span>".
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Right: Zoom Controls -->
+            <?php if ($activeSession): ?>
+                <div class="flex items-center gap-1 flex-shrink-0 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs">
+                    <button type="button" 
+                        onmousedown="window.startZoomHold(-0.05)" 
+                        onmouseup="window.stopZoomHold()" 
+                        onmouseleave="window.stopZoomHold()"
+                        ontouchstart="window.startZoomHold(-0.05)" 
+                        ontouchend="window.stopZoomHold()"
+                        class="px-2 py-1 bg-white hover:bg-slate-200 border border-slate-200 rounded font-bold text-slate-700 transition cursor-pointer select-none" title="Tahan untuk Zoom Out">-</button>
+                    
+                    <span id="zoomIndicator" class="w-11 text-center font-bold text-slate-600">100%</span>
+                    
+                    <button type="button" 
+                        onmousedown="window.startZoomHold(0.05)" 
+                        onmouseup="window.stopZoomHold()" 
+                        onmouseleave="window.stopZoomHold()"
+                        ontouchstart="window.startZoomHold(0.05)" 
+                        ontouchend="window.stopZoomHold()"
+                        class="px-2 py-1 bg-white hover:bg-slate-200 border border-slate-200 rounded font-bold text-slate-700 transition cursor-pointer select-none" title="Tahan untuk Zoom In">+</button>
+                    
+                    <button type="button" onclick="window.resetZoom()" class="px-2 py-1 text-its-blue-light font-semibold hover:underline transition cursor-pointer ml-0.5">Reset</button>
+                </div>
+            <?php endif; ?>
+
+        </div>
+    </header>
+
+    <!-- AREA KONTEN UTAMA HALAMAN DENAH -->
+    <main class="w-full flex-grow px-4 md:px-6 py-4 flex flex-col items-center">
 
         <!-- Tampilan Jika Sesi Kosong / Belum Ada Event -->
         <?php if (!$activeSession || isset($message)): ?>
-            <div
-                class="bg-amber-50 border border-amber-200 text-amber-800 px-6 py-4 rounded-xl max-w-md mx-auto my-12 text-sm">
-                <?= htmlspecialchars($message ?? 'Belum ada data sesi wisuda yang tersedia.') ?>
+            <div class="bg-white/90 backdrop-blur-sm border-2 border-its-blue-sky/40 text-slate-700 p-8 rounded-3xl max-w-md mx-auto my-auto text-center shadow-lg">
+                <div class="relative w-32 h-32 mx-auto mb-4 flex items-center justify-center bg-its-blue/5 rounded-full border border-its-blue-sky/30">
+                    <img src="/images/logo.png" alt="SENO Mascot" class="w-20 h-20 object-contain drop-shadow-md">
+                </div>
+                <h3 class="font-bold text-its-blue text-lg mb-1">Acara Wisuda Belum Dipilih</h3>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    <?= htmlspecialchars($message ?? 'Pilih acara wisuda pada dropdown toolbar di atas untuk melihat denah interaktif tempat duduk.') ?>
+                </p>
             </div>
         <?php else: ?>
             <!-- PANGGUNG UTAMA -->
-            <div
-                class="bg-slate-800 text-white font-bold tracking-widest py-4 rounded-lg mb-6 shadow-md w-full max-w-6xl mx-auto text-xs md:text-sm">
+            <div class="bg-its-blue text-white font-bold tracking-widest py-3 px-4 rounded-xl mb-6 shadow-md w-full max-w-[98vw] mx-auto text-xs md:text-sm text-center border-b-4 border-its-yellow">
                 PANGGUNG UTAMA / REKTORAT
             </div>
 
             <!-- CONTAINER UTAMA DENAH -->
-            <div class="w-full max-w-6xl mx-auto relative">
+            <div class="w-full max-w-[98vw] mx-auto relative flex-grow flex flex-col items-center overflow-hidden">
                 
-                <!-- TOMBOL KONTROL ZOOM (HOLD TO ZOOM & RESET) -->
-                <div class="flex justify-end mb-3">
-                    <div class="inline-flex items-center bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden select-none">
-                        <button type="button" 
-                            onmousedown="window.startZoomHold(-0.05)" 
-                            onmouseup="window.stopZoomHold()" 
-                            onmouseleave="window.stopZoomHold()"
-                            ontouchstart="window.startZoomHold(-0.05)" 
-                            ontouchend="window.stopZoomHold()"
-                            class="px-3.5 py-1.5 text-slate-700 hover:bg-slate-100 font-bold text-sm transition focus:outline-none" title="Tahan untuk Zoom Out">-</button>
-                        
-                        <span id="zoomIndicator" class="px-3 py-1.5 text-xs font-bold text-slate-600 border-x border-slate-200 min-w-[50px] text-center">100%</span>
-                        
-                        <button type="button" 
-                            onmousedown="window.startZoomHold(0.05)" 
-                            onmouseup="window.stopZoomHold()" 
-                            onmouseleave="window.stopZoomHold()"
-                            ontouchstart="window.startZoomHold(0.05)" 
-                            ontouchend="window.stopZoomHold()"
-                            class="px-3.5 py-1.5 text-slate-700 hover:bg-slate-100 font-bold text-sm transition focus:outline-none" title="Tahan untuk Zoom In">+</button>
-                        
-                        <button type="button" onclick="window.resetZoom()" class="px-3.5 py-1.5 text-xs font-semibold text-sky-600 hover:bg-sky-50 border-l border-slate-200 transition focus:outline-none">Reset</button>
-                    </div>
-                </div>
-
-                <!-- AREA SCROLL HORIZONTAL -->
-                <div id="denahContainer"
-                    class="w-full overflow-x-auto pb-16 pt-2 cursor-grab active:cursor-grabbing scroll-smooth custom-scrollbar">
+                <!-- AREA SCROLL HORIZONTAL YANG BERSIH -->
+                <div id="denahContainer" class="w-full overflow-auto pb-8 pt-2 cursor-grab active:cursor-grabbing custom-scrollbar">
                     
-                    <!-- KONTEN KURSI (URUTAN: SAYAP KIRI -> LORONG -> SAYAP KANAN) -->
-                    <div id="zoomContent" class="flex flex-nowrap justify-center mx-auto min-w-max px-4 gap-6 md:gap-10 transition-transform duration-75 origin-top">
+                    <!-- WRAPPER UTAMA: Hapus mx-auto & justify-center agar tidak memicu ghost whitespace -->
+                    <div id="zoomWrapper" class="inline-block relative transition-all duration-75">
+                        
+                        <div id="zoomContent" class="flex flex-nowrap p-4 gap-6 md:gap-10 transition-transform duration-75 origin-top-left">
 
-                        <!-- 1. SAYAP KIRI -->
-                        <div class="flex flex-col gap-6 items-end">
-                            <?php if (empty($leftRows)): ?>
-                                <p class="text-slate-400 text-sm italic">Belum ada data kursi sayap kiri.</p>
-                            <?php else: ?>
-                                <?php foreach ($leftRows as $row): ?>
-                                    <div
-                                        class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
-                                        <span class="font-bold text-slate-400 w-6 text-sm text-center"><?= htmlspecialchars($row['row']) ?></span>
-                                        <div class="flex flex-row flex-nowrap gap-3">
-                                            <?php foreach ($row['seats'] as $seat): ?>
-                                                <?php
-                                                    $hasGraduate = !empty($seat['graduate_name']);
-                                                    $facultyColor = $hasGraduate && !empty($seat['faculty_color'])
-                                                        ? $seat['faculty_color']
-                                                        : '#cbd5e1';
-
-                                                    $graduateData = $hasGraduate
-                                                        ? [
+                            <!-- 1. SAYAP KIRI -->
+                            <div class="flex flex-col gap-6 items-end flex-shrink-0">
+                                <?php if (empty($leftRows)): ?>
+                                    <p class="text-slate-400 text-sm italic">Belum ada data kursi sayap kiri.</p>
+                                <?php else: ?>
+                                    <?php foreach ($leftRows as $row): ?>
+                                        <div class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200 whitespace-nowrap">
+                                            <span class="font-bold text-slate-400 w-6 text-sm text-center"><?= htmlspecialchars($row['row']) ?></span>
+                                            <div class="flex flex-row flex-nowrap gap-3">
+                                                <?php foreach ($row['seats'] as $seat): ?>
+                                                    <?php
+                                                        $hasGraduate = !empty($seat['graduate_name']);
+                                                        $facultyColor = $hasGraduate && !empty($seat['faculty_color']) ? $seat['faculty_color'] : '#cbd5e1';
+                                                        $graduateData = $hasGraduate ? [
                                                             'seat_id' => $seat['id'],
                                                             'seat_code' => $seatMapInfo[$seat['id']]['code'] ?? '-',
                                                             'name' => $seat['graduate_name'],
@@ -275,71 +313,56 @@
                                                             'faculty' => !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-'),
                                                             'faculty_name' => $seat['faculty_name'] ?? '-',
                                                             'color' => $facultyColor,
-                                                        ]
-                                                        : null;
-                                                ?>
-
-                                                <div class="flex flex-col items-center">
-                                                    <button type="button" id="seat-<?= $seat['id'] ?>"
-                                                        @click="selectSeat(<?= $seat['id'] ?>, <?= $graduateData ? htmlspecialchars(json_encode($graduateData), ENT_QUOTES, 'UTF-8') : 'null' ?>)"
-                                                        :class="{ 'search-highlight-seat': searchedSeatIds.includes(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !searchedSeatIds.includes(<?= $seat['id'] ?>) }"
-                                                        class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
-                                                        style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#e2e8f0' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>;">
-                                                        <?= htmlspecialchars($seatMapInfo[$seat['id']]['code'] ?? '-') ?>
-                                                    </button>
-
-                                                    <?php if ($hasGraduate): ?>
-                                                        <?php
-                                                            $facCode = !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-');
-                                                            $prodiName = $seat['prodi_name'] ?? '-';
-                                                        ?>
-                                                        <div class="mt-1 flex flex-col items-center leading-tight w-14 md:w-16 cursor-default" title="<?= htmlspecialchars($facCode . ' - ' . $prodiName) ?>">
-                                                            <span class="text-[10px] font-bold text-slate-800 truncate w-full text-center">
-                                                                <?= htmlspecialchars($facCode) ?>
-                                                            </span>
-                                                            <span class="text-[9px] font-medium text-slate-500 truncate w-full text-center">
-                                                                <?= htmlspecialchars($prodiName) ?>
-                                                            </span>
-                                                        </div>
-                                                    <?php else: ?>
-                                                        <span class="text-[10px] mt-1 text-slate-400 font-medium text-center">-</span>
-                                                    <?php endif; ?>
-                                                </div>
-                                            <?php endforeach; ?>
+                                                        ] : null;
+                                                    ?>
+                                                    <div class="flex flex-col items-center relative" :class="{ 'z-30': searchedSeatIds.includes(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
+                                                        <button type="button" id="seat-<?= $seat['id'] ?>"
+                                                            @click="selectSeat(<?= $seat['id'] ?>, <?= $graduateData ? htmlspecialchars(json_encode($graduateData), ENT_QUOTES, 'UTF-8') : 'null' ?>)"
+                                                            :class="{ 'search-highlight-seat': searchedSeatIds.includes(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !searchedSeatIds.includes(<?= $seat['id'] ?>) }"
+                                                            class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
+                                                            style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#e2e8f0' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>;">
+                                                            <?= htmlspecialchars($seatMapInfo[$seat['id']]['code'] ?? '-') ?>
+                                                        </button>
+                                                        <?php if ($hasGraduate): ?>
+                                                            <?php
+                                                                $facCode = !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-');
+                                                                $prodiName = $seat['prodi_name'] ?? '-';
+                                                            ?>
+                                                            <div class="mt-1 flex flex-col items-center leading-tight w-14 md:w-16 cursor-default" title="<?= htmlspecialchars($facCode . ' - ' . $prodiName) ?>">
+                                                                <span class="text-[10px] font-bold text-slate-800 truncate w-full text-center"><?= htmlspecialchars($facCode) ?></span>
+                                                                <span class="text-[9px] font-medium text-slate-500 truncate w-full text-center"><?= htmlspecialchars($prodiName) ?></span>
+                                                            </div>
+                                                        <?php else: ?>
+                                                            <span class="text-[10px] mt-1 text-slate-400 font-medium text-center">-</span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
                                         </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- 2. LORONG TENGAH (PAS DI TENGAH) -->
-                        <div id="lorongTengah" class="flex items-stretch mx-2">
-                            <div
-                                class="w-12 md:w-16 border-x-2 border-dashed border-slate-400 opacity-60 relative flex items-center justify-center">
-                                <span class="absolute -rotate-90 text-slate-400 font-bold tracking-[0.3em] text-xs whitespace-nowrap">
-                                    LORONG
-                                </span>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </div>
-                        </div>
 
-                        <!-- 3. SAYAP KANAN -->
-                        <div class="flex flex-col gap-6 items-start">
-                            <?php if (empty($rightRows)): ?>
-                                <p class="text-slate-400 text-sm italic">Belum ada data kursi sayap kanan.</p>
-                            <?php else: ?>
-                                <?php foreach ($rightRows as $row): ?>
-                                    <div
-                                        class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
-                                        <div class="flex flex-row flex-nowrap gap-3">
-                                            <?php foreach ($row['seats'] as $seat): ?>
-                                                <?php
-                                                    $hasGraduate = !empty($seat['graduate_name']);
-                                                    $facultyColor = $hasGraduate && !empty($seat['faculty_color'])
-                                                        ? $seat['faculty_color']
-                                                        : '#cbd5e1';
+                            <!-- 2. LORONG TENGAH -->
+                            <div id="lorongTengah" class="flex items-stretch mx-2 flex-shrink-0">
+                                <div class="w-12 md:w-16 border-x-2 border-dashed border-slate-400 opacity-60 relative flex items-center justify-center">
+                                    <span class="absolute -rotate-90 text-slate-400 font-bold tracking-[0.3em] text-xs whitespace-nowrap">LORONG</span>
+                                </div>
+                            </div>
 
-                                                    $graduateData = $hasGraduate
-                                                        ? [
+                            <!-- 3. SAYAP KANAN -->
+                            <div class="flex flex-col gap-6 items-start flex-shrink-0">
+                                <?php if (empty($rightRows)): ?>
+                                    <p class="text-slate-400 text-sm italic">Belum ada data kursi sayap kanan.</p>
+                                <?php else: ?>
+                                    <?php foreach ($rightRows as $row): ?>
+                                        <div class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200 whitespace-nowrap">
+                                            <div class="flex flex-row flex-nowrap gap-3">
+                                                <?php foreach ($row['seats'] as $seat): ?>
+                                                    <?php
+                                                        $hasGraduate = !empty($seat['graduate_name']);
+                                                        $facultyColor = $hasGraduate && !empty($seat['faculty_color']) ? $seat['faculty_color'] : '#cbd5e1';
+                                                        $graduateData = $hasGraduate ? [
                                                             'seat_id' => $seat['id'],
                                                             'seat_code' => $seatMapInfo[$seat['id']]['code'] ?? '-',
                                                             'name' => $seat['graduate_name'],
@@ -348,47 +371,40 @@
                                                             'faculty' => !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-'),
                                                             'faculty_name' => $seat['faculty_name'] ?? '-',
                                                             'color' => $facultyColor,
-                                                        ]
-                                                        : null;
-                                                ?>
-
-                                                <div class="flex flex-col items-center">
-                                                    <button type="button" id="seat-<?= $seat['id'] ?>"
-                                                        @click="selectSeat(<?= $seat['id'] ?>, <?= $graduateData ? htmlspecialchars(json_encode($graduateData), ENT_QUOTES, 'UTF-8') : 'null' ?>)"
-                                                        :class="{ 'search-highlight-seat': searchedSeatIds.includes(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !searchedSeatIds.includes(<?= $seat['id'] ?>) }"
-                                                        class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
-                                                        style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#e2e8f0' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>;">
-                                                        <?= htmlspecialchars($seatMapInfo[$seat['id']]['code'] ?? '-') ?>
-                                                    </button>
-
-                                                    <?php if ($hasGraduate): ?>
-                                                        <?php
-                                                            $facCode = !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-');
-                                                            $prodiName = $seat['prodi_name'] ?? '-';
-                                                        ?>
-                                                        <div class="mt-1 flex flex-col items-center leading-tight w-14 md:w-16 cursor-default" title="<?= htmlspecialchars($facCode . ' - ' . $prodiName) ?>">
-                                                            <span class="text-[10px] font-bold text-slate-800 truncate w-full text-center">
-                                                                <?= htmlspecialchars($facCode) ?>
-                                                            </span>
-                                                            <span class="text-[9px] font-medium text-slate-500 truncate w-full text-center">
-                                                                <?= htmlspecialchars($prodiName) ?>
-                                                            </span>
-                                                        </div>
-                                                    <?php else: ?>
-                                                        <span class="text-[10px] mt-1 text-slate-400 font-medium text-center">-</span>
-                                                    <?php endif; ?>
-                                                </div>
-                                            <?php endforeach; ?>
+                                                        ] : null;
+                                                    ?>
+                                                    <div class="flex flex-col items-center relative" :class="{ 'z-30': searchedSeatIds.includes(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
+                                                        <button type="button" id="seat-<?= $seat['id'] ?>"
+                                                            @click="selectSeat(<?= $seat['id'] ?>, <?= $graduateData ? htmlspecialchars(json_encode($graduateData), ENT_QUOTES, 'UTF-8') : 'null' ?>)"
+                                                            :class="{ 'search-highlight-seat': searchedSeatIds.includes(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !searchedSeatIds.includes(<?= $seat['id'] ?>) }"
+                                                            class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
+                                                            style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#e2e8f0' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>;">
+                                                            <?= htmlspecialchars($seatMapInfo[$seat['id']]['code'] ?? '-') ?>
+                                                        </button>
+                                                        <?php if ($hasGraduate): ?>
+                                                            <?php
+                                                                $facCode = !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-');
+                                                                $prodiName = $seat['prodi_name'] ?? '-';
+                                                            ?>
+                                                            <div class="mt-1 flex flex-col items-center leading-tight w-14 md:w-16 cursor-default" title="<?= htmlspecialchars($facCode . ' - ' . $prodiName) ?>">
+                                                                <span class="text-[10px] font-bold text-slate-800 truncate w-full text-center"><?= htmlspecialchars($facCode) ?></span>
+                                                                <span class="text-[9px] font-medium text-slate-500 truncate w-full text-center"><?= htmlspecialchars($prodiName) ?></span>
+                                                            </div>
+                                                        <?php else: ?>
+                                                            <span class="text-[10px] mt-1 text-slate-400 font-medium text-center">-</span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                            <span class="font-bold text-slate-400 w-6 text-sm text-center"><?= htmlspecialchars($row['row']) ?></span>
                                         </div>
-                                        <span class="font-bold text-slate-400 w-6 text-sm text-center"><?= htmlspecialchars($row['row']) ?></span>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
 
+                        </div>
                     </div>
                 </div>
-
             </div>
 
             <!-- MODAL DETAIL KURSI -->
@@ -402,8 +418,7 @@
                         <div class="flex items-center gap-2">
                             <span class="w-3 h-3 rounded-full"
                                 :style="`background-color: ${activeModalData?.color || '#cbd5e1'}`"></span>
-                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Detail Tempat
-                                Duduk</span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Detail Tempat Duduk</span>
                         </div>
                         <button @click="closeModal()"
                             class="text-slate-400 hover:text-slate-600 font-bold text-sm cursor-pointer focus:outline-none">✕</button>
@@ -412,8 +427,7 @@
                     <template x-if="activeModalData">
                         <div class="space-y-3">
                             <div>
-                                <span
-                                    class="inline-block px-2.5 py-1 bg-sky-100 text-sky-800 font-extrabold text-sm rounded-md mb-2">
+                                <span class="inline-block px-3 py-1 bg-its-blue/10 text-its-blue border border-its-blue-sky/50 font-extrabold text-sm rounded-lg mb-2">
                                     Kursi <span x-text="activeModalData.seat_code"></span>
                                 </span>
                                 <h4 class="text-base font-bold text-slate-800" x-text="activeModalData.name"></h4>
@@ -421,10 +435,8 @@
                             </div>
 
                             <div class="pt-2 border-t border-slate-100 space-y-1 text-xs text-slate-600">
-                                <p><span class="font-semibold text-slate-700">Program Studi:</span> <span
-                                        x-text="activeModalData.prodi"></span></p>
-                                <p><span class="font-semibold text-slate-700">Fakultas:</span> <span
-                                        x-text="activeModalData.faculty_name && activeModalData.faculty_name !== '-' ? activeModalData.faculty_name : activeModalData.faculty"></span></p>
+                                <p><span class="font-semibold text-slate-700">Program Studi:</span> <span x-text="activeModalData.prodi"></span></p>
+                                <p><span class="font-semibold text-slate-700">Fakultas:</span> <span x-text="activeModalData.faculty_name && activeModalData.faculty_name !== '-' ? activeModalData.faculty_name : activeModalData.faculty"></span></p>
                             </div>
                         </div>
                     </template>
@@ -439,7 +451,7 @@
             </div>
         <?php endif; ?>
 
-    </div>
+    </main>
 
     <!-- Script Alpine.js & Zoom Controller -->
     <script>
@@ -525,30 +537,54 @@
         }
 
         // ==========================================
-        // AUTO-CENTER TEPAT DI LORONG & HOLD-TO-ZOOM
+        // AUTO-CENTER LORONG & ZOOM SCALING PRESISI
         // ==========================================
         document.addEventListener("DOMContentLoaded", function() {
             const container = document.getElementById('denahContainer');
             const lorong = document.getElementById('lorongTengah');
+            const zoomContent = document.getElementById('zoomContent');
+            const zoomWrapper = document.getElementById('zoomWrapper');
+            const zoomIndicator = document.getElementById('zoomIndicator');
             
-            // Auto-center presisi langsung mengarahkan pandangan pas di tengah "LORONG"
-            function centerToLorong() {
-                if (container && lorong) {
-                    const containerWidth = container.clientWidth;
-                    const lorongLeft = lorong.offsetLeft;
-                    const lorongWidth = lorong.offsetWidth;
-                    
-                    // Hitung posisi scroll agar garis lorong tepat berada di tengah layar
-                    container.scrollLeft = lorongLeft - (containerWidth / 2) + (lorongWidth / 2);
+            let currentScale = 1;
+            const minScale = 0.3;
+            const maxScale = 1.8;
+            let holdInterval = null;
+
+            function applyZoom() {
+                if (!zoomContent || !zoomWrapper) return;
+
+                // Reset transform sementara untuk mengukur lebar asli tanpa skaling
+                zoomContent.style.transform = 'none';
+                const naturalWidth = zoomContent.offsetWidth;
+                const naturalHeight = zoomContent.offsetHeight;
+
+                // Terapkan scale dari sudut kiri atas
+                zoomContent.style.transform = `scale(${currentScale})`;
+                zoomContent.style.transformOrigin = '0 0';
+
+                // Paksa wrapper memperbarui dimensinya sesuai hasil perkalian
+                const scaledWidth = naturalWidth * currentScale;
+                const scaledHeight = naturalHeight * currentScale;
+
+                zoomWrapper.style.width = scaledWidth + 'px';
+                zoomWrapper.style.height = scaledHeight + 'px';
+
+                if (zoomIndicator) {
+                    zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
                 }
             }
 
-            setTimeout(centerToLorong, 50); // Eksekusi setelah elemen selesai dirender
-
-            let currentScale = 1;
-            const minScale = 0.4;
-            const maxScale = 1.8;
-            let holdInterval = null;
+            function centerToLorong() {
+                if (container && lorong && zoomContent) {
+                    const containerWidth = container.clientWidth;
+                    const lorongLeft = lorong.offsetLeft * currentScale;
+                    const lorongWidth = lorong.offsetWidth * currentScale;
+                    
+                    const targetScroll = lorongLeft - (containerWidth / 2) + (lorongWidth / 2);
+                    container.scrollLeft = Math.max(0, targetScroll);
+                }
+            }
 
             window.adjustZoom = function(amount) {
                 currentScale += amount;
@@ -564,17 +600,14 @@
                 centerToLorong();
             };
 
-            function applyZoom() {
-                const zoomContent = document.getElementById('zoomContent');
-                const zoomIndicator = document.getElementById('zoomIndicator');
-                
-                if (zoomContent) {
-                    zoomContent.style.transform = `scale(${currentScale})`;
-                }
-                if (zoomIndicator) {
-                    zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
-                }
-            }
+            setTimeout(() => {
+                applyZoom();
+                centerToLorong();
+            }, 100);
+
+            window.addEventListener('resize', () => {
+                applyZoom();
+            });
 
             window.startZoomHold = function(amount) {
                 window.adjustZoom(amount);
@@ -590,7 +623,6 @@
                 }
             };
 
-            // Dukungan Ctrl + Scroll Mouse
             if (container) {
                 container.addEventListener('wheel', function(e) {
                     if (e.ctrlKey) {
