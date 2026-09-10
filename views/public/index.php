@@ -16,6 +16,7 @@
                     fontFamily: {
                         sans: ['Work Sans', 'sans-serif'],
                         serif: ['Playfair Display', 'serif'],
+                        friz: ['Friz Quadrata Std','serif']
                     },
                     colors: {
                         'its-blue': '#233F7C',
@@ -29,6 +30,14 @@
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
+        @font-face {
+            font-family: 'Friz Quadrata Std';
+            src: url('https://www.its.ac.id/wp-content/uploads/2026/01/friz-quadrata-std-medium.woff2') format('woff2');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+        }
+
         [x-cloak] {
             display: none !important;
         }
@@ -40,7 +49,7 @@
         }
 
         .judul-its-wordmark {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Friz Quadrata Std','Playfair Display', serif;
         }
 
         /* Ring Highlight saat kursi dipilih */
@@ -166,8 +175,12 @@
                 <img src="/images/logo.png" alt="ITS Logo" class="w-9 h-9 object-contain drop-shadow-xs">
                 <div class="h-8 w-px bg-slate-200"></div>
                 <div>
-                    <p class="text-[10px] font-extrabold uppercase tracking-widest text-its-blue-light leading-none">Sistem Informasi Wisuda</p>
-                    <h1 class="judul-its-wordmark text-base md:text-lg font-bold text-its-blue leading-tight tracking-tight">Denah Tempat Duduk</h1>
+                    <p class="font-friz text-[10px] font-extrabold uppercase tracking-widest text-its-blue-light leading-none">
+                        Sistem Informasi Wisuda
+                    </p>
+                    <h1 class="font-friz text-base md:text-lg font-bold text-its-blue leading-tight tracking-tight">
+                        Denah Tempat Duduk
+                    </h1>
                 </div>
             </div>
 
