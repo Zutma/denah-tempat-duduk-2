@@ -19,6 +19,29 @@
             transform: scale(1.1);
         }
 
+        /* Pulse & Glow Animation saat hasil pencarian */
+        @keyframes seatPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.8), 0 0 15px rgba(2, 132, 199, 0.6);
+                transform: scale(1.12);
+            }
+            50% {
+                box-shadow: 0 0 0 14px rgba(2, 132, 199, 0), 0 0 25px rgba(2, 132, 199, 0.9);
+                transform: scale(1.22);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(2, 132, 199, 0), 0 0 15px rgba(2, 132, 199, 0.6);
+                transform: scale(1.12);
+            }
+        }
+
+        .search-highlight-seat {
+            animation: seatPulse 1.4s infinite ease-in-out;
+            z-index: 25 !important;
+            outline: 4px solid #0284c7 !important;
+            outline-offset: 3px;
+        }
+
         /* Custom Scrollbar Tipis */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
@@ -71,7 +94,6 @@
             </div>
         <?php endif; ?>
 
-
         <?php
     $seatMapInfo = [];
     $globalCounter = 1;
@@ -106,65 +128,75 @@
         }
     }
 
-    if (!empty($searchQuery) && !empty($searchResults)) {
-        $searchResults = array_values(array_filter($searchResults, function($r) use ($searchQuery, $seatMapInfo) {
-            $code = isset($r['seat_id'], $seatMapInfo[$r['seat_id']]) ? $seatMapInfo[$r['seat_id']]['code'] : '';
-            return (stripos($r['name'], $searchQuery) !== false)
-                || (stripos($r['nrp'], $searchQuery) !== false)
-                || ($code !== '' && stripos($code, $searchQuery) !== false);
-        }));
-    }
+    $allGraduatesList = [];
+    $collectGraduates = function($rows) use (&$allGraduatesList, $seatMapInfo) {
+        foreach ($rows as $r) {
+            if (!empty($r['seats'])) {
+                foreach ($r['seats'] as $s) {
+                    if (!empty($s['graduate_name'])) {
+                        $facCode = !empty($s['faculty_code']) ? $s['faculty_code'] : ($s['faculty_name'] ?? '-');
+                        $allGraduatesList[] = [
+                            'seat_id' => (int)$s['id'],
+                            'seat_code' => $seatMapInfo[$s['id']]['code'] ?? '-',
+                            'name' => $s['graduate_name'],
+                            'nrp' => $s['nrp'],
+                            'prodi' => $s['prodi_name'] ?? '-',
+                            'faculty' => $facCode,
+                            'faculty_name' => $s['faculty_name'] ?? '-',
+                            'color' => $s['faculty_color'] ?? '#cbd5e1'
+                        ];
+                    }
+                }
+            }
+        }
+    };
+    $collectGraduates($leftRows);
+    $collectGraduates($rightRows);
 ?>
-        <!-- SEARCH BAR & CARD HASIL PENCARIAN -->
+
+        <!-- SEARCH BAR & CARD HASIL PENCARIAN (LIVE INSTANT SEARCH) -->
         <?php if ($activeSession): ?>
             <div class="mb-8 max-w-lg mx-auto w-full">
-                <form method="GET">
-                    <input type="hidden" name="session_id" value="<?= $activeSession['id'] ?>">
-                    <input type="text" name="search" value="<?= htmlspecialchars($searchQuery ?? '') ?>"
-                        placeholder="🔍 Masukkan Nama atau NRP, lalu Enter..."
+                <div class="relative">
+                    <input type="text" x-model="searchQuery" @input="searchedSeatIdClicked = null"
+                        placeholder="🔍 Ketik Nama, NRP, atau No. Kursi..."
                         class="w-full px-5 py-3 border border-slate-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm text-center font-medium bg-white">
-                </form>
+                </div>
 
-                <?php if (!empty($searchQuery)): ?>
-                    <div class="mt-3 flex items-center justify-between text-xs text-slate-500 px-3">
-                        <span>Ditemukan <strong class="text-slate-800"><?= count($searchResults ?? []) ?></strong> hasil
-                            untuk "<strong><?= htmlspecialchars($searchQuery) ?></strong>"</span>
-                        <a href="?session_id=<?= $activeSession['id'] ?>"
-                            @click="clearSelection()" class="text-sky-600 font-semibold hover:underline">Reset</a>
+                <div x-show="searchQuery.trim() !== ''" x-cloak class="mt-3">
+                    <div class="flex items-center justify-between text-xs text-slate-500 px-3">
+                        <span>Ditemukan <strong class="text-slate-800" x-text="filteredGraduates.length"></strong> hasil
+                            untuk "<strong x-text="searchQuery"></strong>"</span>
+                        <button type="button" @click="clearSelection()" class="text-sky-600 font-semibold hover:underline cursor-pointer">Reset</button>
                     </div>
 
-                    <!-- Card List Hasil Pencarian -->
-                    <?php if (!empty($searchResults)): ?>
-                        <div
-                            class="mt-3 bg-white border border-slate-200 rounded-2xl shadow-sm p-2 text-left max-h-56 overflow-y-auto custom-scrollbar divide-y divide-slate-100">
-                            <?php foreach ($searchResults as $result): ?>
-                                <?php
-                                    $searchData = [
-                                        'seat_id' => $result['seat_id'],
-                                        'seat_code' => isset($seatMapInfo[$result['seat_id']]) ? $seatMapInfo[$result['seat_id']]['code'] : '-',
-                                        'name' => $result['name'],
-                                        'nrp' => $result['nrp'],
-                                        'prodi' => $result['prodi_name'] ?? '-'
-                                    ];
-                                ?>
+                    <!-- Card List Hasil Pencarian Live -->
+                    <template x-if="filteredGraduates.length > 0">
+                        <div class="mt-3 bg-white border border-slate-200 rounded-2xl shadow-sm p-2 text-left max-h-56 overflow-y-auto custom-scrollbar divide-y divide-slate-100">
+                            <template x-for="g in filteredGraduates" :key="g.seat_id">
                                 <button type="button"
-                                    @click="focusSeat(<?= $result['seat_id'] ? $result['seat_id'] : 'null' ?>, <?= htmlspecialchars(json_encode($searchData), ENT_QUOTES, 'UTF-8') ?>)"
+                                    @click="focusSeat(g.seat_id, g)"
                                     class="w-full p-2.5 hover:bg-sky-50/80 rounded-xl transition-colors flex items-center justify-between group cursor-pointer focus:outline-none">
                                     <div>
-                                        <p class="text-xs font-bold text-slate-800 group-hover:text-sky-700">
-                                            <?= htmlspecialchars($result['name']) ?></p>
-                                        <p class="text-[11px] text-slate-500">NRP: <?= htmlspecialchars($result['nrp']) ?> •
-                                            <?= htmlspecialchars($result['prodi_name']) ?></p>
+                                        <p class="text-xs font-bold text-slate-800 group-hover:text-sky-700" x-text="g.name"></p>
+                                        <p class="text-[11px] text-slate-500">
+                                            NRP: <span x-text="g.nrp"></span> • <span x-text="g.faculty"></span> • <span x-text="g.prodi"></span>
+                                        </p>
                                     </div>
-                                    <span
-                                        class="px-2.5 py-1 bg-sky-100 text-sky-700 text-xs font-bold rounded-lg group-hover:bg-sky-500 group-hover:text-white transition-colors whitespace-nowrap">
-                                        <?= isset($seatMapInfo[$result['seat_id']]) ? 'Kursi ' . $seatMapInfo[$result['seat_id']]['code'] : 'Belum ada kursi' ?>
+                                    <span class="px-2.5 py-1 bg-sky-100 text-sky-700 text-xs font-bold rounded-lg group-hover:bg-sky-500 group-hover:text-white transition-colors whitespace-nowrap"
+                                          x-text="'Kursi ' + g.seat_code">
                                     </span>
                                 </button>
-                            <?php endforeach; ?>
+                            </template>
                         </div>
-                    <?php endif; ?>
-                <?php endif; ?>
+                    </template>
+
+                    <template x-if="filteredGraduates.length === 0">
+                        <div class="mt-3 bg-white border border-slate-200 rounded-2xl shadow-sm p-4 text-center text-xs text-slate-500">
+                            Tidak ada wisudawan atau kursi yang cocok dengan "<span x-text="searchQuery" class="font-bold"></span>".
+                        </div>
+                    </template>
+                </div>
             </div>
         <?php endif; ?>
 
@@ -225,7 +257,7 @@
                                     <div
                                         class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
                                         <span class="font-bold text-slate-400 w-6 text-sm text-center"><?= htmlspecialchars($row['row']) ?></span>
-                                        <div class="grid grid-flow-col auto-cols-max gap-3">
+                                        <div class="flex flex-row flex-nowrap gap-3">
                                             <?php foreach ($row['seats'] as $seat): ?>
                                                 <?php
                                                     $hasGraduate = !empty($seat['graduate_name']);
@@ -240,7 +272,8 @@
                                                             'name' => $seat['graduate_name'],
                                                             'nrp' => $seat['nrp'],
                                                             'prodi' => $seat['prodi_name'] ?? '-',
-                                                            'faculty' => $seat['faculty_name'] ?? '-',
+                                                            'faculty' => !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-'),
+                                                            'faculty_name' => $seat['faculty_name'] ?? '-',
                                                             'color' => $facultyColor,
                                                         ]
                                                         : null;
@@ -249,7 +282,7 @@
                                                 <div class="flex flex-col items-center">
                                                     <button type="button" id="seat-<?= $seat['id'] ?>"
                                                         @click="selectSeat(<?= $seat['id'] ?>, <?= $graduateData ? htmlspecialchars(json_encode($graduateData), ENT_QUOTES, 'UTF-8') : 'null' ?>)"
-                                                        :class="{ 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> }"
+                                                        :class="{ 'search-highlight-seat': searchedSeatIds.includes(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !searchedSeatIds.includes(<?= $seat['id'] ?>) }"
                                                         class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
                                                         style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#e2e8f0' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>;">
                                                         <?= htmlspecialchars($seatMapInfo[$seat['id']]['code'] ?? '-') ?>
@@ -297,7 +330,7 @@
                                 <?php foreach ($rightRows as $row): ?>
                                     <div
                                         class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
-                                        <div class="grid grid-flow-col auto-cols-max gap-3">
+                                        <div class="flex flex-row flex-nowrap gap-3">
                                             <?php foreach ($row['seats'] as $seat): ?>
                                                 <?php
                                                     $hasGraduate = !empty($seat['graduate_name']);
@@ -312,7 +345,8 @@
                                                             'name' => $seat['graduate_name'],
                                                             'nrp' => $seat['nrp'],
                                                             'prodi' => $seat['prodi_name'] ?? '-',
-                                                            'faculty' => $seat['faculty_name'] ?? '-',
+                                                            'faculty' => !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-'),
+                                                            'faculty_name' => $seat['faculty_name'] ?? '-',
                                                             'color' => $facultyColor,
                                                         ]
                                                         : null;
@@ -321,7 +355,7 @@
                                                 <div class="flex flex-col items-center">
                                                     <button type="button" id="seat-<?= $seat['id'] ?>"
                                                         @click="selectSeat(<?= $seat['id'] ?>, <?= $graduateData ? htmlspecialchars(json_encode($graduateData), ENT_QUOTES, 'UTF-8') : 'null' ?>)"
-                                                        :class="{ 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> }"
+                                                        :class="{ 'search-highlight-seat': searchedSeatIds.includes(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !searchedSeatIds.includes(<?= $seat['id'] ?>) }"
                                                         class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-bold text-xs md:text-sm shadow transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
                                                         style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#e2e8f0' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>;">
                                                         <?= htmlspecialchars($seatMapInfo[$seat['id']]['code'] ?? '-') ?>
@@ -390,7 +424,7 @@
                                 <p><span class="font-semibold text-slate-700">Program Studi:</span> <span
                                         x-text="activeModalData.prodi"></span></p>
                                 <p><span class="font-semibold text-slate-700">Fakultas:</span> <span
-                                        x-text="activeModalData.faculty"></span></p>
+                                        x-text="activeModalData.faculty_name && activeModalData.faculty_name !== '-' ? activeModalData.faculty_name : activeModalData.faculty"></span></p>
                             </div>
                         </div>
                     </template>
@@ -413,6 +447,39 @@
             return {
                 selectedSeatId: null,
                 activeModalData: null,
+                searchQuery: <?= json_encode($searchQuery ?? '') ?>,
+                graduatesList: <?= json_encode($allGraduatesList ?? []) ?>,
+                searchedSeatIdClicked: null,
+
+                get filteredGraduates() {
+                    const q = this.searchQuery.trim().toLowerCase();
+                    if (!q) return [];
+                    return this.graduatesList.filter(g => {
+                        return (g.name && g.name.toLowerCase().includes(q))
+                            || (g.nrp && g.nrp.toLowerCase().includes(q))
+                            || (g.seat_code && g.seat_code.toLowerCase().includes(q))
+                            || (g.prodi && g.prodi.toLowerCase().includes(q))
+                            || (g.faculty && g.faculty.toLowerCase().includes(q))
+                            || (g.faculty_name && g.faculty_name.toLowerCase().includes(q));
+                    });
+                },
+
+                get searchedSeatIds() {
+                    if (this.searchedSeatIdClicked) {
+                        return [this.searchedSeatIdClicked];
+                    }
+                    if (!this.searchQuery.trim()) {
+                        return [];
+                    }
+                    return this.filteredGraduates.map(g => g.seat_id);
+                },
+
+                init() {
+                    if (this.searchQuery.trim() !== '' && this.filteredGraduates.length > 0) {
+                        const first = this.filteredGraduates[0];
+                        this.focusSeat(first.seat_id, first);
+                    }
+                },
 
                 selectSeat(seatId, data) {
                     if (!data) return;
@@ -426,9 +493,10 @@
                 },
 
                 focusSeat(seatId, data) {
-                    if (!seatId) return; // Belum ada kursi
+                    if (!seatId) return;
                     this.selectedSeatId = seatId;
                     this.activeModalData = data;
+                    this.searchedSeatIdClicked = seatId;
 
                     this.$nextTick(() => {
                         const el = document.getElementById(`seat-${seatId}`);
@@ -450,6 +518,8 @@
                 clearSelection() {
                     this.selectedSeatId = null;
                     this.activeModalData = null;
+                    this.searchQuery = '';
+                    this.searchedSeatIdClicked = null;
                 }
             }
         }

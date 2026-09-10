@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 class PublicSeat {
     public static function getPublishedSessions($conn) {
