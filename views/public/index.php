@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Denah Tempat Duduk Wisuda ITS - Interaktif</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,13 +41,12 @@
             display: none !important;
         }
 
-        /* Set Body agar mendukung Pseudo-element */
         body {
             position: relative;
             background-color: #f8fafc;
+            touch-action: manipulation;
         }
 
-        /* Background Pattern Batik PNG */
         body::before {
             content: "";
             position: fixed;
@@ -58,39 +57,38 @@
             background-image: url('/images/Vector.svg'); 
             background-repeat: repeat;
             background-position: center top;
-            background-size: 380px auto;
-            opacity: 0.12; /* Opasitas 4% (pas & tidak pusing) */
+            background-size: 280px auto;
+            opacity: 0.10;
             pointer-events: none;
-            z-index: 1; /* Dinaikkan ke 1 agar tidak tertutup background body */
+            z-index: 1;
         }
 
-        /* Pastikan Konten Utama Berada Di Atas Layer Pattern (z-index > 1) */
         header, main, footer, div[x-data] {
             position: relative;
             z-index: 2;
         }
 
-        /* Ring Highlight saat kursi dipilih */
+        /* Ring Highlight */
         .selected-seat-ring {
             box-shadow: 0 0 0 3px #127BBE, 0 4px 14px rgba(18, 123, 190, 0.4);
-            transform: scale(1.05);
+            transform: scale(1.1);
             position: relative;
             z-index: 20 !important;
         }
 
-        /* Pulse & Glow Animation saat hasil pencarian */
+        /* Pulse Animation saat hasil pencarian */
         @keyframes seatPulse {
             0% {
                 box-shadow: 0 0 0 3px #127BBE, 0 0 8px rgba(18, 123, 190, 0.5);
-                transform: scale(1.03);
+                transform: scale(1.05);
             }
             50% {
                 box-shadow: 0 0 0 4px #FDBB16, 0 0 18px rgba(253, 187, 22, 0.85);
-                transform: scale(1.08);
+                transform: scale(1.15);
             }
             100% {
                 box-shadow: 0 0 0 3px #127BBE, 0 0 8px rgba(18, 123, 190, 0.5);
-                transform: scale(1.03);
+                transform: scale(1.05);
             }
         }
 
@@ -100,10 +98,10 @@
             z-index: 25 !important;
         }
 
-        /* Custom Scrollbar Tipis ITS Theme */
+        /* Scrollbar Halus */
         .custom-scrollbar::-webkit-scrollbar {
-            width: 7px;
-            height: 7px;
+            width: 5px;
+            height: 5px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-track {
@@ -119,10 +117,10 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #127BBE;
         }
-</style>
+    </style>
 </head>
 
-<body class="its-key-graphic-bg font-sans antialiased text-slate-800 min-h-screen w-full flex flex-col" x-data="seatMapApp()">
+<body class="font-sans antialiased text-slate-800 min-h-screen w-full flex flex-col overflow-x-hidden" x-data="seatMapApp()">
 
 <?php
     $seatMapInfo = [];
@@ -307,44 +305,43 @@
         </div>
     </header>
 
-    <!-- AREA KONTEN UTAMA HALAMAN DENAH -->
-    <main class="w-full flex-grow px-3 md:px-6 pt-4 pb-8 flex flex-col items-center justify-start">
+    <!-- MAIN AREA -->
+    <main class="w-full flex-grow px-2 md:px-6 pt-3 pb-8 flex flex-col items-center justify-start">
 
-        <!-- Tampilan Jika Sesi Kosong / Belum Ada Event Dipilih -->
         <?php if (empty($activeSession) || isset($message)): ?>
-            <div class="bg-white/95 backdrop-blur-md border border-its-blue-sky/40 text-slate-700 p-8 rounded-3xl max-w-md mx-auto my-auto text-center shadow-xl relative overflow-hidden">
-                <div class="relative w-28 h-28 mx-auto mb-5 flex items-center justify-center bg-its-blue/5 rounded-full border border-its-blue-sky/30 shadow-inner">
-                    <img src="/images/logo.png" alt="ITS Logo" class="w-16 h-16 object-contain drop-shadow-md">
+            <div class="bg-white/95 backdrop-blur-md border border-its-blue-sky/40 text-slate-700 p-6 md:p-8 rounded-3xl max-w-sm md:max-w-md mx-auto my-auto text-center shadow-xl relative overflow-hidden">
+                <div class="relative w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 flex items-center justify-center bg-its-blue/5 rounded-full border border-its-blue-sky/30 shadow-inner">
+                    <img src="/images/logo.png" alt="ITS Logo" class="w-12 h-12 md:w-16 md:h-16 object-contain">
                 </div>
-                <h3 class="font-extrabold text-its-blue text-lg mb-2">Acara Wisuda Belum Dipilih</h3>
+                <h3 class="font-extrabold text-its-blue text-base md:text-lg mb-1.5">Acara Wisuda Belum Dipilih</h3>
                 <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">
-                    <?= htmlspecialchars($message ?? 'Silakan pilih acara wisuda pada dropdown toolbar di atas untuk melihat denah interaktif posisi tempat duduk wisudawan.') ?>
+                    <?= htmlspecialchars($message ?? 'Silakan pilih acara wisuda pada dropdown toolbar di atas untuk melihat denah interaktif tempat duduk wisudawan.') ?>
                 </p>
             </div>
         <?php else: ?>
             <!-- PANGGUNG UTAMA -->
-            <div class="bg-its-blue text-white font-bold tracking-widest py-3 px-4 rounded-xl mb-4 shadow-md w-full max-w-[98vw] mx-auto text-xs md:text-sm text-center border-b-4 border-its-yellow flex-shrink-0">
+            <div class="bg-its-blue text-white font-bold tracking-widest py-2 md:py-2.5 px-4 rounded-xl mb-3 shadow-xs w-full max-w-full text-[11px] md:text-xs text-center border-b-4 border-its-yellow shrink-0">
                 PANGGUNG UTAMA / REKTORAT
             </div>
 
-            <!-- CONTAINER UTAMA DENAH -->
-            <div class="w-full max-w-[98vw] mx-auto relative flex-grow flex flex-col items-center overflow-hidden">
+            <!-- CANVAS CONTAINER DENAH -->
+            <div class="w-full relative flex-grow flex flex-col items-center overflow-hidden">
                 
-                <div id="denahContainer" class="w-full overflow-auto pb-8 pt-2 cursor-grab active:cursor-grabbing custom-scrollbar">
+                <div id="denahContainer" class="w-full overflow-auto pb-8 pt-2 cursor-grab active:cursor-grabbing custom-scrollbar touch-pan-x touch-pan-y">
                     
                     <div id="zoomWrapper" class="inline-block relative transition-all duration-75">
                         
-                        <div id="zoomContent" class="flex flex-nowrap p-4 gap-6 md:gap-10 transition-transform duration-75 origin-top-left">
+                        <div id="zoomContent" class="flex flex-nowrap p-2 md:p-4 gap-4 md:gap-10 transition-transform duration-75 origin-top-left">
 
-                            <!-- 1. SAYAP KIRI -->
-                            <div class="flex flex-col gap-6 items-end flex-shrink-0">
+                            <!-- SAYAP KIRI -->
+                            <div class="flex flex-col gap-3 md:gap-5 items-end shrink-0">
                                 <?php if (empty($leftRows)): ?>
-                                    <p class="text-slate-400 text-sm italic">Belum ada data kursi sayap kiri.</p>
+                                    <p class="text-slate-400 text-xs italic">Belum ada data kursi sayap kiri.</p>
                                 <?php else: ?>
                                     <?php foreach ($leftRows as $row): ?>
-                                        <div class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-xs border border-slate-200/80 whitespace-nowrap">
-                                            <span class="font-extrabold text-its-blue bg-its-blue/10 border border-its-blue-sky/30 px-2 py-1 rounded-md text-xs w-7 text-center"><?= htmlspecialchars($row['row']) ?></span>
-                                            <div class="flex flex-row flex-nowrap gap-3">
+                                        <div class="flex items-center gap-1.5 md:gap-3 bg-white p-2 md:p-3 rounded-xl shadow-2xs border border-slate-200/80 whitespace-nowrap">
+                                            <span class="font-extrabold text-its-blue bg-its-blue/10 border border-its-blue-sky/30 px-1.5 py-0.5 rounded text-[10px] md:text-xs w-6 md:w-7 text-center"><?= htmlspecialchars($row['row']) ?></span>
+                                            <div class="flex flex-row flex-nowrap gap-1.5 md:gap-2.5">
                                                 <?php foreach ($row['seats'] as $seat): ?>
                                                     <?php
                                                         $hasGraduate = !empty($seat['graduate_name']);
@@ -364,7 +361,7 @@
                                                         <button type="button" id="seat-<?= $seat['id'] ?>"
                                                             @click="selectSeat(<?= $seat['id'] ?>, <?= $graduateData ? htmlspecialchars(json_encode($graduateData), ENT_QUOTES, 'UTF-8') : 'null' ?>)"
                                                             :class="{ 'search-highlight-seat': searchedSeatIds.includes(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !searchedSeatIds.includes(<?= $seat['id'] ?>) }"
-                                                            class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-extrabold text-xs md:text-sm shadow-xs transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
+                                                            class="w-10 h-10 md:w-13 md:h-13 rounded-lg flex items-center justify-center font-extrabold text-[11px] md:text-xs shadow-2xs transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
                                                             style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#f1f5f9' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>; border: <?= $hasGraduate ? 'none' : '1px solid #cbd5e1' ?>;">
                                                             <?= htmlspecialchars($seatMapInfo[$seat['id']]['code'] ?? '-') ?>
                                                         </button>
@@ -373,12 +370,12 @@
                                                                 $facCode = !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-');
                                                                 $prodiName = $seat['prodi_name'] ?? '-';
                                                             ?>
-                                                            <div class="mt-1 flex flex-col items-center leading-tight w-14 md:w-16 cursor-default" title="<?= htmlspecialchars($facCode . ' - ' . $prodiName) ?>">
-                                                                <span class="text-[10px] font-bold text-slate-800 truncate w-full text-center"><?= htmlspecialchars($facCode) ?></span>
-                                                                <span class="text-[9px] font-medium text-slate-500 truncate w-full text-center"><?= htmlspecialchars($prodiName) ?></span>
+                                                            <div class="mt-1 flex flex-col items-center leading-tight w-10 md:w-13 cursor-default" title="<?= htmlspecialchars($facCode . ' - ' . $prodiName) ?>">
+                                                                <span class="text-[9px] font-bold text-slate-800 truncate w-full text-center"><?= htmlspecialchars($facCode) ?></span>
+                                                                <span class="text-[8px] font-medium text-slate-500 truncate w-full text-center"><?= htmlspecialchars($prodiName) ?></span>
                                                             </div>
                                                         <?php else: ?>
-                                                            <span class="text-[10px] mt-1 text-slate-400 font-medium text-center">-</span>
+                                                            <span class="text-[9px] mt-1 text-slate-400 font-medium text-center">-</span>
                                                         <?php endif; ?>
                                                     </div>
                                                 <?php endforeach; ?>
@@ -388,21 +385,21 @@
                                 <?php endif; ?>
                             </div>
 
-                            <!-- 2. LORONG TENGAH -->
-                            <div id="lorongTengah" class="flex items-stretch mx-2 flex-shrink-0">
-                                <div class="w-12 md:w-16 border-x-2 border-dashed border-slate-400 opacity-60 relative flex items-center justify-center">
-                                    <span class="absolute -rotate-90 text-slate-400 font-bold tracking-[0.3em] text-xs whitespace-nowrap">LORONG</span>
+                            <!-- LORONG TENGAH -->
+                            <div id="lorongTengah" class="flex items-stretch mx-1 md:mx-2 shrink-0">
+                                <div class="w-8 md:w-14 border-x-2 border-dashed border-slate-300 relative flex items-center justify-center">
+                                    <span class="absolute -rotate-90 text-slate-400 font-bold tracking-[0.25em] text-[10px] md:text-xs whitespace-nowrap">LORONG</span>
                                 </div>
                             </div>
 
-                            <!-- 3. SAYAP KANAN -->
-                            <div class="flex flex-col gap-6 items-start flex-shrink-0">
+                            <!-- SAYAP KANAN -->
+                            <div class="flex flex-col gap-3 md:gap-5 items-start shrink-0">
                                 <?php if (empty($rightRows)): ?>
-                                    <p class="text-slate-400 text-sm italic">Belum ada data kursi sayap kanan.</p>
+                                    <p class="text-slate-400 text-xs italic">Belum ada data kursi sayap kanan.</p>
                                 <?php else: ?>
                                     <?php foreach ($rightRows as $row): ?>
-                                        <div class="flex items-center gap-3 bg-white p-3 rounded-xl shadow-xs border border-slate-200/80 whitespace-nowrap">
-                                            <div class="flex flex-row flex-nowrap gap-3">
+                                        <div class="flex items-center gap-1.5 md:gap-3 bg-white p-2 md:p-3 rounded-xl shadow-2xs border border-slate-200/80 whitespace-nowrap">
+                                            <div class="flex flex-row flex-nowrap gap-1.5 md:gap-2.5">
                                                 <?php foreach ($row['seats'] as $seat): ?>
                                                     <?php
                                                         $hasGraduate = !empty($seat['graduate_name']);
@@ -422,7 +419,7 @@
                                                         <button type="button" id="seat-<?= $seat['id'] ?>"
                                                             @click="selectSeat(<?= $seat['id'] ?>, <?= $graduateData ? htmlspecialchars(json_encode($graduateData), ENT_QUOTES, 'UTF-8') : 'null' ?>)"
                                                             :class="{ 'search-highlight-seat': searchedSeatIds.includes(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !searchedSeatIds.includes(<?= $seat['id'] ?>) }"
-                                                            class="w-12 h-12 md:w-14 md:h-14 rounded-lg flex items-center justify-center font-extrabold text-xs md:text-sm shadow-xs transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
+                                                            class="w-10 h-10 md:w-13 md:h-13 rounded-lg flex items-center justify-center font-extrabold text-[11px] md:text-xs shadow-2xs transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
                                                             style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#f1f5f9' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>; border: <?= $hasGraduate ? 'none' : '1px solid #cbd5e1' ?>;">
                                                             <?= htmlspecialchars($seatMapInfo[$seat['id']]['code'] ?? '-') ?>
                                                         </button>
@@ -431,17 +428,17 @@
                                                                 $facCode = !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-');
                                                                 $prodiName = $seat['prodi_name'] ?? '-';
                                                             ?>
-                                                            <div class="mt-1 flex flex-col items-center leading-tight w-14 md:w-16 cursor-default" title="<?= htmlspecialchars($facCode . ' - ' . $prodiName) ?>">
-                                                                <span class="text-[10px] font-bold text-slate-800 truncate w-full text-center"><?= htmlspecialchars($facCode) ?></span>
-                                                                <span class="text-[9px] font-medium text-slate-500 truncate w-full text-center"><?= htmlspecialchars($prodiName) ?></span>
+                                                            <div class="mt-1 flex flex-col items-center leading-tight w-10 md:w-13 cursor-default" title="<?= htmlspecialchars($facCode . ' - ' . $prodiName) ?>">
+                                                                <span class="text-[9px] font-bold text-slate-800 truncate w-full text-center"><?= htmlspecialchars($facCode) ?></span>
+                                                                <span class="text-[8px] font-medium text-slate-500 truncate w-full text-center"><?= htmlspecialchars($prodiName) ?></span>
                                                             </div>
                                                         <?php else: ?>
-                                                            <span class="text-[10px] mt-1 text-slate-400 font-medium text-center">-</span>
+                                                            <span class="text-[9px] mt-1 text-slate-400 font-medium text-center">-</span>
                                                         <?php endif; ?>
                                                     </div>
                                                 <?php endforeach; ?>
                                             </div>
-                                            <span class="font-extrabold text-its-blue bg-its-blue/10 border border-its-blue-sky/30 px-2 py-1 rounded-md text-xs w-7 text-center"><?= htmlspecialchars($row['row']) ?></span>
+                                            <span class="font-extrabold text-its-blue bg-its-blue/10 border border-its-blue-sky/30 px-1.5 py-0.5 rounded text-[10px] md:text-xs w-6 md:w-7 text-center"><?= htmlspecialchars($row['row']) ?></span>
                                         </div>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
@@ -454,41 +451,41 @@
 
             <!-- MODAL DETAIL KURSI -->
             <div x-show="activeModalData" x-cloak
-                class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4"
                 @click.self="closeModal()">
-                <div class="bg-white rounded-2xl shadow-2xl border border-its-blue-sky/30 max-w-sm w-full p-6 text-left transform transition-all relative overflow-hidden"
+                <div class="bg-white rounded-2xl shadow-2xl border border-its-blue-sky/30 max-w-xs md:max-w-sm w-full p-5 text-left transform transition-all relative overflow-hidden"
                     @keydown.escape.window="closeModal()">
 
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3">
                         <div class="flex items-center gap-2">
-                            <span class="w-3.5 h-3.5 rounded-full border border-white shadow-xs"
+                            <span class="w-3 h-3 rounded-full border border-white shadow-xs"
                                 :style="`background-color: ${activeModalData?.color || '#cbd5e1'}`"></span>
-                            <span class="text-xs font-extrabold uppercase tracking-wider text-its-blue-light">Detail Tempat Duduk</span>
+                            <span class="text-[11px] font-extrabold uppercase tracking-wider text-its-blue-light">Detail Tempat Duduk</span>
                         </div>
                         <button @click="closeModal()"
-                            class="text-slate-400 hover:text-its-blue font-bold text-base cursor-pointer focus:outline-none transition-colors">✕</button>
+                            class="text-slate-400 hover:text-its-blue font-bold text-sm cursor-pointer focus:outline-none transition-colors">✕</button>
                     </div>
 
                     <template x-if="activeModalData">
-                        <div class="space-y-3">
+                        <div class="space-y-2.5">
                             <div>
-                                <span class="inline-block px-3 py-1 bg-its-yellow/20 text-its-blue border border-its-yellow/60 font-extrabold text-sm rounded-lg mb-2">
+                                <span class="inline-block px-2.5 py-0.5 bg-its-yellow/20 text-its-blue border border-its-yellow/60 font-extrabold text-xs rounded-md mb-1.5">
                                     Kursi <span x-text="activeModalData.seat_code"></span>
                                 </span>
-                                <h4 class="text-base font-extrabold text-slate-800" x-text="activeModalData.name"></h4>
-                                <p class="text-xs font-semibold text-its-blue-light" x-text="`NRP: ${activeModalData.nrp}`"></p>
+                                <h4 class="text-sm md:text-base font-extrabold text-slate-800 leading-snug" x-text="activeModalData.name"></h4>
+                                <p class="text-xs font-semibold text-its-blue-light mt-0.5" x-text="`NRP: ${activeModalData.nrp}`"></p>
                             </div>
 
-                            <div class="pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-600">
+                            <div class="pt-2 border-t border-slate-100 space-y-1 text-xs text-slate-600">
                                 <p><span class="font-bold text-slate-700">Program Studi:</span> <span class="font-medium text-slate-800" x-text="activeModalData.prodi"></span></p>
                                 <p><span class="font-bold text-slate-700">Fakultas:</span> <span class="font-medium text-slate-800" x-text="activeModalData.faculty_name && activeModalData.faculty_name !== '-' ? activeModalData.faculty_name : activeModalData.faculty"></span></p>
                             </div>
                         </div>
                     </template>
 
-                    <div class="mt-6 pt-3 border-t border-slate-100 text-right">
+                    <div class="mt-5 pt-2 border-t border-slate-100 text-right">
                         <button @click="closeModal()"
-                            class="px-5 py-2 bg-its-blue hover:bg-its-blue-light text-white text-xs font-bold rounded-lg transition-colors cursor-pointer focus:outline-none shadow-xs">
+                            class="px-4 py-1.5 bg-its-blue hover:bg-its-blue-light text-white text-xs font-bold rounded-lg transition-colors cursor-pointer focus:outline-none shadow-xs">
                             Tutup
                         </button>
                     </div>
@@ -498,7 +495,7 @@
 
     </main>
 
-    <!-- Script Alpine.js & Zoom Controller -->
+    <!-- SCRIPT ALPINEJS & AUTO-RESPONSIVE CANVAS CONTROLLER -->
     <script>
         function seatMapApp() {
             return {
@@ -589,9 +586,23 @@
             const zoomIndicator = document.getElementById('zoomIndicator');
             
             let currentScale = 1;
-            const minScale = 0.3;
+            const minScale = 0.25;
             const maxScale = 1.8;
             let holdInterval = null;
+
+            // Auto Skala Awal Berdasarkan Lebar Layar (Layar HP otomatis diset mengecil agar terlihat utuh)
+            function calculateInitialScale() {
+                if (!container || !zoomContent) return 1;
+                const windowWidth = window.innerWidth;
+                const contentWidth = zoomContent.scrollWidth || 1200;
+
+                if (windowWidth < 640) { // Mobile
+                    return Math.max(0.40, Math.min(0.55, (windowWidth - 20) / contentWidth));
+                } else if (windowWidth < 1024) { // Tablet
+                    return Math.max(0.65, Math.min(0.85, (windowWidth - 40) / contentWidth));
+                }
+                return 1; // Desktop
+            }
 
             function applyZoom() {
                 if (!zoomContent || !zoomWrapper) return;
@@ -654,12 +665,14 @@
             };
 
             window.resetZoom = function() {
-                currentScale = 1;
+                currentScale = calculateInitialScale();
                 applyZoom();
                 centerToLorong();
             };
 
+            // Inisialisasi awal
             setTimeout(() => {
+                currentScale = calculateInitialScale();
                 applyZoom();
                 centerToLorong();
             }, 100);
@@ -682,7 +695,38 @@
                 }
             };
 
+            // Touch Pinch-to-Zoom untuk Layar HP
+            let initialPinchDistance = null;
             if (container) {
+                container.addEventListener('touchstart', function(e) {
+                    if (e.touches.length === 2) {
+                        initialPinchDistance = Math.hypot(
+                            e.touches[0].pageX - e.touches[1].pageX,
+                            e.touches[0].pageY - e.touches[1].pageY
+                        );
+                    }
+                }, { passive: true });
+
+                container.addEventListener('touchmove', function(e) {
+                    if (e.touches.length === 2 && initialPinchDistance) {
+                        const currentDistance = Math.hypot(
+                            e.touches[0].pageX - e.touches[1].pageX,
+                            e.touches[0].pageY - e.touches[1].pageY
+                        );
+                        const diff = currentDistance - initialPinchDistance;
+
+                        if (Math.abs(diff) > 10) {
+                            window.adjustZoom(diff > 0 ? 0.03 : -0.03);
+                            initialPinchDistance = currentDistance;
+                        }
+                    }
+                }, { passive: true });
+
+                container.addEventListener('touchend', function() {
+                    initialPinchDistance = null;
+                });
+
+                // Desktop Mouse Wheel Zoom
                 container.addEventListener('wheel', function(e) {
                     if (e.ctrlKey) {
                         e.preventDefault();
