@@ -78,7 +78,12 @@ class SeatRowController extends BaseController {
         $sessionId = $_GET['session_id'] ?? null;
 
         if (isset($_GET['id'])) {
-            SeatRow::delete($conn, $_GET['id']);
+            $ids = array_map('intval', explode(',', $_GET['id']));
+            foreach ($ids as $id) {
+                if ($id > 0) {
+                    SeatRow::delete($conn, $id);
+                }
+            }
         }
 
         if ($sessionId) {
