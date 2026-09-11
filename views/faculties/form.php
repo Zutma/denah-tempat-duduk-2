@@ -1,66 +1,66 @@
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
-<h1 class="text-xl font-bold text-gray-800 mb-6"><?= !empty($faculty['id']) ? 'Edit' : 'Tambah' ?> Fakultas</h1>
-
-<div class="p-6 rounded-xl shadow-sm border border-gray-200 bg-white">
-    <form method="POST" class="flex flex-col gap-4">
-        <?php if (!empty($faculty['id'])): ?>
-            <input type="hidden" name="id" value="<?= $faculty['id'] ?>">
-        <?php endif; ?>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label for="code" class="block text-sm font-medium text-gray-700 mb-1">Kode</label>
-                <input type="text" id="code" name="code" value="<?= htmlspecialchars($faculty['code'] ?? '') ?>"
-                    placeholder="Contoh: FSAD"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light uppercase placeholder:normal-case font-semibold">
-            </div>
-
-            <div>
-                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
-                <input type="text" id="name" name="name" value="<?= htmlspecialchars($faculty['name'] ?? '') ?>"
-                    placeholder="Contoh: Fakultas Sains dan Analitika Data"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light">
-            </div>
-        </div>
-
-        <div x-data="{ hexColor: '<?= htmlspecialchars($faculty['color'] ?? '#ffffff') ?>' }">
-            <label for="color" class="block text-sm font-medium text-gray-700 mb-1">Warna Hex (opsional)</label>
-            <div class="flex items-center space-x-2">
-                <input type="color" x-model="hexColor"
-                    class="h-9 w-10 p-0.5 border border-gray-300 rounded-lg cursor-pointer bg-white">
-                <input type="text" id="color" name="color" x-model="hexColor" placeholder="#ffffff"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light">
-            </div>
-        </div>
-
-        <div class="flex justify-end gap-3 pt-2">
-            <a href="/faculties"
-                class="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                </svg>
-                Batal
-            </a>
-            <button type="submit"
-                class="inline-flex items-center gap-1.5 px-6 py-2 bg-its-blue-light hover:bg-its-blue text-white font-medium text-sm rounded-lg shadow-sm transition-colors cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-                <?= !empty($faculty['id']) ? 'Update' : 'Simpan' ?>
-            </button>
-        </div>
-    </form>
+<div class="flex items-center justify-between gap-4 mb-6">
+    <div>
+        <h1 class="text-xl font-bold text-slate-800 tracking-tight"><?= !empty($faculty['id']) ? 'Edit Fakultas' : 'Tambah Fakultas' ?></h1>
+        <p class="text-xs text-slate-500 mt-1">Lengkapi data informasi fakultas dan warna identitas penanda tempat duduk.</p>
+    </div>
 </div>
 
 <?php if (!empty($errors)): ?>
-    <div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-        <ul class="list-disc list-inside text-sm text-red-600 space-y-1">
+    <div class="mb-6 p-4 bg-red-50 border border-red-200/80 rounded-xl">
+        <ul class="list-disc list-inside text-xs font-semibold text-red-700 space-y-1">
             <?php foreach ($errors as $error): ?>
                 <li><?= htmlspecialchars($error) ?></li>
             <?php endforeach; ?>
         </ul>
     </div>
 <?php endif; ?>
+
+<div class="p-6 rounded-2xl shadow-2xs border border-slate-200/80 bg-white w-full">
+    <form method="POST" class="flex flex-col gap-5">
+        <?php if (!empty($faculty['id'])): ?>
+            <input type="hidden" name="id" value="<?= $faculty['id'] ?>">
+        <?php endif; ?>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+                <label for="code" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Kode Fakultas <span class="text-red-500">*</span></label>
+                <input type="text" id="code" name="code" value="<?= htmlspecialchars($faculty['code'] ?? '') ?>"
+                    placeholder="Contoh: FSAD" required
+                    class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light outline-none uppercase placeholder:normal-case transition-all">
+            </div>
+
+            <div>
+                <label for="name" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Nama Fakultas <span class="text-red-500">*</span></label>
+                <input type="text" id="name" name="name" value="<?= htmlspecialchars($faculty['name'] ?? '') ?>"
+                    placeholder="Contoh: Fakultas Sains dan Analitika Data" required
+                    class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light outline-none transition-all">
+            </div>
+        </div>
+
+        <div x-data="{ hexColor: '<?= htmlspecialchars($faculty['color'] ?? '#127BBE') ?>' }">
+            <label for="color" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Warna Penanda Kursi <span class="text-red-500">*</span></label>
+            <div class="flex items-center gap-3">
+                <input type="color" x-model="hexColor"
+                    class="h-10 w-12 p-0.5 border border-slate-200 rounded-xl cursor-pointer bg-white shadow-2xs">
+                <input type="text" id="color" name="color" x-model="hexColor" placeholder="#127BBE" required
+                    class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light outline-none transition-all">
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+            <a href="/faculties"
+                class="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all">
+                Batal
+            </a>
+            <button type="submit"
+                class="inline-flex items-center gap-2 px-5 py-2 bg-its-blue-light text-white rounded-xl text-xs font-bold hover:bg-its-blue transition-all shadow-xs cursor-pointer">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                <?= !empty($faculty['id']) ? 'Update Fakultas' : 'Simpan Fakultas' ?>
+            </button>
+        </div>
+    </form>
+</div>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>

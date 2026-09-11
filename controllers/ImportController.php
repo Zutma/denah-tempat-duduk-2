@@ -194,9 +194,6 @@ class ImportController extends BaseController {
         // Header CSV dengan delimiter titik koma (;)
         fputcsv($output, ['FAKULTAS', 'PROGRAM STUDI', 'KURSI', 'SISI', 'NOMOR', 'NRP', 'NAMA'], ';');
 
-        // Baris contoh agar user paham format pengisian
-        fputcsv($output, ['FV', 'D4-TEK. REK. KIMIA INDUSTRI', 'B', 'KANAN', '62', '2041211031', 'SAFIRA FIRDAUS PUSPANINGRUM'], ';');
-        fputcsv($output, ['FSAD', 'S3-ILMU FISIKA', 'B', 'KANAN', '70', '7001212002', 'RIAN MAHENDRA TARUNA'], ';');
 
         fclose($output);
         exit;

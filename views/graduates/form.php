@@ -1,86 +1,77 @@
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
-<!-- Breadcrumb -->
-<nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
-    <a href="/graduation-events" class="hover:text-its-blue-light transition-colors">Wisuda</a>
-    <span class="text-gray-300">/</span>
-    <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>"
-        class="hover:text-its-blue-light transition-colors">
-        <?= htmlspecialchars($session['event_name'] ?? 'Detail Event') ?>
-    </a>
-    <span class="text-gray-300">/</span>
-    <a href="/graduates?session_id=<?= $sessionId ?>" class="hover:text-its-blue-light transition-colors">Data Wisudawan</a>
-    <span class="text-gray-300">/</span>
-    <span class="text-gray-800 font-semibold">Tambah</span>
-</nav>
+<div class="flex items-center justify-between gap-4 mb-6">
+    <div>
+        <h1 class="text-xl font-bold text-slate-800 tracking-tight">
+            Tambah Wisudawan — Sesi <?= !empty($session['date']) ? date('d F Y', strtotime($session['date'])) : '' ?>
+        </h1>
+        <p class="text-xs text-slate-500 mt-1">Lengkapi identitas wisudawan dan alokasikan tempat duduk jika tersedia.</p>
+    </div>
+</div>
 
-<h1 class="text-xl font-bold text-gray-800 mb-6">
-    Tambah Wisudawan — Sesi <?= !empty($session['date']) ? date('d F Y', strtotime($session['date'])) : '' ?>
-</h1>
+<?php if (!empty($errors)): ?>
+    <div class="mb-6 p-4 bg-red-50 border border-red-200/80 rounded-xl">
+        <ul class="list-disc list-inside text-xs font-semibold text-red-700 space-y-1">
+            <?php foreach ($errors as $error): ?>
+                <li><?= htmlspecialchars($error) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
 
-<div class="max-w-screen-2xl bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-    <?php if (!empty($errors)): ?>
-        <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
-            <ul class="list-disc list-inside space-y-1">
-                <?php foreach ($errors as $error): ?>
-                    <li><?= htmlspecialchars($error) ?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-    <?php endif; ?>
-
-    <form method="POST">
+<div class="p-6 rounded-2xl shadow-2xs border border-slate-200/80 bg-white w-full">
+    <form method="POST" class="space-y-5">
         <input type="hidden" name="session_id" value="<?= $sessionId ?>">
 
-        <div class="mb-4">
-            <label for="nrp" class="block text-sm font-medium text-gray-700 mb-1">NRP</label>
-            <input type="text" id="nrp" name="nrp" value="<?= htmlspecialchars($_POST['nrp'] ?? '') ?>"
-                placeholder="Contoh: 5025211001"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light outline-none"
-                required>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+                <label for="nrp" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">NRP / NIM <span class="text-red-500">*</span></label>
+                <input type="text" id="nrp" name="nrp" value="<?= htmlspecialchars($_POST['nrp'] ?? '') ?>" required
+                    placeholder="Contoh: 5025211001"
+                    class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all outline-none">
+            </div>
+
+            <div>
+                <label for="name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
+                <input type="text" id="name" name="name" value="<?= htmlspecialchars($_POST['name'] ?? '') ?>" required
+                    placeholder="Contoh: Ahmad Subagyo"
+                    class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all outline-none">
+            </div>
         </div>
 
-        <div class="mb-4">
-            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-            <input type="text" id="name" name="name" value="<?= htmlspecialchars($_POST['name'] ?? '') ?>"
-                placeholder="Nama: Malik Gntg"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light outline-none"
-                required>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+                <label for="faculty_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Fakultas <span class="text-red-500">*</span></label>
+                <select id="faculty_id" name="faculty_id" required
+                    class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all outline-none">
+                    <option value="">-- Pilih Fakultas --</option>
+                    <?php foreach ($faculties as $faculty): ?>
+                        <option value="<?= $faculty['id'] ?>" <?= ($_POST['faculty_id'] ?? '') == $faculty['id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($faculty['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div>
+                <label for="study_program_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Program Studi <span class="text-red-500">*</span></label>
+                <select id="study_program_id" name="study_program_id" required
+                    class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all outline-none">
+                    <option value="">-- Pilih Prodi --</option>
+                    <?php foreach ($studyPrograms as $sp): ?>
+                        <option value="<?= $sp['id'] ?>" <?= ($_POST['study_program_id'] ?? '') == $sp['id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($sp['name']) ?> (<?= htmlspecialchars($sp['degree_level']) ?>)
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
 
-        <div class="mb-4">
-            <label for="faculty_id" class="block text-sm font-medium text-gray-700 mb-1">Fakultas</label>
-            <select id="faculty_id" name="faculty_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light outline-none"
-                required>
-                <option value="">-- Pilih Fakultas --</option>
-                <?php foreach ($faculties as $faculty): ?>
-                    <option value="<?= $faculty['id'] ?>" <?= ($_POST['faculty_id'] ?? '') == $faculty['id'] ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($faculty['name']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-
-        <div class="mb-4">
-            <label for="study_program_id" class="block text-sm font-medium text-gray-700 mb-1">Program Studi</label>
-            <select id="study_program_id" name="study_program_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light outline-none"
-                required>
-                <option value="">-- Pilih Prodi --</option>
-                <?php foreach ($studyPrograms as $sp): ?>
-                    <option value="<?= $sp['id'] ?>" <?= ($_POST['study_program_id'] ?? '') == $sp['id'] ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($sp['name']) ?> (<?= htmlspecialchars($sp['degree_level']) ?>)
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-
-        <div class="mb-6">
-            <label for="seat_id" class="block text-sm font-medium text-gray-700 mb-1">Kursi (Opsional)</label>
+        <div>
+            <label for="seat_id" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Alokasi Kursi (Opsional)</label>
             <select id="seat_id" name="seat_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light outline-none">
-                <option value="">-- Belum Ditentukan --</option>
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all outline-none">
+                <option value="">-- Belum Ditentukan / Plot Otomatis Nanti --</option>
                 <?php foreach ($seats as $seat): ?>
                     <option value="<?= $seat['id'] ?>" <?= ($_POST['seat_id'] ?? '') == $seat['id'] ? 'selected' : '' ?>>
                         Baris <?= htmlspecialchars($seat['row']) ?> <?= $seat['side'] == 'left' ? 'Kiri' : 'Kanan' ?> — No. <?= htmlspecialchars($seat['number'] ?? $seat['position']) ?>
@@ -89,22 +80,15 @@
             </select>
         </div>
 
-        <div class="flex justify-end space-x-3 pt-2">
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
             <a href="/graduates?session_id=<?= $sessionId ?>"
-                class="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" class="w-4 h-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                </svg>
+                class="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all">
                 Batal
             </a>
             <button type="submit"
-                class="inline-flex items-center gap-1.5 px-4 py-2 bg-its-blue-light hover:bg-its-blue text-white rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" class="w-4 h-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-                Simpan
+                class="inline-flex items-center gap-2 px-5 py-2 bg-its-blue-light text-white rounded-xl text-xs font-bold hover:bg-its-blue transition-all shadow-xs cursor-pointer">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                Simpan Wisudawan
             </button>
         </div>
     </form>

@@ -1,49 +1,43 @@
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
-<!-- Breadcrumb -->
-<nav class="flex items-center gap-2 text-xs font-medium text-gray-500 mb-3">
-    <a href="/graduation-events" class="hover:text-its-blue-light transition-colors">Wisuda</a>
-    <span class="text-gray-300">/</span>
-    <span class="text-gray-800 font-semibold"><?= htmlspecialchars($event['name']) ?></span>
-</nav>
-
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+<!-- Header & Breadcrumb Terpadu -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
-        <h1 class="text-2xl font-bold text-gray-800 tracking-tight"><?= htmlspecialchars($event['name']) ?></h1>
-        <p class="text-sm text-gray-500 mt-1">Daftar sesi pelaksanaan wisuda untuk event ini.</p>
+        <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
+            <a href="/graduation-events" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
+            <svg class="w-3 h-3 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <span class="text-slate-700 font-bold"><?= htmlspecialchars($event['name']) ?></span>
+        </nav>
+        <h1 class="text-xl font-bold text-slate-800 tracking-tight">Daftar Sesi Wisuda</h1>
     </div>
+    
     <a href="/graduation-sessions/create?event_id=<?= $event['id'] ?>"
-        class="inline-flex items-center gap-2 px-4 py-2.5 bg-its-blue-light text-white rounded-xl text-sm font-semibold hover:bg-its-blue transition-all shadow-sm hover:shadow-md cursor-pointer whitespace-nowrap self-start sm:self-auto">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-            <path fill-rule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
-        </svg>
-        Tambah Sesi
+        class="inline-flex items-center gap-2 px-4 py-2 bg-its-blue-light text-white rounded-xl text-xs font-bold hover:bg-its-blue transition-all shadow-xs cursor-pointer whitespace-nowrap self-start sm:self-auto">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        Tambah Sesi Baru
     </a>
 </div>
 
 <?php if (!empty($_SESSION['success'])): ?>
-    <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg border border-green-200">
+    <div class="p-3.5 mb-5 text-xs font-semibold text-emerald-800 bg-emerald-50 rounded-xl border border-emerald-200/80 flex items-center gap-2">
+        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
         <?= htmlspecialchars($_SESSION['success']) ?>
         <?php unset($_SESSION['success']); ?>
     </div>
 <?php endif; ?>
 
-<!-- Form Tersembunyi untuk Bulk Delete -->
+<!-- Form Tersembunyi & Floating Bulk Bar -->
 <form id="bulkDeleteForm" method="POST" action="/graduation-sessions/bulk-delete" class="hidden">
     <input type="hidden" name="_method" value="DELETE">
 </form>
 
-<!-- Floating Bulk Action Bar (Tanpa Menggeser Layout Tabel) -->
-<div id="bulkToolbar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white rounded-full shadow-2xl px-5 py-3 border border-slate-700 hidden items-center gap-4 z-50 transition-all transform duration-200">
+<div id="bulkToolbar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white rounded-full shadow-2xl px-5 py-2.5 border border-slate-700 hidden items-center gap-4 z-50 transition-all">
     <div class="flex items-center gap-2 text-xs font-medium text-slate-300">
         <span id="selectedCount" class="bg-its-blue-light text-white px-2 py-0.5 rounded-full font-bold text-xs">0</span>
         <span>item terpilih</span>
     </div>
     <div class="h-4 w-px bg-slate-700"></div>
-    <button type="button" onclick="submitBulkDelete()" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-        </svg>
+    <button type="button" onclick="submitBulkDelete()" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer">
         Hapus Terpilih
     </button>
     <button type="button" onclick="unselectAll()" class="text-xs text-slate-400 hover:text-white transition-colors px-2 py-1 font-medium cursor-pointer">
@@ -51,81 +45,64 @@
     </button>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-    <!-- Card Header Control Bar -->
-    <div class="px-5 py-4 bg-white border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div class="relative flex-1 max-w-xs">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-            </div>
+<!-- Card Tabel Utama -->
+<div class="bg-white rounded-2xl shadow-2xs border border-slate-200/80 overflow-hidden">
+    <div class="p-4 bg-white border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="relative flex-1 max-w-sm">
             <input type="text" id="searchInput" placeholder="Cari tanggal atau status..."
-                class="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-800 placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light transition-all outline-none">
+                class="w-full pl-3.5 pr-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all outline-none">
         </div>
         <div class="flex items-center gap-2">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-its-blue/5 text-its-blue border border-its-blue/15">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-its-blue/5 text-its-blue border border-its-blue/15">
                 Total: <?= count($sessions ?? []) ?> Sesi
             </span>
         </div>
     </div>
 
     <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left text-gray-900">
-            <thead class="bg-its-blue/5 border-b border-its-blue/10 text-its-blue uppercase font-bold text-[11px] tracking-wider">
+        <table class="w-full text-xs text-left text-slate-800">
+            <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 uppercase font-bold text-[10px] tracking-wider">
                 <tr>
                     <th class="px-4 py-3 text-center w-10">
-                        <input type="checkbox" id="selectAll" class="w-4 h-4 text-its-blue-light border-gray-300 rounded focus:ring-its-blue-light cursor-pointer">
+                        <input type="checkbox" id="selectAll" class="w-4 h-4 text-its-blue-light border-slate-300 rounded cursor-pointer">
                     </th>
-                    <th class="px-6 py-3 text-left">Tanggal</th>
-                    <th class="px-6 py-3 text-center">Sesi Ke-</th>
+                    <th class="px-6 py-3 text-left">Tanggal Exec</th>
+                    <th class="px-6 py-3 text-center">Sesi</th>
                     <th class="px-6 py-3 text-center">Status</th>
                     <th class="px-6 py-3 text-right">Aksi</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-slate-100">
                 <?php if (empty($sessions)): ?>
                     <tr>
-                        <td colspan="5" class="px-6 py-8 text-center text-gray-400 italic">Belum ada sesi untuk event ini.</td>
+                        <td colspan="5" class="px-6 py-8 text-center text-slate-400 italic">Belum ada sesi untuk event ini.</td>
                     </tr>
                 <?php else: ?>
                     <?php foreach ($sessions as $session): ?>
-                        <?php
-                            $badgeClass = match($session['status']) {
-                                'published' => 'bg-green-100 text-green-700 border-green-200',
-                                'archived'  => 'bg-yellow-100 text-yellow-700 border-yellow-200',
-                                default     => 'bg-gray-100 text-gray-700 border-gray-200',
-                            };
-                        ?>
-                        <tr class="hover:bg-gray-50/80 transition-colors">
-                            <td class="px-4 py-4 text-center">
-                                <input type="checkbox" class="rowCheckbox w-4 h-4 text-its-blue-light border-gray-300 rounded focus:ring-its-blue-light cursor-pointer" value="<?= $session['id'] ?>">
+                        <tr class="hover:bg-slate-50/80 transition-colors">
+                            <td class="px-4 py-3.5 text-center">
+                                <input type="checkbox" class="rowCheckbox w-4 h-4 text-its-blue-light border-slate-300 rounded cursor-pointer" value="<?= $session['id'] ?>">
                             </td>
-                            <td class="px-6 py-4 font-semibold text-gray-900">
+                            <td class="px-6 py-3.5 font-bold text-slate-800">
                                 <?= date('d F Y', strtotime($session['date'])) ?>
                             </td>
-                            <td class="px-6 py-4 text-center text-gray-600 font-medium"><?= htmlspecialchars($session['session'] ?? '-') ?></td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-md border capitalize <?= $badgeClass ?>">
+                            <td class="px-6 py-3.5 text-center text-slate-600 font-semibold">Sesi <?= htmlspecialchars($session['session'] ?? '-') ?></td>
+                            <td class="px-6 py-3.5 text-center">
+                                <span class="inline-block px-2.5 py-0.5 text-[11px] font-bold rounded-md border capitalize <?= $session['status'] === 'published' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200' ?>">
                                     <?= htmlspecialchars($session['status']) ?>
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                                <a href="/seat-rows?session_id=<?= $session['id'] ?>" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200">🪑 Kursi</a>
-                                <a href="/graduates?session_id=<?= $session['id'] ?>" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors border border-slate-200">🎓 Wisudawan</a>
-                                <a href="/graduation-sessions/edit?id=<?= $session['id'] ?>"
-                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
+                            <td class="px-6 py-3.5 text-right space-x-1 whitespace-nowrap">
+                                <a href="/seat-rows?session_id=<?= $session['id'] ?>" class="px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
+                                    Kelola Kursi
+                                </a>
+                                <a href="/graduates?session_id=<?= $session['id'] ?>" class="px-2.5 py-1.5 text-xs font-bold text-its-blue bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
+                                    Wisudawan
+                                </a>
+                                <a href="/graduation-sessions/edit?id=<?= $session['id'] ?>" class="px-2.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
                                     Edit
                                 </a>
-                                <a href="/graduation-sessions/delete?id=<?= $session['id'] ?>"
-                                    onclick="return confirm('Yakin hapus? Semua kursi dan wisudawan di dalamnya ikut terhapus.')"
-                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/60">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
+                                <a href="/graduation-sessions/delete?id=<?= $session['id'] ?>" onclick="return confirm('Yakin hapus?')" class="px-2.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-red-200">
                                     Hapus
                                 </a>
                             </td>
@@ -148,25 +125,17 @@
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 const query = this.value.toLowerCase().trim();
-                const rows = document.querySelectorAll('tbody tr');
-                rows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    row.style.display = text.includes(query) ? '' : 'none';
+                document.querySelectorAll('tbody tr').forEach(row => {
+                    row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
                 });
             });
         }
 
         window.updateToolbarState = function() {
             const checkedCount = document.querySelectorAll('.rowCheckbox:checked').length;
-            
-            if (checkedCount > 0) {
-                bulkToolbar.classList.remove('hidden');
-                bulkToolbar.classList.add('flex');
-                selectedCount.textContent = checkedCount;
-            } else {
-                bulkToolbar.classList.remove('flex');
-                bulkToolbar.classList.add('hidden');
-            }
+            bulkToolbar.classList.toggle('hidden', checkedCount === 0);
+            bulkToolbar.classList.toggle('flex', checkedCount > 0);
+            if (selectedCount) selectedCount.textContent = checkedCount;
         };
 
         window.unselectAll = function() {
@@ -180,20 +149,14 @@
                 rowCheckboxes.forEach(cb => cb.checked = selectAll.checked);
                 window.updateToolbarState();
             });
-
-            rowCheckboxes.forEach(cb => {
-                cb.addEventListener('change', function() {
-                    selectAll.checked = Array.from(rowCheckboxes).every(c => c.checked);
-                    window.updateToolbarState();
-                });
-            });
+            rowCheckboxes.forEach(cb => cb.addEventListener('change', window.updateToolbarState));
         }
     });
 
     function submitBulkDelete() {
         const checked = document.querySelectorAll('.rowCheckbox:checked');
-        if (checked.length === 0) { alert('Pilih minimal satu sesi!'); return; }
-        if (confirm(`Yakin mau hapus ${checked.length} sesi terpilih?`)) {
+        if (checked.length === 0) return;
+        if (confirm(`Hapus ${checked.length} sesi terpilih?`)) {
             const form = document.getElementById('bulkDeleteForm');
             form.querySelectorAll('input[name="ids[]"]').forEach(el => el.remove());
             checked.forEach(cb => {
