@@ -68,7 +68,6 @@
             z-index: 2;
         }
 
-        /* Ring Highlight */
         .selected-seat-ring {
             box-shadow: 0 0 0 3px #127BBE, 0 4px 14px rgba(18, 123, 190, 0.4);
             transform: scale(1.1);
@@ -76,7 +75,6 @@
             z-index: 20 !important;
         }
 
-        /* Pulse Animation saat hasil pencarian */
         @keyframes seatPulse {
             0% {
                 box-shadow: 0 0 0 3px #127BBE, 0 0 8px rgba(18, 123, 190, 0.5);
@@ -98,7 +96,6 @@
             z-index: 25 !important;
         }
 
-        /* Scrollbar Halus */
         .custom-scrollbar::-webkit-scrollbar {
             width: 5px;
             height: 5px;
@@ -122,76 +119,10 @@
 
 <body class="font-sans antialiased text-slate-800 min-h-screen w-full flex flex-col overflow-x-hidden" x-data="seatMapApp()">
 
-<?php
-    $seatMapInfo = [];
-    $allGraduatesList = [];
-    $leftRows = $leftRows ?? [];
-    $rightRows = $rightRows ?? [];
-
-    if (!empty($activeSession)) {
-        $globalCounter = 1;
-        $rowLabels = [];
-        foreach ($leftRows as $lr) { $rowLabels[$lr['row']] = true; }
-        foreach ($rightRows as $rr) { $rowLabels[$rr['row']] = true; }
-        ksort($rowLabels);
-
-        $leftByRow = [];
-        foreach ($leftRows as $lr) { $leftByRow[$lr['row']] = $lr; }
-        $rightByRow = [];
-        foreach ($rightRows as $rr) { $rightByRow[$rr['row']] = $rr; }
-
-        foreach (array_keys($rowLabels) as $label) {
-            if (!empty($leftByRow[$label]['seats'])) {
-                foreach ($leftByRow[$label]['seats'] as $s) {
-                    $num = $globalCounter++;
-                    $seatMapInfo[$s['id']] = [
-                        'code' => $label . sprintf('%03d', $num),
-                        'num' => $num
-                    ];
-                }
-            }
-            if (!empty($rightByRow[$label]['seats'])) {
-                foreach ($rightByRow[$label]['seats'] as $s) {
-                    $num = $globalCounter++;
-                    $seatMapInfo[$s['id']] = [
-                        'code' => $label . sprintf('%03d', $num),
-                        'num' => $num
-                    ];
-                }
-            }
-        }
-
-        $collectGraduates = function($rows) use (&$allGraduatesList, $seatMapInfo) {
-            foreach ($rows as $r) {
-                if (!empty($r['seats'])) {
-                    foreach ($r['seats'] as $s) {
-                        if (!empty($s['graduate_name'])) {
-                            $facCode = !empty($s['faculty_code']) ? $s['faculty_code'] : ($s['faculty_name'] ?? '-');
-                            $allGraduatesList[] = [
-                                'seat_id' => (int)$s['id'],
-                                'seat_code' => $seatMapInfo[$s['id']]['code'] ?? '-',
-                                'name' => $s['graduate_name'],
-                                'nrp' => $s['nrp'],
-                                'prodi' => $s['prodi_name'] ?? '-',
-                                'faculty' => $facCode,
-                                'faculty_name' => $s['faculty_name'] ?? '-',
-                                'color' => $s['faculty_color'] ?? '#cbd5e1'
-                            ];
-                        }
-                    }
-                }
-            }
-        };
-        $collectGraduates($leftRows);
-        $collectGraduates($rightRows);
-    }
-?>
-
     <!-- HEADER RESPONSIF RAPI -->
     <header class="w-full bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
         <div class="max-w-[98vw] mx-auto px-3 md:px-4 py-2 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 md:gap-3">
             
-            <!-- Baris 1: Logo & Dropdown (Desktop: Sejajar di Kiri) -->
             <div class="flex items-center justify-between gap-3 shrink-0">
                 <div class="flex items-center gap-2.5">
                     <img src="/images/logo.png" alt="ITS Logo" class="w-8 h-8 md:w-9 md:h-9 object-contain">
@@ -206,7 +137,6 @@
                     </div>
                 </div>
 
-                <!-- Dropdown Sesi di HP Pindah ke Kanan Atas -->
                 <div class="md:hidden w-44">
                     <form method="GET" id="sessionFormMobile" class="m-0">
                         <select name="session_id" 
@@ -225,7 +155,6 @@
                 </div>
             </div>
 
-            <!-- Dropdown Sesi Desktop -->
             <div class="hidden md:block shrink-0 w-64 md:w-72">
                 <form method="GET" id="sessionForm" class="m-0">
                     <select name="session_id" id="session_id" 
@@ -243,7 +172,6 @@
                 </form>
             </div>
 
-            <!-- Baris 2: Search Input & Zoom (Desktop: Sejajar di Kanan) -->
             <div class="flex items-center gap-2 w-full md:w-auto flex-1 max-w-none md:max-w-md">
                 <div class="relative flex-1 min-w-0">
                     <div class="relative flex items-center">
@@ -256,7 +184,6 @@
                             class="w-full pl-7 pr-2 py-1.5 border border-slate-300 rounded-lg text-xs font-medium bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all shadow-2xs disabled:bg-slate-100">
                     </div>
 
-                    <!-- Dropdown Hasil Pencarian -->
                     <?php if (!empty($activeSession)): ?>
                         <div x-show="searchQuery.trim() !== ''" x-cloak 
                              class="absolute top-full left-0 right-0 mt-1.5 bg-white border border-its-blue-sky/40 rounded-xl shadow-xl z-50 p-2 text-left max-h-64 overflow-y-auto custom-scrollbar divide-y divide-slate-100">
@@ -283,7 +210,6 @@
                     <?php endif; ?>
                 </div>
 
-                <!-- Zoom Controls -->
                 <div class="flex items-center gap-0.5 shrink-0 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs shadow-2xs <?= empty($activeSession) ? 'opacity-50 pointer-events-none' : '' ?>">
                     <button type="button" onmousedown="window.startZoomHold(-0.05)" onmouseup="window.stopZoomHold()" onmouseleave="window.stopZoomHold()" ontouchstart="window.startZoomHold(-0.05)" ontouchend="window.stopZoomHold()" class="w-6 h-6 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-bold text-slate-700 flex items-center justify-center">-</button>
                     <span id="zoomIndicator" class="w-10 text-center font-extrabold text-its-blue text-[11px]">100%</span>
@@ -309,12 +235,10 @@
                 </p>
             </div>
         <?php else: ?>
-            <!-- PANGGUNG UTAMA -->
             <div class="bg-its-blue text-white font-bold tracking-widest py-2 px-4 rounded-xl mb-3 shadow-xs w-full text-[11px] md:text-xs text-center border-b-4 border-its-yellow shrink-0">
                 PANGGUNG UTAMA / REKTORAT
             </div>
 
-            <!-- CANVAS CONTAINER DENAH -->
             <div class="w-full relative flex-grow flex flex-col items-center overflow-hidden">
                 <div id="denahContainer" class="w-full overflow-auto pb-8 pt-2 cursor-grab active:cursor-grabbing custom-scrollbar touch-pan-x touch-pan-y">
                     <div id="zoomWrapper" class="inline-block relative transition-all duration-75">
@@ -332,14 +256,14 @@
                                                         $hasGraduate = !empty($seat['graduate_name']);
                                                         $facultyColor = $hasGraduate && !empty($seat['faculty_color']) ? $seat['faculty_color'] : '#cbd5e1';
                                                         $graduateData = $hasGraduate ? [
-                                                            'seat_id' => $seat['id'],
-                                                            'seat_code' => $seatMapInfo[$seat['id']]['code'] ?? '-',
-                                                            'name' => $seat['graduate_name'],
-                                                            'nrp' => $seat['nrp'],
-                                                            'prodi' => $seat['prodi_name'] ?? '-',
-                                                            'faculty' => !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-'),
+                                                            'seat_id'      => $seat['id'],
+                                                            'seat_code'    => $seatMapInfo[$seat['id']]['code'] ?? '-',
+                                                            'name'         => $seat['graduate_name'],
+                                                            'nrp'          => $seat['nrp'],
+                                                            'prodi'        => $seat['prodi_name'] ?? '-',
+                                                            'faculty'      => !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-'),
                                                             'faculty_name' => $seat['faculty_name'] ?? '-',
-                                                            'color' => $facultyColor,
+                                                            'color'        => $facultyColor,
                                                         ] : null;
                                                     ?>
                                                     <div class="flex flex-col items-center relative" :class="{ 'z-30': searchedSeatIds.includes(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
@@ -384,14 +308,14 @@
                                                         $hasGraduate = !empty($seat['graduate_name']);
                                                         $facultyColor = $hasGraduate && !empty($seat['faculty_color']) ? $seat['faculty_color'] : '#cbd5e1';
                                                         $graduateData = $hasGraduate ? [
-                                                            'seat_id' => $seat['id'],
-                                                            'seat_code' => $seatMapInfo[$seat['id']]['code'] ?? '-',
-                                                            'name' => $seat['graduate_name'],
-                                                            'nrp' => $seat['nrp'],
-                                                            'prodi' => $seat['prodi_name'] ?? '-',
-                                                            'faculty' => !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-'),
+                                                            'seat_id'      => $seat['id'],
+                                                            'seat_code'    => $seatMapInfo[$seat['id']]['code'] ?? '-',
+                                                            'name'         => $seat['graduate_name'],
+                                                            'nrp'          => $seat['nrp'],
+                                                            'prodi'        => $seat['prodi_name'] ?? '-',
+                                                            'faculty'      => !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-'),
                                                             'faculty_name' => $seat['faculty_name'] ?? '-',
-                                                            'color' => $facultyColor,
+                                                            'color'        => $facultyColor,
                                                         ] : null;
                                                     ?>
                                                     <div class="flex flex-col items-center relative" :class="{ 'z-30': searchedSeatIds.includes(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
@@ -525,18 +449,17 @@
             const maxScale = 1.8;
             let holdInterval = null;
 
-            // FUNGSI AUTO ZOOM RESPONSIF (KUNCI KODE TEMANMU)
             function calculateInitialScale() {
                 if (!container || !zoomContent) return 1;
                 const windowWidth = window.innerWidth;
                 const contentWidth = zoomContent.scrollWidth || 1200;
 
-                if (windowWidth < 640) { // Mobile HP
+                if (windowWidth < 640) {
                     return Math.max(0.30, Math.min(0.45, (windowWidth - 20) / contentWidth));
-                } else if (windowWidth < 1024) { // Tablet
+                } else if (windowWidth < 1024) {
                     return Math.max(0.60, Math.min(0.80, (windowWidth - 40) / contentWidth));
                 }
-                return 1; // Desktop
+                return 1;
             }
 
             function applyZoom() {
@@ -576,7 +499,6 @@
                 centerToLorong();
             };
 
-            // Inisialisasi awal
             setTimeout(() => {
                 currentScale = calculateInitialScale();
                 applyZoom();
@@ -596,7 +518,6 @@
                 if (holdInterval) { clearInterval(holdInterval); holdInterval = null; }
             };
 
-            // Touch Pinch Zoom di Mobile
             let initialPinchDistance = null;
             if (container) {
                 container.addEventListener('touchstart', (e) => {
