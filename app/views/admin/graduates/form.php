@@ -1,8 +1,8 @@
-<h1 class="text-xl font-bold text-gray-800 mb-6">
+<h1 class="text-2xl font-bold text-slate-800 tracking-tight mb-6">
     Tambah Wisudawan — Sesi <?= !empty($session['date']) ? date('d F Y', strtotime($session['date'])) : '' ?>
 </h1>
 
-<div class="p-6 rounded-xl shadow-sm border border-gray-200 bg-white"
+<div class="p-6 rounded-2xl shadow-2xs border border-slate-200/80 bg-white"
      x-data="{ 
          selectedFaculty: '<?= $_POST['faculty_id'] ?? '' ?>',
          allStudyPrograms: <?= htmlspecialchars(json_encode($studyPrograms), ENT_QUOTES, 'UTF-8') ?>,
@@ -16,25 +16,25 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label for="nrp" class="block text-sm font-medium text-gray-700 mb-1">NRP / NIM</label>
+                <label for="nrp" class="block text-sm font-medium text-slate-700 mb-1">NRP / NIM</label>
                 <input type="text" id="nrp" name="nrp" value="<?= htmlspecialchars($_POST['nrp'] ?? '') ?>" required
                     placeholder="Contoh: 5025211001"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light">
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light">
             </div>
 
             <div>
-                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                <label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap</label>
                 <input type="text" id="name" name="name" value="<?= htmlspecialchars($_POST['name'] ?? '') ?>" required
                     placeholder="Contoh: Ahmad Subagyo"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light">
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light">
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label for="faculty_id" class="block text-sm font-medium text-gray-700 mb-1">Fakultas</label>
+                <label for="faculty_id" class="block text-sm font-medium text-slate-700 mb-1">Fakultas</label>
                 <select id="faculty_id" name="faculty_id" x-model="selectedFaculty" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light bg-white cursor-pointer">
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light bg-white cursor-pointer">
                     <option value="">-- Pilih Fakultas Dulu --</option>
                     <?php foreach ($faculties as $faculty): ?>
                         <option value="<?= $faculty['id'] ?>">
@@ -45,10 +45,10 @@
             </div>
 
             <div>
-                <label for="study_program_id" class="block text-sm font-medium text-gray-700 mb-1">Program Studi</label>
+                <label for="study_program_id" class="block text-sm font-medium text-slate-700 mb-1">Program Studi</label>
                 <select id="study_program_id" name="study_program_id" required
                     :disabled="!selectedFaculty"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                     <option value="">-- Pilih Prodi --</option>
                     <template x-for="sp in filteredStudyPrograms" :key="sp.id">
                         <option :value="sp.id" x-text="`${sp.name} (${sp.degree_level})`" :selected="sp.id == '<?= $_POST['study_program_id'] ?? '' ?>'"></option>
@@ -58,9 +58,9 @@
         </div>
 
         <div>
-            <label for="seat_id" class="block text-sm font-medium text-gray-700 mb-1">Alokasi Kursi Kosong (Opsional)</label>
+            <label for="seat_id" class="block text-sm font-medium text-slate-700 mb-1">Alokasi Kursi Kosong (Opsional)</label>
             <select id="seat_id" name="seat_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light bg-white cursor-pointer">
+                class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light bg-white cursor-pointer">
                 <option value="">-- Biarkan Sistem Plot Otomatis Nanti --</option>
                 <?php if (empty($seats)): ?>
                     <option value="" disabled>Semua kursi di sesi ini sudah penuh terisi!</option>
@@ -76,14 +76,14 @@
 
         <div class="flex justify-end gap-3 pt-2">
             <a href="/graduates?session_id=<?= $sessionId ?>"
-                class="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors">
+                class="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-medium transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
                 Batal
             </a>
             <button type="submit"
-                class="inline-flex items-center gap-1.5 px-6 py-2 bg-its-blue-light hover:bg-its-blue text-white font-medium text-sm rounded-lg shadow-sm transition-colors cursor-pointer">
+                class="inline-flex items-center gap-1.5 px-6 py-2 bg-its-blue-light hover:bg-its-blue text-white font-medium text-sm rounded-xl shadow-sm transition-colors cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>

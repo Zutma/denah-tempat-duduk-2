@@ -116,6 +116,39 @@
             </tbody>
         </table>
     </div>
+
+    <?php if ($totalPages > 1): ?>
+        <div class="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-white">
+            <p class="text-xs font-medium text-slate-500">
+                Halaman <span class="font-bold text-slate-700"><?= $page ?></span> dari <span class="font-bold text-slate-700"><?= $totalPages ?></span>
+            </p>
+            <div class="flex items-center gap-1.5">
+                <?php if ($page > 1): ?>
+                    <a href="/graduates?session_id=<?= $sessionId ?>&page=<?= $page - 1 ?>"
+                        class="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
+                        ← Sebelumnya
+                    </a>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <a href="/graduates?session_id=<?= $sessionId ?>&page=<?= $i ?>"
+                        class="w-8 h-8 inline-flex items-center justify-center text-xs font-bold rounded-lg transition-colors border
+                            <?= $i == $page
+                                ? 'bg-its-blue-light text-white border-its-blue-light'
+                                : 'text-slate-600 bg-white hover:bg-slate-100 border-slate-200' ?>">
+                        <?= $i ?>
+                    </a>
+                <?php endfor; ?>
+
+                <?php if ($page < $totalPages): ?>
+                    <a href="/graduates?session_id=<?= $sessionId ?>&page=<?= $page + 1 ?>"
+                        class="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
+                        Selanjutnya →
+                    </a>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>
 
 <script>

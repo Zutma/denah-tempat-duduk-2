@@ -6,7 +6,7 @@
             <span class="text-slate-300">/</span>
             <a href="/graduates?session_id=<?= htmlspecialchars($sessionId ?? '') ?>" class="hover:text-its-blue transition-colors">Wisudawan</a>
             <span class="text-slate-300">/</span>
-            <span class="text-slate-600 font-bold">Import CSV</span>
+            <span class="text-slate-700 font-bold">Import CSV</span>
         </nav>
         <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Import Data Wisudawan</h1>
         <p class="text-sm text-slate-500 mt-1">Unggah file CSV sesuai template untuk mengimpor data mahasiswa sekaligus.</p>
@@ -52,4 +52,3 @@
         </form>
     </div>
 </div>
-

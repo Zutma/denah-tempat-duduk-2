@@ -1,7 +1,6 @@
+<h1 class="text-2xl font-bold text-slate-800 tracking-tight mb-6"><?= !empty($studyProgram['id']) ? 'Edit Program Studi' : 'Tambah Program Studi' ?></h1>
 
-<h1 class="text-xl font-bold text-gray-800 mb-6"><?= !empty($studyProgram['id']) ? 'Edit Program Studi' : 'Tambah Program Studi' ?></h1>
-
-<div class="p-6 rounded-xl shadow-sm border border-gray-200 bg-white">
+<div class="p-6 rounded-2xl shadow-2xs border border-slate-200/80 bg-white">
     <form method="POST" class="flex flex-col gap-4">
         <?php if (!empty($studyProgram['id'])): ?>
             <input type="hidden" name="id" value="<?= $studyProgram['id'] ?>">
@@ -9,9 +8,9 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label for="faculty_id" class="block text-sm font-medium text-gray-700 mb-1">Fakultas</label>
+                <label for="faculty_id" class="block text-sm font-medium text-slate-700 mb-1">Fakultas</label>
                 <select id="faculty_id" name="faculty_id"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light bg-white">
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light bg-white">
                     <option value="">-- Pilih Fakultas --</option>
                     <?php foreach ($faculties as $faculty): ?>
                         <option value="<?= $faculty['id'] ?>"
@@ -23,30 +22,30 @@
             </div>
 
             <div>
-                <label for="degree_level" class="block text-sm font-medium text-gray-700 mb-1">Jenjang (S1/S2/S3/D4)</label>
+                <label for="degree_level" class="block text-sm font-medium text-slate-700 mb-1">Jenjang (S1/S2/S3/D4)</label>
                 <input type="text" id="degree_level" name="degree_level" value="<?= htmlspecialchars($studyProgram['degree_level'] ?? '') ?>"
                     placeholder="Contoh: S1"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light uppercase placeholder:normal-case">
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light uppercase placeholder:normal-case">
             </div>
         </div>
 
         <div>
-            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Program Studi</label>
+            <label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nama Program Studi</label>
             <input type="text" id="name" name="name" value="<?= htmlspecialchars($studyProgram['name'] ?? '') ?>"
                 placeholder="Contoh: Informatika"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-light focus:border-its-blue-light">
+                class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light">
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
             <a href="/study-programs"
-                class="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors">
+                class="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-medium transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
                 Batal
             </a>
             <button type="submit"
-                class="inline-flex items-center gap-1.5 px-6 py-2 bg-its-blue-light hover:bg-its-blue text-white font-medium text-sm rounded-lg shadow-sm transition-colors cursor-pointer">
+                class="inline-flex items-center gap-1.5 px-6 py-2 bg-its-blue-light hover:bg-its-blue text-white font-medium text-sm rounded-xl shadow-sm transition-colors cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
@@ -65,4 +64,3 @@
         </ul>
     </div>
 <?php endif; ?>
-

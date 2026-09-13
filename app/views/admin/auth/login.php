@@ -6,7 +6,7 @@
     <title>Login - Sistem Wisuda</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="font-sans text-gray-900 antialiased">
+<body class="font-sans text-slate-800 antialiased">
 
     <!-- Container Utama dengan Background Gambar Denah -->
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-cover bg-center bg-no-repeat relative"
@@ -22,9 +22,9 @@
             </div>
 
             <!-- Form Card -->
-            <div class="w-full sm:max-w-md px-6 py-8 bg-white/95 backdrop-blur-md shadow-2xl overflow-hidden sm:rounded-xl border border-white/20">
-                <h2 class="text-xl font-bold text-gray-800 mb-1">Masuk ke Admin Portal</h2>
-                <p class="text-sm text-gray-500 mb-6">Sistem Informasi Denah Tempat Duduk Wisuda</p>
+            <div class="w-full sm:max-w-md px-6 py-8 bg-white/95 backdrop-blur-md shadow-2xl overflow-hidden sm:rounded-2xl border border-white/20">
+                <h2 class="text-xl font-bold text-slate-800 mb-1">Masuk ke Admin Portal</h2>
+                <p class="text-sm text-slate-500 mb-6">Sistem Informasi Denah Tempat Duduk Wisuda</p>
 
                 <?php if (!empty($errors)): ?>
                     <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
@@ -38,23 +38,23 @@
 
                 <form method="POST" class="space-y-5">
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
                         <input type="email" id="email" name="email"
                             value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
                             required autofocus
-                            class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
+                            class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition">
                     </div>
 
                     <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
                         <input type="password" id="password" name="password"
                             required
-                            class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
+                            class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition">
                     </div>
 
                     <div class="flex items-center justify-end pt-1">
                         <button type="submit"
-                            class="px-6 py-2.5 bg-[#127BBE] hover:bg-[#75BDE0] active:bg-[#233F7C] text-white font-semibold text-sm rounded-lg shadow-sm transition-colors">
+                            class="px-6 py-2.5 bg-[#127BBE] hover:bg-[#75BDE0] active:bg-[#233F7C] text-white font-semibold text-sm rounded-xl shadow-sm transition-colors">
                             Log In
                         </button>
                     </div>

@@ -1,12 +1,11 @@
-
-<nav class="flex items-center gap-2 text-sm font-medium text-slate-500 mb-4">
-    <a href="/graduation-events" class="hover:text-its-blue-light transition-colors">Wisuda</a>
+<nav class="flex items-center gap-2 text-sm font-medium text-slate-400 mb-1">
+    <a href="/graduation-events" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
     <span class="text-slate-300">/</span>
-    <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>" class="hover:text-its-blue-light transition-colors">
+    <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>" class="hover:text-its-blue transition-colors">
         <?= htmlspecialchars($session['event_name'] ?? 'Detail Event') ?>
     </a>
     <span class="text-slate-300">/</span>
-    <span class="text-slate-800 font-semibold">Kelola Kursi</span>
+    <span class="text-slate-700 font-bold">Kelola Kursi</span>
 </nav>
 
 <div class="flex items-center justify-between gap-4 mb-6">
@@ -77,7 +76,7 @@
 
             <div class="overflow-x-auto mb-4 border border-slate-200 rounded-xl bg-white">
                 <table class="w-full text-sm text-left border-collapse">
-                    <thead class="bg-its-blue/5 text-its-blue uppercase text-xs font-extrabold tracking-wider border-b border-its-blue/10">
+                    <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 uppercase font-bold text-xs tracking-wider">
                         <tr>
                             <th class="px-5 py-3.5 w-56">BARIS</th>
                             <th class="px-5 py-3.5">KAPASITAS KIRI</th>
@@ -106,7 +105,7 @@
                                 </td>
                                 <td class="p-3 text-center">
                                     <button type="button" @click="removeRow(index)" class="w-9 h-9 inline-flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer" title="Hapus">
-                                        🗑️
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                     </button>
                                 </td>
                             </tr>
@@ -125,7 +124,7 @@
                         Batal
                     </button>
                     <button type="submit" :disabled="rows.length === 0" class="inline-flex items-center gap-2 px-6 py-2.5 bg-its-blue hover:bg-its-blue-light disabled:opacity-50 text-white text-xs font-extrabold rounded-xl shadow-xs transition-all cursor-pointer">
-                        💾 Simpan Semua
+                        Simpan Semua
                     </button>
                 </div>
             </div>
@@ -134,7 +133,7 @@
 
     <div class="overflow-x-auto">
         <table class="w-full text-sm text-left text-slate-800 border-collapse">
-            <thead class="bg-slate-50 border-b border-slate-200/80 text-its-blue uppercase font-extrabold text-xs tracking-wider">
+            <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 uppercase font-bold text-xs tracking-wider">
                 <tr>
                     <th class="px-6 py-4">BARIS</th>
                     <th class="px-6 py-4 text-center">KAPASITAS KIRI</th>
@@ -178,7 +177,7 @@
                             </td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
                                 <a href="/seat-rows/delete?id=<?= $deleteParam ?>&session_id=<?= $session['id'] ?>" onclick="return confirm('Yakin menghapus Baris <?= htmlspecialchars($rLabel) ?>?')" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200/80 rounded-lg transition-colors cursor-pointer">
-                                    🗑️ Hapus
+                                    Hapus
                                 </a>
                             </td>
                         </tr>
@@ -232,4 +231,3 @@
         }
     });
 </script>
-

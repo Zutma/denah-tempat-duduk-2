@@ -13,7 +13,7 @@
 </div>
 
 <?php if (!empty($_SESSION['success'])): ?>
-    <div class="p-4 mb-5 text-sm font-semibold text-green-800 bg-green-50 rounded-xl border border-green-200/80 shadow-2xs">
+    <div class="p-4 mb-5 text-sm font-semibold text-emerald-800 bg-emerald-50 rounded-xl border border-emerald-200/80 flex items-center gap-2">
         ✅ <?= htmlspecialchars($_SESSION['success']) ?>
         <?php unset($_SESSION['success']); ?>
     </div>
@@ -53,7 +53,7 @@
 
     <div class="overflow-x-auto">
         <table class="w-full text-sm text-left text-slate-800 border-collapse">
-            <thead class="bg-its-blue/5 border-b border-its-blue/10 text-its-blue uppercase font-bold text-xs tracking-wider">
+            <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 uppercase font-bold text-xs tracking-wider">
                 <tr>
                     <th class="px-5 py-4 text-center w-12">
                         <input type="checkbox" id="selectAll" class="w-4 h-4 text-its-blue-light border-slate-300 rounded cursor-pointer">
@@ -88,7 +88,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                                <a href="/faculties/edit?id=<?= $faculty['id'] ?>" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/15 rounded-lg transition-colors border border-its-blue/15">
+                                <a href="/faculties/edit?id=<?= $faculty['id'] ?>" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
                                     Edit
                                 </a>
                                 <a href="/faculties/delete?id=<?= $faculty['id'] ?>" onclick="return confirm('Yakin hapus fakultas ini?')" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80">
