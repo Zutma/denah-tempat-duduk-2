@@ -2,8 +2,6 @@
 
 class GraduateController extends BaseController {
     public function index($conn) {
-        
-
         $sessionId = $_GET['session_id'] ?? null;
         if (!$sessionId) {
             $this->redirect('/graduation-events');
@@ -32,9 +30,15 @@ class GraduateController extends BaseController {
     }
 
     public function form($conn) {
-        
+        $this->checkAuth();
 
         $sessionId = $_GET['session_id'] ?? $_POST['session_id'] ?? null;
+        
+        if (!$sessionId) {
+            $this->redirect('/graduation-events');
+        }
+
+        $session = GraduationSession::find($conn, $sessionId);
         $faculties = Faculty::all($conn);
         $studyPrograms = StudyProgram::all($conn);
         $seats = Graduate::getAvailableSeats($conn, $sessionId);
@@ -52,20 +56,39 @@ class GraduateController extends BaseController {
             if ($facultyId === '') $errors[] = "Fakultas wajib dipilih.";
             if ($studyProgramId === '') $errors[] = "Prodi wajib dipilih.";
 
+            // 1. Cek Duplikat NRP Eksplisit
+            if (!empty($nrp)) {
+                $stmtCheck = $conn->prepare("SELECT id FROM graduates WHERE nrp = ?");
+                $stmtCheck->bind_param("s", $nrp);
+                $stmtCheck->execute();
+                if ($stmtCheck->get_result()->num_rows > 0) {
+                    $errors[] = "NRP '$nrp' sudah terdaftar di sistem! Gunakan NRP lain.";
+                }
+            }
+
             if (empty($errors)) {
-                Graduate::create($conn, $sessionId, $facultyId, $studyProgramId, $nrp, $name, $seatId);
-                $this->redirect("/graduates?session_id=" . $sessionId);
+                try {
+                    Graduate::create($conn, $sessionId, $facultyId, $studyProgramId, $nrp, $name, $seatId);
+                    $_SESSION['success'] = "Wisudawan ($name - $nrp) berhasil ditambahkan.";
+                    
+                    // Redirect langsung ke daftar wisudawan sesi tersebut
+                    $this->redirect("/graduates?session_id=" . $sessionId);
+                } catch (\mysqli_sql_exception $e) {
+                    $errors[] = "Gagal menyimpan ke database: " . $e->getMessage();
+                }
             }
         }
 
         $pageTitle = 'Tambah Wisudawan';
+        
         $this->renderAdmin('graduates/form', [
-            'sessionId' => $sessionId,
-            'faculties' => $faculties,
+            'sessionId'     => $sessionId,
+            'session'       => $session,
+            'faculties'     => $faculties,
             'studyPrograms' => $studyPrograms,
-            'seats' => $seats,
-            'errors' => $errors,
-            'pageTitle' => $pageTitle
+            'seats'         => $seats,
+            'errors'        => $errors,
+            'pageTitle'     => $pageTitle
         ]);
     }
 
@@ -76,7 +99,12 @@ class GraduateController extends BaseController {
         $page = $_GET['page'] ?? 1;
 
         if (isset($_GET['id'])) {
-            Graduate::delete($conn, $_GET['id']);
+            try {
+                Graduate::delete($conn, $_GET['id']);
+                $_SESSION['success'] = "Data wisudawan berhasil dihapus.";
+            } catch (\Throwable $e) {
+                $_SESSION['error'] = "Gagal menghapus data wisudawan.";
+            }
         }
 
         if ($sessionId) {
@@ -94,7 +122,12 @@ class GraduateController extends BaseController {
         $ids = $_POST['ids'] ?? [];
 
         if (!empty($ids) && is_array($ids)) {
-            Graduate::bulkDelete($conn, array_map('intval', $ids));
+            try {
+                Graduate::bulkDelete($conn, array_map('intval', $ids));
+                $_SESSION['success'] = "Data wisudawan terpilih berhasil dihapus.";
+            } catch (\Throwable $e) {
+                $_SESSION['error'] = "Gagal menghapus data wisudawan terpilih.";
+            }
         }
 
         if ($sessionId) {

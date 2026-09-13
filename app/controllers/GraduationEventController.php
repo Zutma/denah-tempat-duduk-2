@@ -2,8 +2,6 @@
 
 class GraduationEventController extends BaseController {
     public function index($conn) {
-        
-
         $events = GraduationEvent::all($conn);
         $pageTitle = 'Daftar Event Wisuda';
 
@@ -14,8 +12,6 @@ class GraduationEventController extends BaseController {
     }
 
     public function form($conn) {
-        
-
         $event = null;
         if (isset($_GET['id'])) {
             $event = GraduationEvent::find($conn, $_GET['id']);
@@ -52,7 +48,11 @@ class GraduationEventController extends BaseController {
         $this->checkAuth();
 
         if (isset($_GET['id'])) {
-            GraduationEvent::delete($conn, $_GET['id']);
+            try {
+                GraduationEvent::delete($conn, $_GET['id']);
+            } catch (Throwable $e) {
+                // Mencegah crash jika terjadi kesalahan tak terduga
+            }
         }
 
         $this->redirect('/graduation-events');
@@ -63,7 +63,11 @@ class GraduationEventController extends BaseController {
 
         $ids = $_POST['ids'] ?? [];
         if (!empty($ids) && is_array($ids)) {
-            GraduationEvent::bulkDelete($conn, array_map('intval', $ids));
+            try {
+                GraduationEvent::bulkDelete($conn, array_map('intval', $ids));
+            } catch (Throwable $e) {
+                // Mencegah crash jika terjadi kesalahan tak terduga
+            }
         }
 
         $this->redirect('/graduation-events');

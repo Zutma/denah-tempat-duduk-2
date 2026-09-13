@@ -1,19 +1,19 @@
 
+<!-- Breadcrumb -->
+<nav class="flex items-center gap-2 text-xs font-medium text-slate-400 mb-1">
+    <a href="/graduation-events" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
+    <span class="text-slate-300">/</span>
+    <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>" class="hover:text-its-blue transition-colors">
+        <?= htmlspecialchars($session['event_name'] ?? 'Detail Event') ?>
+    </a>
+    <span class="text-slate-300">/</span>
+    <span class="text-slate-700 font-bold">Wisudawan</span>
+</nav>
+
 <div class="flex items-center justify-between gap-4 mb-6">
-    <div>
-        <nav class="flex items-center gap-2 text-sm font-medium text-slate-400 mb-1">
-            <a href="/graduation-events" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
-            <span class="text-slate-300">/</span>
-            <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>" class="hover:text-its-blue transition-colors">
-                <?= htmlspecialchars($session['event_name'] ?? 'Detail Event') ?>
-            </a>
-            <span class="text-slate-300">/</span>
-            <span class="text-slate-700 font-bold">Wisudawan</span>
-        </nav>
-        <h1 class="text-2xl font-bold text-slate-800 tracking-tight">
-            Data Wisudawan — Sesi <?= !empty($session['date']) ? date('d F Y', strtotime($session['date'])) : '' ?>
-        </h1>
-    </div>
+    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">
+        Data Wisudawan — Sesi <?= !empty($session['date']) ? date('d F Y', strtotime($session['date'])) : '' ?>
+    </h1>
 
     <a href="/graduates/create?session_id=<?= $sessionId ?>"
         class="inline-flex items-center gap-2 px-5 py-2.5 bg-its-blue-light text-white rounded-xl text-sm font-bold hover:bg-its-blue transition-all shadow-xs cursor-pointer whitespace-nowrap">
@@ -22,14 +22,7 @@
     </a>
 </div>
 
-<?php if (!empty($_SESSION['success'])): ?>
-    <div class="p-4 mb-5 text-sm font-semibold text-emerald-800 bg-emerald-50 rounded-xl border border-emerald-200/80 flex items-center gap-2">
-        ✅ <?= htmlspecialchars($_SESSION['success']) ?>
-        <?php unset($_SESSION['success']); ?>
-    </div>
-<?php endif; ?>
-
-<!-- Import Card Form -->
+<!-- Import Card Form (Tombol Upload & Import Hijau) -->
 <div class="bg-white rounded-2xl shadow-2xs border border-slate-200/80 p-5 mb-6">
     <div class="flex items-center justify-between gap-3 mb-3">
         <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
@@ -42,10 +35,69 @@
     <form method="POST" action="/imports/process" enctype="multipart/form-data" class="flex items-center gap-4">
         <input type="hidden" name="session_id" value="<?= $sessionId ?>">
         <input type="file" name="file" accept=".csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 border border-slate-200 rounded-xl cursor-pointer bg-slate-50" required>
-        <button type="submit" class="px-5 py-2.5 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-900 transition-all whitespace-nowrap cursor-pointer shadow-xs">
-            Import CSV
+        <button type="submit" class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-all whitespace-nowrap cursor-pointer shadow-xs">
+            Upload &amp; Import
         </button>
     </form>
+</div>
+
+<!-- Rekapitulasi Hasil Impor (Logika Terbaru) -->
+<?php if (isset($_SESSION['import_success'])): ?>
+    <div class="mb-6 p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-3">
+        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+            <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Hasil Rekapitulasi Impor CSV
+        </h3>
+
+        <div class="flex flex-wrap gap-2 text-xs font-semibold">
+            <span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-lg">
+                <?= $_SESSION['import_success'] ?> Data Baru Masuk
+            </span>
+            <?php if (!empty($_SESSION['import_skipped'])): ?>
+                <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-lg">
+                    <?= $_SESSION['import_skipped'] ?> Data Duplikat Di-skip
+                </span>
+            <?php endif; ?>
+            <?php if (!empty($_SESSION['import_failed'])): ?>
+                <span class="px-3 py-1 bg-red-100 text-red-800 rounded-lg">
+                    <?= count($_SESSION['import_failed']) ?> Baris Error Sistem
+                </span>
+            <?php endif; ?>
+        </div>
+
+        <?php if (!empty($_SESSION['import_details'])): ?>
+            <div class="mt-2 max-h-40 overflow-y-auto bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs font-mono text-slate-600 space-y-1">
+                <?php foreach ($_SESSION['import_details'] as $detail): ?>
+                    <p class="text-slate-600">• <?= htmlspecialchars($detail) ?></p>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+    <?php 
+        unset($_SESSION['import_success'], $_SESSION['import_skipped'], $_SESSION['import_failed'], $_SESSION['import_details']);
+    ?>
+<?php endif; ?>
+
+<!-- Form Tersembunyi untuk Bulk Delete -->
+<form id="bulkDeleteForm" method="POST" action="/graduates/bulk-delete" class="hidden">
+    <input type="hidden" name="session_id" value="<?= $sessionId ?>">
+    <input type="hidden" name="page" value="<?= $page ?? 1 ?>">
+</form>
+
+<!-- Floating Bulk Action Bar (Gaya Melayang Versi Lama) -->
+<div id="bulkToolbar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white rounded-full shadow-2xl px-5 py-3 border border-slate-700 hidden items-center gap-4 z-50 transition-all transform duration-200">
+    <div class="flex items-center gap-2 text-xs font-medium text-slate-300">
+        <span id="selectedCount" class="bg-its-blue-light text-white px-2 py-0.5 rounded-full font-bold text-xs">0</span>
+        <span>item terpilih</span>
+    </div>
+    <div class="h-4 w-px bg-slate-700"></div>
+    <button type="button" onclick="submitBulkDelete()" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+        Hapus Terpilih
+    </button>
+    <button type="button" onclick="unselectAll()" class="text-xs text-slate-400 hover:text-white transition-colors px-2 py-1 font-medium cursor-pointer">
+        Batal
+    </button>
 </div>
 
 <div class="bg-white rounded-2xl shadow-2xs border border-slate-200/80 overflow-hidden">
@@ -106,7 +158,7 @@
                             </td>
                             <td class="px-6 py-4 text-center font-bold text-slate-800"><?= htmlspecialchars($g['number'] ?? '-') ?></td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <a href="/graduates/delete?id=<?= $g['id'] ?>&session_id=<?= $sessionId ?>&page=<?= $page ?>" onclick="return confirm('Yakin hapus data wisudawan ini?')" class="px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80">
+                                <a href="/graduates/delete?id=<?= $g['id'] ?>&session_id=<?= $sessionId ?>&page=<?= $page ?? 1 ?>" onclick="return confirm('Yakin hapus data wisudawan ini?')" class="px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80">
                                     Hapus
                                 </a>
                             </td>
@@ -117,7 +169,8 @@
         </table>
     </div>
 
-    <?php if ($totalPages > 1): ?>
+    <!-- Pagination Stabil (Logika Terbaru) -->
+    <?php if (($totalPages ?? 1) > 1): ?>
         <div class="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-white">
             <p class="text-xs font-medium text-slate-500">
                 Halaman <span class="font-bold text-slate-700"><?= $page ?></span> dari <span class="font-bold text-slate-700"><?= $totalPages ?></span>
@@ -153,7 +206,12 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        const selectAll = document.getElementById('selectAll');
+        const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
+        const bulkToolbar = document.getElementById('bulkToolbar');
+        const selectedCount = document.getElementById('selectedCount');
         const searchInput = document.getElementById('searchInput');
+
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 const query = this.value.toLowerCase().trim();
@@ -162,6 +220,52 @@
                 });
             });
         }
-    });
-</script>
 
+        window.updateToolbarState = function() {
+            const checkedCount = document.querySelectorAll('.rowCheckbox:checked').length;
+            if (checkedCount > 0) {
+                bulkToolbar.classList.remove('hidden');
+                bulkToolbar.classList.add('flex');
+                selectedCount.textContent = checkedCount;
+            } else {
+                bulkToolbar.classList.remove('flex');
+                bulkToolbar.classList.add('hidden');
+            }
+        };
+
+        window.unselectAll = function() {
+            if (selectAll) selectAll.checked = false;
+            rowCheckboxes.forEach(cb => cb.checked = false);
+            window.updateToolbarState();
+        };
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function() {
+                rowCheckboxes.forEach(cb => cb.checked = selectAll.checked);
+                window.updateToolbarState();
+            });
+
+            rowCheckboxes.forEach(cb => {
+                cb.addEventListener('change', function() {
+                    selectAll.checked = Array.from(rowCheckboxes).every(c => c.checked);
+                    window.updateToolbarState();
+                });
+            });
+        }
+    });
+
+    function submitBulkDelete() {
+        const checked = document.querySelectorAll('.rowCheckbox:checked');
+        if (checked.length === 0) { alert('Pilih minimal satu data wisudawan!'); return; }
+        if (confirm(`Yakin mau hapus ${checked.length} data wisudawan yang dipilih?`)) {
+            const form = document.getElementById('bulkDeleteForm');
+            form.querySelectorAll('input[name="ids[]"]').forEach(el => el.remove());
+            checked.forEach(cb => {
+                const input = document.createElement('input');
+                input.type = 'hidden'; input.name = 'ids[]'; input.value = cb.value;
+                form.appendChild(input);
+            });
+            form.submit();
+        }
+    }
+</script>

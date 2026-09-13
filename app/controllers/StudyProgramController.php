@@ -2,8 +2,6 @@
 
 class StudyProgramController extends BaseController {
     public function index($conn) {
-        
-
         $studyPrograms = StudyProgram::all($conn);
         $pageTitle = 'Daftar Program Studi';
 
@@ -14,8 +12,6 @@ class StudyProgramController extends BaseController {
     }
 
     public function form($conn) {
-        
-
         $faculties = Faculty::all($conn);
         $studyProgram = null;
 
@@ -63,7 +59,16 @@ class StudyProgramController extends BaseController {
         $this->checkAuth();
 
         if (isset($_GET['id'])) {
-            StudyProgram::delete($conn, $_GET['id']);
+            try {
+                StudyProgram::delete($conn, $_GET['id']);
+                $_SESSION['success'] = "Program studi berhasil dihapus.";
+            } catch (\mysqli_sql_exception $e) {
+                if ($e->getCode() === 1451) {
+                    $_SESSION['error'] = "Gagal menghapus! Program Studi ini masih memiliki data Wisudawan di dalamnya.";
+                } else {
+                    $_SESSION['error'] = "Terjadi kesalahan database: " . $e->getMessage();
+                }
+            }
         }
 
         $this->redirect('/study-programs');
@@ -74,7 +79,11 @@ class StudyProgramController extends BaseController {
 
         $ids = $_POST['ids'] ?? [];
         if (!empty($ids) && is_array($ids)) {
-            StudyProgram::bulkDelete($conn, array_map('intval', $ids));
+            try {
+                StudyProgram::bulkDelete($conn, array_map('intval', $ids));
+            } catch (Throwable $e) {
+                // Mencegah crash jika terikat foreign key
+            }
         }
 
         $this->redirect('/study-programs');

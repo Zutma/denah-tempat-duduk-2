@@ -2,8 +2,6 @@
 
 class ImportController extends BaseController {
     public function form($conn) {
-        
-
         $sessionId = $_GET['session_id'] ?? null;
         $pageTitle = 'Import Data Wisudawan';
 
@@ -18,6 +16,7 @@ class ImportController extends BaseController {
 
         $sessionId = $_POST['session_id'] ?? null;
         $success = 0;
+        $skipped = 0;
         $failed = [];
         $warnings = [];
         $infoMatch = [];
@@ -26,10 +25,10 @@ class ImportController extends BaseController {
             $filePath = $_FILES['file']['tmp_name'];
             $fileContent = file_get_contents($filePath);
 
-            // Bersihkan BOM UTF-8 jika ada
+            // Bersihkan BOM UTF-8
             $fileContent = preg_replace('/^\xEF\xBB\xBF/', '', $fileContent);
 
-            // Deteksi delimiter (titik-koma ;, koma ,, atau tab \t)
+            // Deteksi delimiter
             $delimiter = ',';
             if (strpos($fileContent, "sep=;") !== false) {
                 $delimiter = ';';
@@ -44,7 +43,6 @@ class ImportController extends BaseController {
                 }
             }
 
-            // Simpan kembali ke stream temporary
             $tempStream = fopen('php://memory', 'r+');
             fwrite($tempStream, $fileContent);
             rewind($tempStream);
@@ -53,50 +51,48 @@ class ImportController extends BaseController {
             $rowNum = 0;
             $headerFound = false;
 
-            $conn->begin_transaction();
+            while (($data = fgetcsv($tempStream, 0, $delimiter)) !== false) {
+                $rowNum++;
 
-            try {
-                while (($data = fgetcsv($tempStream, 0, $delimiter)) !== false) {
-                    $rowNum++;
+                $cleanData = array_map(function($val) {
+                    return trim((string)$val);
+                }, $data);
 
-                    // Bersihkan setiap cell
-                    $cleanData = array_map(function($val) {
-                        return trim((string)$val);
-                    }, $data);
+                if (empty(array_filter($cleanData))) continue;
 
-                    // Skip baris kosong
-                    if (empty(array_filter($cleanData))) {
-                        continue;
-                    }
-
-                    // Cari baris header jika belum ketemu
-                    if (!$headerFound) {
-                        $lowerData = array_map('strtolower', $cleanData);
-                        // Cek apakah baris ini berisi header (ada nrp & nama atau program studi)
-                        if (in_array('nrp', $lowerData) && (in_array('nama', $lowerData) || in_array('program studi', $lowerData) || in_array('prodi', $lowerData))) {
-                            foreach ($lowerData as $idx => $colName) {
-                                if (strpos($colName, 'fakultas') !== false) $headerMap['fakultas'] = $idx;
-                                elseif (strpos($colName, 'prodi') !== false || strpos($colName, 'program studi') !== false) $headerMap['prodi'] = $idx;
-                                elseif (strpos($colName, 'jenjang') !== false) $headerMap['jenjang'] = $idx;
-                                elseif (strpos($colName, 'kursi') !== false) $headerMap['kursi'] = $idx;
-                                elseif (strpos($colName, 'sisi') !== false) $headerMap['sisi'] = $idx;
-                                elseif (strpos($colName, 'nomor') !== false || strpos($colName, 'urut') !== false || strpos($colName, 'no') !== false) $headerMap['nomor'] = $idx;
-                                elseif (strpos($colName, 'nrp') !== false) $headerMap['nrp'] = $idx;
-                                elseif (strpos($colName, 'nama') !== false) $headerMap['nama'] = $idx;
-                            }
-                            $headerFound = true;
-                            continue;
+                if (!$headerFound) {
+                    $lowerData = array_map('strtolower', $cleanData);
+                    if (in_array('nrp', $lowerData) && (in_array('nama', $lowerData) || in_array('program studi', $lowerData) || in_array('prodi', $lowerData))) {
+                        foreach ($lowerData as $idx => $colName) {
+                            if (strpos($colName, 'fakultas') !== false) $headerMap['fakultas'] = $idx;
+                            elseif (strpos($colName, 'prodi') !== false || strpos($colName, 'program studi') !== false) $headerMap['prodi'] = $idx;
+                            elseif (strpos($colName, 'jenjang') !== false) $headerMap['jenjang'] = $idx;
+                            elseif (strpos($colName, 'kursi') !== false) $headerMap['kursi'] = $idx;
+                            elseif (strpos($colName, 'sisi') !== false) $headerMap['sisi'] = $idx;
+                            elseif (strpos($colName, 'nomor') !== false || strpos($colName, 'urut') !== false || strpos($colName, 'no') !== false) $headerMap['nomor'] = $idx;
+                            elseif (strpos($colName, 'nrp') !== false) $headerMap['nrp'] = $idx;
+                            elseif (strpos($colName, 'nama') !== false) $headerMap['nama'] = $idx;
                         }
-                        // Jika belum ada header dan ini baris awal, abaikan dulu sampai ketemu header
+                        $headerFound = true;
                         continue;
                     }
+                    continue;
+                }
 
-                    // Ambil nilai berdasarkan headerMap
-                    $nrp = isset($headerMap['nrp']) && isset($cleanData[$headerMap['nrp']]) ? $cleanData[$headerMap['nrp']] : '';
-                    $nama = isset($headerMap['nama']) && isset($cleanData[$headerMap['nama']]) ? $cleanData[$headerMap['nama']] : '';
+                $nrp = isset($headerMap['nrp']) && isset($cleanData[$headerMap['nrp']]) ? $cleanData[$headerMap['nrp']] : '';
+                $nama = isset($headerMap['nama']) && isset($cleanData[$headerMap['nama']]) ? $cleanData[$headerMap['nama']] : '';
 
-                    // Jika baris ini tidak punya NRP atau Nama (misal baris header judul prodi S3 - MANAJEMEN TEKNOLOGI / Page 4), skip!
-                    if (!$nrp || !$nama || !preg_match('/^[0-9]+$/', $nrp)) {
+                if (!$nrp || !$nama || !preg_match('/^[0-9]+$/', $nrp)) continue;
+
+                try {
+                    // Cek duplikat NRP
+                    $stmtCheck = $conn->prepare("SELECT id FROM graduates WHERE nrp = ?");
+                    $stmtCheck->bind_param("s", $nrp);
+                    $stmtCheck->execute();
+                    if ($stmtCheck->get_result()->num_rows > 0) {
+                        $skipped++;
+                        // Dicatat khusus sebagai catatan duplikat (bukan error fatal)
+                        $warnings[] = "Baris $rowNum ($nama - $nrp): Di-skip karena NRP sudah terdaftar.";
                         continue;
                     }
 
@@ -107,7 +103,6 @@ class ImportController extends BaseController {
                     $sisi = ($sisiRaw === 'kiri' || $sisiRaw === 'left') ? 'left' : 'right';
                     $nomor = isset($headerMap['nomor']) && isset($cleanData[$headerMap['nomor']]) ? (int)$cleanData[$headerMap['nomor']] : 0;
 
-                    // Parse Jenjang dan Nama Prodi dari $prodiRaw (contoh: "D4-TEK. REK. KIMIA INDUSTRI" atau "S3 - MANAJEMEN TEKNOLOGI")
                     $jenjang = 'S1';
                     $prodiNama = $prodiRaw;
 
@@ -118,14 +113,7 @@ class ImportController extends BaseController {
                         $prodiNama = trim($matches[2]);
                     }
 
-                    if (!$prodiNama) {
-                        $prodiNama = $prodiRaw ?: 'Umum';
-                    }
-
-                    if (!$baris || !$nomor) {
-                        $failed[] = "Baris $rowNum ($nama - $nrp): Posisi kursi ($baris/$nomor) tidak valid.";
-                        continue;
-                    }
+                    if (!$prodiNama) $prodiNama = $prodiRaw ?: 'Umum';
 
                     $facultyRes = Graduate::findOrCreateFaculty($conn, $fakultasKode);
                     $facultyId = $facultyRes['id'];
@@ -133,33 +121,20 @@ class ImportController extends BaseController {
                     $studyProgramRes = Graduate::findOrCreateStudyProgram($conn, $facultyId, $prodiNama, $jenjang);
                     $studyProgramId = $studyProgramRes['id'];
 
-                    // Catat info pencocokan atau pembuatan prodi baru
-                    $prodiKey = $prodiNama . ' (' . $jenjang . ')';
-                    if ($studyProgramRes['created']) {
-                        $warnings["prodi_created_$prodiKey"] = "Prodi baru dibuat dari Excel: \"$prodiNama\" ($jenjang).";
-                    } else {
-                        $infoMatch["prodi_match_$prodiKey"] = "Prodi \"$prodiNama\" otomatis dicocokkan ke \"{$studyProgramRes['matched_name']}\" di database.";
-                    }
-
-                    $seatId = Graduate::findSeatByPosition($conn, $sessionId, $baris, $sisi, $nomor);
-                    if (!$seatId) {
-                        $failed[] = "Baris $rowNum ($nama): kursi $baris $sisi $nomor tidak ditemukan di denah.";
-                        continue;
-                    }
-
-                    if (Graduate::seatIsTaken($conn, $seatId)) {
-                        $failed[] = "Baris $rowNum ($nama): kursi $baris $sisi $nomor sudah terisi.";
-                        continue;
+                    $seatId = null;
+                    if ($baris && $nomor) {
+                        $seatId = Graduate::findSeatByPosition($conn, $sessionId, $baris, $sisi, $nomor);
+                        if ($seatId && Graduate::seatIsTaken($conn, $seatId)) {
+                            $seatId = null; 
+                        }
                     }
 
                     Graduate::create($conn, $sessionId, $facultyId, $studyProgramId, $nrp, $nama, $seatId);
                     $success++;
-                }
 
-                $conn->commit();
-            } catch (Throwable $e) {
-                $conn->rollback();
-                $failed[] = "Terjadi kesalahan sistem saat impor: " . $e->getMessage();
+                } catch (\Throwable $e) {
+                    $failed[] = "Baris $rowNum ($nama): Gagal diimpor - " . $e->getMessage();
+                }
             }
 
             fclose($tempStream);
@@ -169,12 +144,14 @@ class ImportController extends BaseController {
             session_start();
         }
 
+        // Rekap Data untuk Card UI
         $_SESSION['import_success'] = $success;
-        $_SESSION['import_failed'] = $failed;
-        $_SESSION['import_warnings'] = array_values($warnings ?? []);
-        $_SESSION['import_info'] = array_values($infoMatch ?? []);
+        $_SESSION['import_skipped'] = $skipped;
+        $_SESSION['import_failed']  = $failed;
+        $_SESSION['import_details'] = array_merge($warnings, $failed);
 
-        $this->redirect("/graduates?session_id=$sessionId&success=" . urlencode("$success data berhasil diimport."));
+        // Dapatkan redirection bersih tanpa toast mengganggu
+        $this->redirect("/graduates?session_id=$sessionId");
     }
 
     public function downloadTemplate($conn) {
@@ -183,17 +160,11 @@ class ImportController extends BaseController {
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename=template_import_wisudawan.csv');
 
-        // Output BOM UTF-8 agar karakter & accents di Excel terbaca sempurna
         echo "\xEF\xBB\xBF";
 
         $output = fopen('php://output', 'w');
-        
-        // instruksi khusus Excel agar langsung memisah kolom berdasarkan titik koma (;)
         fwrite($output, "sep=;\n");
-
-        // Header CSV dengan delimiter titik koma (;)
         fputcsv($output, ['FAKULTAS', 'PROGRAM STUDI', 'KURSI', 'SISI', 'NOMOR', 'NRP', 'NAMA'], ';');
-
 
         fclose($output);
         exit;

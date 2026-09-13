@@ -31,18 +31,50 @@ class GraduationEvent {
     }
 
     public static function delete($conn, $id) {
-        $stmt = $conn->prepare("DELETE FROM graduation_events WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        return $stmt->execute();
+        // 1. Hapus semua wisudawan yang terikat pada sesi di dalam event ini
+        $stmt1 = $conn->prepare("
+            DELETE g FROM graduates g
+            JOIN graduation_sessions gs ON g.graduation_session_id = gs.id
+            WHERE gs.graduation_event_id = ?
+        ");
+        $stmt1->bind_param("i", $id);
+        $stmt1->execute();
+
+        // 2. Hapus semua sesi wisuda di bawah event ini
+        $stmt2 = $conn->prepare("DELETE FROM graduation_sessions WHERE graduation_event_id = ?");
+        $stmt2->bind_param("i", $id);
+        $stmt2->execute();
+
+        // 3. Hapus Event Wisuda utama
+        $stmt3 = $conn->prepare("DELETE FROM graduation_events WHERE id = ?");
+        $stmt3->bind_param("i", $id);
+        return $stmt3->execute();
     }
 
     public static function bulkDelete($conn, array $ids) {
         if (empty($ids)) return false;
+        
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $types = str_repeat('i', count($ids));
-        $stmt = $conn->prepare("DELETE FROM graduation_events WHERE id IN ($placeholders)");
-        $stmt->bind_param($types, ...$ids);
-        return $stmt->execute();
+
+        // 1. Hapus wisudawan terkait
+        $stmt1 = $conn->prepare("
+            DELETE g FROM graduates g
+            JOIN graduation_sessions gs ON g.graduation_session_id = gs.id
+            WHERE gs.graduation_event_id IN ($placeholders)
+        ");
+        $stmt1->bind_param($types, ...$ids);
+        $stmt1->execute();
+
+        // 2. Hapus sesi wisuda terkait
+        $stmt2 = $conn->prepare("DELETE FROM graduation_sessions WHERE graduation_event_id IN ($placeholders)");
+        $stmt2->bind_param($types, ...$ids);
+        $stmt2->execute();
+
+        // 3. Hapus event wisuda terkait
+        $stmt3 = $conn->prepare("DELETE FROM graduation_events WHERE id IN ($placeholders)");
+        $stmt3->bind_param($types, ...$ids);
+        return $stmt3->execute();
     }
 
     public static function getRecentSummary($conn, $limit = 5) {
