@@ -31,18 +31,49 @@ class GraduationSession {
     }
 
     public static function delete($conn, $id) {
-        $stmt = $conn->prepare("DELETE FROM graduation_sessions WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        return $stmt->execute();
+        // 1. Hapus wisudawan di sesi ini
+        $stmt1 = $conn->prepare("DELETE FROM graduates WHERE graduation_session_id = ?");
+        $stmt1->bind_param("i", $id);
+        $stmt1->execute();
+
+        // 2. Hapus kursi dan baris kursi di sesi ini
+        $stmt2 = $conn->prepare("DELETE s FROM seats s JOIN seat_rows sr ON s.seat_row_id = sr.id WHERE sr.graduation_session_id = ?");
+        $stmt2->bind_param("i", $id);
+        $stmt2->execute();
+
+        $stmt3 = $conn->prepare("DELETE FROM seat_rows WHERE graduation_session_id = ?");
+        $stmt3->bind_param("i", $id);
+        $stmt3->execute();
+
+        // 3. Hapus sesi wisuda
+        $stmt4 = $conn->prepare("DELETE FROM graduation_sessions WHERE id = ?");
+        $stmt4->bind_param("i", $id);
+        return $stmt4->execute();
     }
 
     public static function bulkDelete($conn, array $ids) {
         if (empty($ids)) return false;
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $types = str_repeat('i', count($ids));
-        $stmt = $conn->prepare("DELETE FROM graduation_sessions WHERE id IN ($placeholders)");
-        $stmt->bind_param($types, ...$ids);
-        return $stmt->execute();
+
+        // 1. Hapus wisudawan di sesi-sesi ini
+        $stmt1 = $conn->prepare("DELETE FROM graduates WHERE graduation_session_id IN ($placeholders)");
+        $stmt1->bind_param($types, ...$ids);
+        $stmt1->execute();
+
+        // 2. Hapus kursi dan baris kursi
+        $stmt2 = $conn->prepare("DELETE s FROM seats s JOIN seat_rows sr ON s.seat_row_id = sr.id WHERE sr.graduation_session_id IN ($placeholders)");
+        $stmt2->bind_param($types, ...$ids);
+        $stmt2->execute();
+
+        $stmt3 = $conn->prepare("DELETE FROM seat_rows WHERE graduation_session_id IN ($placeholders)");
+        $stmt3->bind_param($types, ...$ids);
+        $stmt3->execute();
+
+        // 3. Hapus sesi wisuda
+        $stmt4 = $conn->prepare("DELETE FROM graduation_sessions WHERE id IN ($placeholders)");
+        $stmt4->bind_param($types, ...$ids);
+        return $stmt4->execute();
     }
 
     public static function countByStatus($conn, $status) {

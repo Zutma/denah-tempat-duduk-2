@@ -40,12 +40,30 @@ class GraduationEvent {
         $stmt1->bind_param("i", $id);
         $stmt1->execute();
 
-        // 2. Hapus semua sesi wisuda di bawah event ini
+        // 2. Hapus semua kursi & baris kursi di dalam event ini
+        $stmtSeats = $conn->prepare("
+            DELETE s FROM seats s
+            JOIN seat_rows sr ON s.seat_row_id = sr.id
+            JOIN graduation_sessions gs ON sr.graduation_session_id = gs.id
+            WHERE gs.graduation_event_id = ?
+        ");
+        $stmtSeats->bind_param("i", $id);
+        $stmtSeats->execute();
+
+        $stmtRows = $conn->prepare("
+            DELETE sr FROM seat_rows sr
+            JOIN graduation_sessions gs ON sr.graduation_session_id = gs.id
+            WHERE gs.graduation_event_id = ?
+        ");
+        $stmtRows->bind_param("i", $id);
+        $stmtRows->execute();
+
+        // 3. Hapus semua sesi wisuda di bawah event ini
         $stmt2 = $conn->prepare("DELETE FROM graduation_sessions WHERE graduation_event_id = ?");
         $stmt2->bind_param("i", $id);
         $stmt2->execute();
 
-        // 3. Hapus Event Wisuda utama
+        // 4. Hapus Event Wisuda utama
         $stmt3 = $conn->prepare("DELETE FROM graduation_events WHERE id = ?");
         $stmt3->bind_param("i", $id);
         return $stmt3->execute();
@@ -66,12 +84,30 @@ class GraduationEvent {
         $stmt1->bind_param($types, ...$ids);
         $stmt1->execute();
 
-        // 2. Hapus sesi wisuda terkait
+        // 2. Hapus kursi & baris kursi terkait
+        $stmtSeats = $conn->prepare("
+            DELETE s FROM seats s
+            JOIN seat_rows sr ON s.seat_row_id = sr.id
+            JOIN graduation_sessions gs ON sr.graduation_session_id = gs.id
+            WHERE gs.graduation_event_id IN ($placeholders)
+        ");
+        $stmtSeats->bind_param($types, ...$ids);
+        $stmtSeats->execute();
+
+        $stmtRows = $conn->prepare("
+            DELETE sr FROM seat_rows sr
+            JOIN graduation_sessions gs ON sr.graduation_session_id = gs.id
+            WHERE gs.graduation_event_id IN ($placeholders)
+        ");
+        $stmtRows->bind_param($types, ...$ids);
+        $stmtRows->execute();
+
+        // 3. Hapus sesi wisuda terkait
         $stmt2 = $conn->prepare("DELETE FROM graduation_sessions WHERE graduation_event_id IN ($placeholders)");
         $stmt2->bind_param($types, ...$ids);
         $stmt2->execute();
 
-        // 3. Hapus event wisuda terkait
+        // 4. Hapus event wisuda terkait
         $stmt3 = $conn->prepare("DELETE FROM graduation_events WHERE id IN ($placeholders)");
         $stmt3->bind_param($types, ...$ids);
         return $stmt3->execute();

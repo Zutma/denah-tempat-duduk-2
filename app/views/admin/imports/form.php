@@ -2,7 +2,7 @@
 <div class="flex items-center justify-between gap-4 mb-6">
     <div>
         <nav class="flex items-center gap-2 text-sm font-medium text-slate-400 mb-1">
-            <a href="/graduation-events" class="hover:text-its-blue transition-colors">Acara Wisuda</a>
+            <a href="/graduation-events" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
             <span class="text-slate-300">/</span>
             <a href="/graduates?session_id=<?= htmlspecialchars($sessionId ?? '') ?>" class="hover:text-its-blue transition-colors">Wisudawan</a>
             <span class="text-slate-300">/</span>

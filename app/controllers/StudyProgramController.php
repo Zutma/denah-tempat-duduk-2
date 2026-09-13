@@ -64,7 +64,7 @@ class StudyProgramController extends BaseController {
                 $_SESSION['success'] = "Program studi berhasil dihapus.";
             } catch (\mysqli_sql_exception $e) {
                 if ($e->getCode() === 1451) {
-                    $_SESSION['error'] = "Gagal menghapus! Program Studi ini masih memiliki data Wisudawan di dalamnya.";
+                    $_SESSION['warning'] = "Gagal menghapus! Program Studi ini masih memiliki data Wisudawan.";
                 } else {
                     $_SESSION['error'] = "Terjadi kesalahan database: " . $e->getMessage();
                 }
@@ -79,10 +79,27 @@ class StudyProgramController extends BaseController {
 
         $ids = $_POST['ids'] ?? [];
         if (!empty($ids) && is_array($ids)) {
-            try {
-                StudyProgram::bulkDelete($conn, array_map('intval', $ids));
-            } catch (Throwable $e) {
-                // Mencegah crash jika terikat foreign key
+            $deleted = 0;
+            $failed = 0;
+            foreach ($ids as $id) {
+                $id = (int)$id;
+                if ($id <= 0) continue;
+                try {
+                    StudyProgram::delete($conn, $id);
+                    $deleted++;
+                } catch (\mysqli_sql_exception $e) {
+                    if ($e->getCode() === 1451) {
+                        $failed++;
+                    }
+                }
+            }
+
+            if ($deleted > 0 && $failed === 0) {
+                $_SESSION['success'] = "$deleted program studi berhasil dihapus.";
+            } elseif ($deleted > 0 && $failed > 0) {
+                $_SESSION['warning'] = "$deleted program studi berhasil dihapus, namun $failed program studi tidak dapat dihapus karena masih memiliki data Wisudawan.";
+            } else {
+                $_SESSION['warning'] = "Gagal menghapus! Seluruh program studi yang dipilih masih memiliki data Wisudawan.";
             }
         }
 

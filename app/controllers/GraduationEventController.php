@@ -3,7 +3,7 @@
 class GraduationEventController extends BaseController {
     public function index($conn) {
         $events = GraduationEvent::all($conn);
-        $pageTitle = 'Daftar Event Wisuda';
+        $pageTitle = 'Daftar Periode Wisuda';
 
         $this->renderAdmin('graduation-events/index', [
             'events' => $events,
@@ -22,13 +22,15 @@ class GraduationEventController extends BaseController {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim($_POST['name'] ?? '');
 
-            if ($name === '') $errors[] = "Nama event wajib diisi.";
+            if ($name === '') $errors[] = "Nama periode wajib diisi.";
 
             if (empty($errors)) {
                 if (isset($_POST['id']) && $_POST['id'] !== '') {
                     GraduationEvent::update($conn, $_POST['id'], $name);
+                    $_SESSION['success'] = "Periode wisuda berhasil diperbarui.";
                 } else {
                     GraduationEvent::create($conn, $name);
+                    $_SESSION['success'] = "Periode wisuda baru berhasil ditambahkan.";
                 }
                 $this->redirect('/graduation-events');
             }
@@ -36,7 +38,7 @@ class GraduationEventController extends BaseController {
             $event = ['id' => $_POST['id'] ?? null, 'name' => $name];
         }
 
-        $pageTitle = $event ? 'Edit Event' : 'Tambah Event';
+        $pageTitle = $event ? 'Edit Periode Wisuda' : 'Tambah Periode Wisuda';
         $this->renderAdmin('graduation-events/form', [
             'event' => $event,
             'errors' => $errors,
@@ -50,8 +52,9 @@ class GraduationEventController extends BaseController {
         if (isset($_GET['id'])) {
             try {
                 GraduationEvent::delete($conn, $_GET['id']);
+                $_SESSION['success'] = "Periode wisuda dan seluruh data di dalamnya berhasil dihapus.";
             } catch (Throwable $e) {
-                // Mencegah crash jika terjadi kesalahan tak terduga
+                $_SESSION['error'] = "Gagal menghapus periode wisuda: " . $e->getMessage();
             }
         }
 
@@ -65,8 +68,9 @@ class GraduationEventController extends BaseController {
         if (!empty($ids) && is_array($ids)) {
             try {
                 GraduationEvent::bulkDelete($conn, array_map('intval', $ids));
+                $_SESSION['success'] = count($ids) . " periode wisuda terpilih berhasil dihapus.";
             } catch (Throwable $e) {
-                // Mencegah crash jika terjadi kesalahan tak terduga
+                $_SESSION['error'] = "Gagal menghapus periode wisuda terpilih: " . $e->getMessage();
             }
         }
 

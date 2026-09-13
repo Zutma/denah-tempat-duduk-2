@@ -1,6 +1,6 @@
 
 <!-- Breadcrumb -->
-<nav class="flex items-center gap-2 text-xs font-medium text-slate-400 mb-1">
+<nav class="flex items-center gap-2 text-sm font-medium text-slate-400 mb-1">
     <a href="/graduation-events" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
     <span class="text-slate-300">/</span>
     <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>" class="hover:text-its-blue transition-colors">

@@ -76,10 +76,37 @@ class SeatRowController extends BaseController {
 
         if (isset($_GET['id'])) {
             $ids = array_map('intval', explode(',', $_GET['id']));
+            $count = 0;
             foreach ($ids as $id) {
                 if ($id > 0) {
                     SeatRow::delete($conn, $id);
+                    $count++;
                 }
+            }
+            if ($count > 0) {
+                $_SESSION['success'] = "Baris kursi berhasil dihapus.";
+            }
+        }
+
+        if ($sessionId) {
+            $this->redirect("/seat-rows?session_id=" . $sessionId);
+        }
+
+        $this->redirect('/graduation-events');
+    }
+
+    public function bulkDelete($conn) {
+        $this->checkAuth();
+
+        $sessionId = $_POST['session_id'] ?? $_GET['session_id'] ?? null;
+        $ids = $_POST['ids'] ?? [];
+
+        if (!empty($ids) && is_array($ids)) {
+            try {
+                SeatRow::bulkDelete($conn, array_map('intval', $ids));
+                $_SESSION['success'] = count($ids) . " baris kursi terpilih berhasil dihapus.";
+            } catch (Throwable $e) {
+                $_SESSION['error'] = "Gagal menghapus baris kursi terpilih: " . $e->getMessage();
             }
         }
 

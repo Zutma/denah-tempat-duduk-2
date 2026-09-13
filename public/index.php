@@ -59,6 +59,7 @@ $routes = [
 
     'seat-rows'           => [SeatRowController::class, 'index'],
     'seat-rows/delete'    => [SeatRowController::class, 'delete'],
+    'seat-rows/bulk-delete'=> [SeatRowController::class, 'bulkDelete'],
 
     'graduates'           => [GraduateController::class, 'index'],
     'graduates/create'    => [GraduateController::class, 'form'],

@@ -65,7 +65,7 @@ class FacultyController extends BaseController {
                 $_SESSION['success'] = "Fakultas berhasil dihapus.";
             } catch (\mysqli_sql_exception $e) {
                 if ($e->getCode() === 1451) {
-                    $_SESSION['error'] = "Gagal menghapus! Fakultas ini masih memiliki data Program Studi atau Wisudawan di dalamnya.";
+                    $_SESSION['warning'] = "Gagal menghapus! Fakultas ini masih memiliki data Program Studi atau Wisudawan.";
                 } else {
                     $_SESSION['error'] = "Terjadi kesalahan database: " . $e->getMessage();
                 }
@@ -80,10 +80,27 @@ class FacultyController extends BaseController {
 
         $ids = $_POST['ids'] ?? [];
         if (!empty($ids) && is_array($ids)) {
-            try {
-                Faculty::bulkDelete($conn, array_map('intval', $ids));
-            } catch (Throwable $e) {
-                // Tangkap exception jika terikat foreign key
+            $deleted = 0;
+            $failed = 0;
+            foreach ($ids as $id) {
+                $id = (int)$id;
+                if ($id <= 0) continue;
+                try {
+                    Faculty::delete($conn, $id);
+                    $deleted++;
+                } catch (\mysqli_sql_exception $e) {
+                    if ($e->getCode() === 1451) {
+                        $failed++;
+                    }
+                }
+            }
+
+            if ($deleted > 0 && $failed === 0) {
+                $_SESSION['success'] = "$deleted fakultas berhasil dihapus.";
+            } elseif ($deleted > 0 && $failed > 0) {
+                $_SESSION['warning'] = "$deleted fakultas berhasil dihapus, namun $failed fakultas tidak dapat dihapus karena masih memiliki data Program Studi/Wisudawan.";
+            } else {
+                $_SESSION['warning'] = "Gagal menghapus! Seluruh fakultas yang dipilih masih memiliki data Program Studi/Wisudawan.";
             }
         }
 

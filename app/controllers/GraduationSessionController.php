@@ -2,8 +2,6 @@
 
 class GraduationSessionController extends BaseController {
     public function index($conn) {
-        
-
         if (!isset($_GET['event_id'])) {
             $this->redirect('/graduation-events');
         }
@@ -20,8 +18,6 @@ class GraduationSessionController extends BaseController {
     }
 
     public function form($conn) {
-        
-
         $session = null;
         $eventId = $_GET['event_id'] ?? null;
 
@@ -45,8 +41,10 @@ class GraduationSessionController extends BaseController {
             if (empty($errors)) {
                 if (isset($_POST['id']) && $_POST['id'] !== '') {
                     GraduationSession::update($conn, $_POST['id'], $date, $sessionNumber, $status);
+                    $_SESSION['success'] = "Sesi wisuda berhasil diperbarui.";
                 } else {
                     GraduationSession::create($conn, $eventId, $date, $sessionNumber, $status);
+                    $_SESSION['success'] = "Sesi wisuda baru berhasil ditambahkan.";
                 }
                 $this->redirect("/graduation-sessions?event_id=" . $eventId);
             }
@@ -69,7 +67,12 @@ class GraduationSessionController extends BaseController {
         if (isset($_GET['id'])) {
             $session = GraduationSession::find($conn, $_GET['id']);
             $eventId = $session ? $session['graduation_event_id'] : null;
-            GraduationSession::delete($conn, $_GET['id']);
+            try {
+                GraduationSession::delete($conn, $_GET['id']);
+                $_SESSION['success'] = "Sesi wisuda beserta data wisudawan & denah di dalamnya berhasil dihapus.";
+            } catch (Throwable $e) {
+                $_SESSION['error'] = "Gagal menghapus sesi wisuda: " . $e->getMessage();
+            }
 
             if ($eventId) {
                 $this->redirect("/graduation-sessions?event_id=" . $eventId);
@@ -86,7 +89,12 @@ class GraduationSessionController extends BaseController {
         $ids = $_POST['ids'] ?? [];
 
         if (!empty($ids) && is_array($ids)) {
-            GraduationSession::bulkDelete($conn, array_map('intval', $ids));
+            try {
+                GraduationSession::bulkDelete($conn, array_map('intval', $ids));
+                $_SESSION['success'] = count($ids) . " sesi wisuda terpilih berhasil dihapus.";
+            } catch (Throwable $e) {
+                $_SESSION['error'] = "Gagal menghapus sesi terpilih: " . $e->getMessage();
+            }
         }
 
         if ($eventId) {
