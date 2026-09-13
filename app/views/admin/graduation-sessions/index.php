@@ -49,23 +49,23 @@
                         <tr class="hover:bg-slate-50/80 transition-colors">
                             <td class="px-5 py-4 text-center"><input type="checkbox" class="rowCheckbox w-4 h-4 text-its-blue-light border-slate-300 rounded cursor-pointer" value="<?= $session['id'] ?>"></td>
                             <td class="px-6 py-4 font-bold text-slate-800"><?= date('d F Y', strtotime($session['date'])) ?></td>
-                            <td class="px-6 py-4 text-center text-slate-700 font-semibold">Sesi <?= htmlspecialchars($session['session'] ?? '-') ?></td>
+                            <td class="px-6 py-4 text-center text-slate-700 font-bold">Sesi <?= htmlspecialchars($session['session'] ?? '-') ?></td>
                             <td class="px-6 py-4 text-center">
                                 <span class="inline-block px-3 py-1 text-xs font-bold rounded-md border capitalize <?= $session['status'] === 'published' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200' ?>">
                                     <?= htmlspecialchars($session['status']) ?>
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                                <a href="/seat-rows?session_id=<?= $session['id'] ?>" class="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
+                                <a href="/seat-rows?session_id=<?= $session['id'] ?>" class="px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
                                     Kelola Kursi
                                 </a>
                                 <a href="/graduates?session_id=<?= $session['id'] ?>" class="px-3 py-1.5 text-xs font-bold text-its-blue bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
                                     Wisudawan
                                 </a>
-                                <a href="/graduation-sessions/edit?id=<?= $session['id'] ?>" class="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
+                                <a href="/graduation-sessions/edit?id=<?= $session['id'] ?>" class="px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
                                     Edit
                                 </a>
-                                <a href="/graduation-sessions/delete?id=<?= $session['id'] ?>" onclick="return confirm('Yakin hapus?')" class="px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-red-200">
+                                <a href="/graduation-sessions/delete?id=<?= $session['id'] ?>" onclick="return confirm('Yakin hapus?')" class="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80">
                                     Hapus
                                 </a>
                             </td>

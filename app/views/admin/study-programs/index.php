@@ -13,7 +13,7 @@
 </div>
 
 <?php if (!empty($_SESSION['success'])): ?>
-    <div class="p-4 mb-5 text-sm font-semibold text-emerald-800 bg-emerald-50 rounded-xl border border-emerald-200/80">
+    <div class="p-4 mb-5 text-sm font-semibold text-emerald-800 bg-emerald-50 rounded-xl border border-emerald-200/80 flex items-center gap-2">
         ✅ <?= htmlspecialchars($_SESSION['success']) ?>
         <?php unset($_SESSION['success']); ?>
     </div>

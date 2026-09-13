@@ -106,7 +106,7 @@
                             </td>
                             <td class="px-6 py-4 text-center font-bold text-slate-800"><?= htmlspecialchars($g['number'] ?? '-') ?></td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <a href="/graduates/delete?id=<?= $g['id'] ?>&session_id=<?= $sessionId ?>&page=<?= $page ?>" onclick="return confirm('Yakin hapus data wisudawan ini?')" class="px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-red-200">
+                                <a href="/graduates/delete?id=<?= $g['id'] ?>&session_id=<?= $sessionId ?>&page=<?= $page ?>" onclick="return confirm('Yakin hapus data wisudawan ini?')" class="px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80">
                                     Hapus
                                 </a>
                             </td>
