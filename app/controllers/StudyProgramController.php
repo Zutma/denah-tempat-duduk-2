@@ -12,6 +12,8 @@ class StudyProgramController extends BaseController {
     }
 
     public function form($conn) {
+        $this->checkAuth();
+        $this->checkCsrf();
         $faculties = Faculty::all($conn);
         $studyProgram = null;
 

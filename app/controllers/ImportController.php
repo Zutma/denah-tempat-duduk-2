@@ -2,6 +2,7 @@
 
 class ImportController extends BaseController {
     public function form($conn) {
+        $this->checkAuth();
         $sessionId = $_GET['session_id'] ?? null;
         $pageTitle = 'Import Data Wisudawan';
 
@@ -13,6 +14,7 @@ class ImportController extends BaseController {
 
     public function process($conn) {
         $this->checkAuth();
+        $this->checkCsrf();
 
         $sessionId = $_POST['session_id'] ?? null;
         $success = 0;

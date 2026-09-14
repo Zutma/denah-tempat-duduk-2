@@ -12,6 +12,8 @@ class FacultyController extends BaseController {
     }
 
     public function form($conn) {
+        $this->checkAuth();
+        $this->checkCsrf();
         $faculty = null;
         if (isset($_GET['id'])) {
             $faculty = Faculty::find($conn, $_GET['id']);
@@ -41,7 +43,7 @@ class FacultyController extends BaseController {
                     if ($e->getCode() === 1062) {
                         $errors[] = "Kode fakultas '$code' sudah digunakan! Gunakan kode lain.";
                     } else {
-                        $errors[] = "Gagal menyimpan ke database: " . $e->getMessage();
+                        $errors[] = "Gagal menyimpan data. Silakan coba lagi.";
                     }
                 }
             }

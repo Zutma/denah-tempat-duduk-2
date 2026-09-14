@@ -18,6 +18,8 @@ class GraduationSessionController extends BaseController {
     }
 
     public function form($conn) {
+        $this->checkAuth();
+        $this->checkCsrf();
         $session = null;
         $eventId = $_GET['event_id'] ?? null;
 

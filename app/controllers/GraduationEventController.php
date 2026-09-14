@@ -12,6 +12,8 @@ class GraduationEventController extends BaseController {
     }
 
     public function form($conn) {
+        $this->checkAuth();
+        $this->checkCsrf();
         $event = null;
         if (isset($_GET['id'])) {
             $event = GraduationEvent::find($conn, $_GET['id']);

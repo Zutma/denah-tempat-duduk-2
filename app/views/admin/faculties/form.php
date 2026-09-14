@@ -2,6 +2,7 @@
 
 <div class="p-6 rounded-2xl shadow-2xs border border-slate-200/80 bg-white">
     <form method="POST" class="flex flex-col gap-4">
+        <?= Csrf::field() ?>
         <?php if (!empty($faculty['id'])): ?>
             <input type="hidden" name="id" value="<?= $faculty['id'] ?>">
         <?php endif; ?>

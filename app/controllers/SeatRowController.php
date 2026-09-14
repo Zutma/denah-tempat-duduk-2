@@ -2,7 +2,7 @@
 
 class SeatRowController extends BaseController {
     public function index($conn) {
-        
+        $this->checkAuth();
 
         if (!isset($_GET['session_id'])) {
             $this->redirect('/graduation-events');

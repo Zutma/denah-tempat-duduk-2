@@ -33,6 +33,7 @@
     </div>
 
     <form method="POST" action="/imports/process" enctype="multipart/form-data" class="flex items-center gap-4">
+        <?= Csrf::field() ?>
         <input type="hidden" name="session_id" value="<?= $sessionId ?>">
         <input type="file" name="file" accept=".csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 border border-slate-200 rounded-xl cursor-pointer bg-slate-50" required>
         <button type="submit" class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-all whitespace-nowrap cursor-pointer shadow-xs">
@@ -204,68 +205,10 @@
     <?php endif; ?>
 </div>
 
+<script src="/js/admin/table-utils.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const selectAll = document.getElementById('selectAll');
-        const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
-        const bulkToolbar = document.getElementById('bulkToolbar');
-        const selectedCount = document.getElementById('selectedCount');
-        const searchInput = document.getElementById('searchInput');
-
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                const query = this.value.toLowerCase().trim();
-                document.querySelectorAll('tbody tr').forEach(row => {
-                    row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
-                });
-            });
-        }
-
-        window.updateToolbarState = function() {
-            const checkedCount = document.querySelectorAll('.rowCheckbox:checked').length;
-            if (checkedCount > 0) {
-                bulkToolbar.classList.remove('hidden');
-                bulkToolbar.classList.add('flex');
-                selectedCount.textContent = checkedCount;
-            } else {
-                bulkToolbar.classList.remove('flex');
-                bulkToolbar.classList.add('hidden');
-            }
-        };
-
-        window.unselectAll = function() {
-            if (selectAll) selectAll.checked = false;
-            rowCheckboxes.forEach(cb => cb.checked = false);
-            window.updateToolbarState();
-        };
-
-        if (selectAll) {
-            selectAll.addEventListener('change', function() {
-                rowCheckboxes.forEach(cb => cb.checked = selectAll.checked);
-                window.updateToolbarState();
-            });
-
-            rowCheckboxes.forEach(cb => {
-                cb.addEventListener('change', function() {
-                    selectAll.checked = Array.from(rowCheckboxes).every(c => c.checked);
-                    window.updateToolbarState();
-                });
-            });
-        }
-    });
-
+    initBulkTable();
     function submitBulkDelete() {
-        const checked = document.querySelectorAll('.rowCheckbox:checked');
-        if (checked.length === 0) { alert('Pilih minimal satu data wisudawan!'); return; }
-        if (confirm(`Yakin mau hapus ${checked.length} data wisudawan yang dipilih?`)) {
-            const form = document.getElementById('bulkDeleteForm');
-            form.querySelectorAll('input[name="ids[]"]').forEach(el => el.remove());
-            checked.forEach(cb => {
-                const input = document.createElement('input');
-                input.type = 'hidden'; input.name = 'ids[]'; input.value = cb.value;
-                form.appendChild(input);
-            });
-            form.submit();
-        }
+        submitBulkDeleteForm('bulkDeleteForm', 'Yakin mau hapus {count} data wisudawan yang dipilih?');
     }
 </script>

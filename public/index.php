@@ -5,7 +5,7 @@ define('BASE_PATH', dirname(__DIR__));
 // 2. Load Koneksi Database
 require_once BASE_PATH . '/app/config/database.php';
 
-// 3. Autoloader Otomatis untuk Controller & Model
+// 3. Autoloader Otomatis untuk Controller, Model & Helper
 spl_autoload_register(function ($class) {
     // Cek di folder controllers
     $controllerFile = BASE_PATH . '/app/controllers/' . $class . '.php';
@@ -18,6 +18,13 @@ spl_autoload_register(function ($class) {
     $modelFile = BASE_PATH . '/app/models/' . $class . '.php';
     if (file_exists($modelFile)) {
         require_once $modelFile;
+        return;
+    }
+
+    // Cek di folder helpers (baru ditambahkan untuk Csrf.php dkk)
+    $helperFile = BASE_PATH . '/app/helpers/' . $class . '.php';
+    if (file_exists($helperFile)) {
+        require_once $helperFile;
         return;
     }
 });

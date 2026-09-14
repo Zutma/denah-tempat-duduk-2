@@ -31,6 +31,7 @@ class GraduateController extends BaseController {
 
     public function form($conn) {
         $this->checkAuth();
+        $this->checkCsrf();
 
         $sessionId = $_GET['session_id'] ?? $_POST['session_id'] ?? null;
         
@@ -57,13 +58,8 @@ class GraduateController extends BaseController {
             if ($studyProgramId === '') $errors[] = "Prodi wajib dipilih.";
 
             // 1. Cek Duplikat NRP Eksplisit
-            if (!empty($nrp)) {
-                $stmtCheck = $conn->prepare("SELECT id FROM graduates WHERE nrp = ?");
-                $stmtCheck->bind_param("s", $nrp);
-                $stmtCheck->execute();
-                if ($stmtCheck->get_result()->num_rows > 0) {
-                    $errors[] = "NRP '$nrp' sudah terdaftar di sistem! Gunakan NRP lain.";
-                }
+            if (!empty($nrp) && Graduate::nrpExists($conn, $nrp)) {
+                $errors[] = "NRP '$nrp' sudah terdaftar di sistem! Gunakan NRP lain.";
             }
 
             if (empty($errors)) {
@@ -74,7 +70,7 @@ class GraduateController extends BaseController {
                     // Redirect langsung ke daftar wisudawan sesi tersebut
                     $this->redirect("/graduates?session_id=" . $sessionId);
                 } catch (\mysqli_sql_exception $e) {
-                    $errors[] = "Gagal menyimpan ke database: " . $e->getMessage();
+                    $errors[] = "Gagal menyimpan data. Silakan coba lagi.";
                 }
             }
         }

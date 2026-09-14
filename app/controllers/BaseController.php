@@ -14,6 +14,15 @@ class BaseController {
         }
     }
 
+    protected function checkCsrf(): void {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!Csrf::validate()) {
+                http_response_code(419);
+                die("Sesi form kadaluarsa. Silakan muat ulang halaman dan coba lagi.");
+            }
+        }
+    }
+
     /**
      * Render Tampilan Admin (Otomatis Proteksi Auth + Include Layout)
      */

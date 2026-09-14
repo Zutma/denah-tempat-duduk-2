@@ -17,6 +17,7 @@
          }
      }">
     <form method="POST" class="flex flex-col gap-4">
+        <?= Csrf::field() ?>
         <input type="hidden" name="session_id" value="<?= htmlspecialchars($sessionId ?? '') ?>">
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

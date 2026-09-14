@@ -155,4 +155,11 @@ class Graduate {
         $result = $conn->query($sql);
         return (int) ($result ? $result->fetch_assoc()['total'] : 0);
     }
+
+    public static function nrpExists($conn, $nrp): bool {
+        $stmt = $conn->prepare("SELECT id FROM graduates WHERE nrp = ?");
+        $stmt->bind_param("s", $nrp);
+        $stmt->execute();
+        return $stmt->get_result()->num_rows > 0;
+    }
 }
