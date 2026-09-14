@@ -32,6 +32,18 @@
         }
     </script>
 
+    <!-- Passing Data PHP ke JS Global SEBELUM Alpine & Script App di-load -->
+    <script>
+        window.__seatMapData = {
+            searchQuery: <?= json_encode($searchQuery ?? '') ?>,
+            graduatesList: <?= json_encode($allGraduatesList ?? []) ?>
+        };
+    </script>
+
+    <!-- External JS Files (defer) -->
+    <script src="/js/public/seat-map-app.js" defer></script>
+    <script src="/js/public/zoom-controller.js" defer></script>
+
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 

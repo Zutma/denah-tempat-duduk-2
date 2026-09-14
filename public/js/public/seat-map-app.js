@@ -2,39 +2,91 @@ function seatMapApp() {
     return {
         selectedSeatId: null,
         activeModalData: null,
-        searchQuery: window.__seatMapData?.searchQuery || '',
-        graduatesList: window.__seatMapData?.graduatesList || [],
+        searchQuery: (window.__seatMapData && window.__seatMapData.searchQuery) ? window.__seatMapData.searchQuery : '',
+        graduatesList: (window.__seatMapData && Array.isArray(window.__seatMapData.graduatesList)) ? window.__seatMapData.graduatesList : [],
         searchedSeatIdClicked: null,
+        filteredGraduates: [],
+        searchedSeatIds: [],
+        gradMap: null,
 
-        get filteredGraduates() {
-            const q = this.searchQuery.trim().toLowerCase();
-            if (!q) return [];
-            return this.graduatesList.filter(g => {
-                return (g.name && g.name.toLowerCase().includes(q))
-                    || (g.nrp && g.nrp.toLowerCase().includes(q))
-                    || (g.seat_code && g.seat_code.toLowerCase().includes(q));
+        init() {
+            this.buildGradMap();
+
+            this.$watch('searchQuery', (val) => {
+                this.searchedSeatIdClicked = null;
+                const q = (val || '').toString().trim().toLowerCase();
+
+                if (!q || !Array.isArray(this.graduatesList)) {
+                    this.filteredGraduates = [];
+                    this.searchedSeatIds = [];
+                    return;
+                }
+
+                this.filteredGraduates = this.graduatesList.filter(g => {
+                    if (!g) return false;
+                    const nameMatch = g.name && g.name.toString().toLowerCase().includes(q);
+                    const nrpMatch = g.nrp && g.nrp.toString().toLowerCase().includes(q);
+                    const seatMatch = g.seat_code && g.seat_code.toString().toLowerCase().includes(q);
+                    return nameMatch || nrpMatch || seatMatch;
+                });
+
+                this.searchedSeatIds = this.filteredGraduates.map(g => Number(g.seat_id)).filter(Boolean);
             });
+
+            if (this.searchQuery.trim() !== '') {
+                this.$nextTick(() => {
+                    const q = this.searchQuery.trim().toLowerCase();
+                    this.filteredGraduates = this.graduatesList.filter(g => {
+                        return (g.name && g.name.toString().toLowerCase().includes(q))
+                            || (g.nrp && g.nrp.toString().toLowerCase().includes(q))
+                            || (g.seat_code && g.seat_code.toString().toLowerCase().includes(q));
+                    });
+                    this.searchedSeatIds = this.filteredGraduates.map(g => Number(g.seat_id)).filter(Boolean);
+                });
+            }
         },
 
-        get searchedSeatIds() {
-            if (this.searchedSeatIdClicked) return [this.searchedSeatIdClicked];
-            if (!this.searchQuery.trim()) return [];
-            return this.filteredGraduates.map(g => g.seat_id);
+        buildGradMap() {
+            this.gradMap = {};
+            if (Array.isArray(this.graduatesList)) {
+                for (let i = 0; i < this.graduatesList.length; i++) {
+                    const g = this.graduatesList[i];
+                    if (g && g.seat_id) {
+                        this.gradMap[Number(g.seat_id)] = g;
+                    }
+                }
+            }
+        },
+
+        getGradBySeatId(seatId) {
+            if (!this.gradMap) {
+                this.buildGradMap();
+            }
+            return this.gradMap[Number(seatId)] || null;
         },
 
         selectSeat(seatId, data) {
-            if (!data) return;
-            this.selectedSeatId = (this.selectedSeatId === seatId) ? null : seatId;
-            this.activeModalData = this.selectedSeatId ? data : null;
+            const targetId = Number(seatId);
+            if (!targetId) return;
+            const gradData = data || this.getGradBySeatId(targetId);
+            if (!gradData) return;
+
+            this.selectedSeatId = (this.selectedSeatId === targetId) ? null : targetId;
+            this.activeModalData = this.selectedSeatId ? gradData : null;
         },
 
         focusSeat(seatId, data) {
             if (!seatId) return;
-            this.selectedSeatId = seatId;
-            this.activeModalData = data;
-            this.searchedSeatIdClicked = seatId;
+            const targetId = Number(seatId);
+            const gradData = data || this.getGradBySeatId(targetId);
+
+            this.selectedSeatId = targetId;
+            this.activeModalData = gradData;
+            this.searchedSeatIdClicked = targetId;
+            this.searchedSeatIds = [targetId];
+
             this.$nextTick(() => {
-                const el = document.getElementById(`seat-${seatId}`);
+                const el = document.getElementById(`seat-${targetId}`);
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
             });
         },
@@ -49,6 +101,8 @@ function seatMapApp() {
             this.activeModalData = null;
             this.searchQuery = '';
             this.searchedSeatIdClicked = null;
+            this.filteredGraduates = [];
+            this.searchedSeatIds = [];
         }
     }
 }
