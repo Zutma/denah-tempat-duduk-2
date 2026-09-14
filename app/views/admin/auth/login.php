@@ -18,7 +18,7 @@
         <div class="relative z-10 w-full flex flex-col items-center px-4">
             <!-- Logo -->
             <div class="mb-6 text-center">
-                <img src="/images/logo.png" alt="Logo" class="w-[140px] h-auto mx-auto drop-shadow-md">
+                <img src="/images/LOGO.PNG" alt="Logo" class="w-[140px] h-auto mx-auto drop-shadow-md">
             </div>
 
             <!-- Form Card -->
