@@ -114,12 +114,194 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #127BBE;
         }
+
+        /* ===== SENO MASCOT STYLES (v2) ===== */
+        #seno-mascot {
+            position: fixed;
+            bottom: 0;
+            right: clamp(12px, 3vw, 40px);
+            width: clamp(100px, 15vw, 160px);
+            z-index: 9999;
+            pointer-events: none;
+            will-change: transform;
+        }
+        #seno-mascot.seno-hidden { opacity: 0; pointer-events: none; }
+        #seno-mascot.seno-visible { opacity: 1; pointer-events: auto; }
+
+        @keyframes senoSlideInRight {
+            from { transform: translateX(220px); }
+            to   { transform: translateX(0); }
+        }
+        @keyframes senoRiseUp {
+            from { transform: translateY(260px); }
+            to   { transform: translateY(0); }
+        }
+        @keyframes senoDropDown {
+            0%   { transform: translateY(-280px) rotate(-12deg); }
+            65%  { transform: translateY(18px) rotate(4deg); }
+            82%  { transform: translateY(-8px) rotate(-2deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        @keyframes senoPeekRight {
+            0%   { transform: translateX(150px); }
+            28%  { transform: translateX(55px); }
+            52%  { transform: translateX(55px); }
+            100% { transform: translateX(0); }
+        }
+        @keyframes senoExitRight {
+            from { transform: translateX(0); }
+            to   { transform: translateX(230px); }
+        }
+        @keyframes senoFloat {
+            0%,100% { transform: translateY(0); }
+            50%     { transform: translateY(-7px); }
+        }
+        @keyframes senoBounceIn {
+            0%   { transform: scale(0.65); opacity: 0; }
+            60%  { transform: scale(1.08); opacity: 1; }
+            80%  { transform: scale(0.96); }
+            100% { transform: scale(1); }
+        }
+        @keyframes senoProgress {
+            from { width: 0%; }
+            to   { width: 100%; }
+        }
+
+        #seno-mascot.anim-right  { animation: senoSlideInRight 0.75s cubic-bezier(.34,1.56,.64,1) forwards; }
+        #seno-mascot.anim-rise   { animation: senoRiseUp       0.7s  cubic-bezier(.34,1.56,.64,1) forwards; }
+        #seno-mascot.anim-drop   { animation: senoDropDown     0.85s ease-out forwards; }
+        #seno-mascot.anim-peek   { animation: senoPeekRight    1.1s  ease forwards; }
+        #seno-mascot.anim-exit   { animation: senoExitRight    0.55s ease-in forwards; }
+        #seno-mascot.anim-float  { animation: senoFloat        3s    ease-in-out infinite; }
+
+        #seno-img {
+            width: 100%;
+            cursor: pointer;
+            display: block;
+            user-select: none;
+            filter: drop-shadow(0 6px 20px rgba(18,123,190,.32));
+            transition: transform .25s;
+        }
+        #seno-img:hover { transform: scale(1.04); }
+
+        #seno-bubble {
+            position: absolute;
+            bottom: calc(100% - 8px);
+            right: 0;
+            width: clamp(200px, 45vw, 270px);
+            background: #fff;
+            border-radius: 16px 16px 4px 16px;
+            box-shadow: 0 8px 28px rgba(35,63,124,.16), 0 0 0 1.5px rgba(18,123,190,.13);
+            padding: 13px 15px 11px;
+            font-family: 'Work Sans', sans-serif;
+            animation: senoBounceIn .35s ease forwards;
+            display: none;
+        }
+        #seno-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            right: 18px;
+            border: 13px solid transparent;
+            border-top-color: #fff;
+            border-right: 0;
+            filter: drop-shadow(0 2px 3px rgba(35,63,124,.1));
+        }
+
+        .seno-text {
+            font-size: clamp(11px, 1.5vw, 13px);
+            line-height: 1.55;
+            color: #1e293b;
+            min-height: 36px;
+        }
+
+        #seno-progress-wrap {
+            height: 3px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+            display: none;
+        }
+        #seno-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg,#127BBE,#FDBB16);
+            border-radius: 4px;
+            width: 0%;
+        }
+        #seno-progress-bar.running {
+            animation: senoProgress var(--seno-dur, 4s) linear forwards;
+        }
+
+        .seno-btn-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 9px;
+            align-items: center;
+        }
+        .seno-btn {
+            flex: 1;
+            background: linear-gradient(135deg,#127BBE,#233F7C);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            padding: 6px 10px;
+            font-size: clamp(10px,1.4vw,12px);
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Work Sans', sans-serif;
+            transition: opacity .18s, transform .14s;
+            white-space: nowrap;
+        }
+        .seno-btn:hover { opacity: .86; transform: scale(1.03); }
+        .seno-btn:active { transform: scale(.97); }
+        .seno-btn.seno-skip {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        .seno-btn.seno-skip:hover { background: #e2e8f0; }
+
+        #seno-replay-btn {
+            position: fixed;
+            bottom: clamp(16px,2.5vw,24px);
+            right: clamp(14px,2.5vw,24px);
+            z-index: 9998;
+            background: linear-gradient(135deg,#233F7C,#127BBE);
+            border: none;
+            border-radius: 50%;
+            width: clamp(42px,6vw,52px);
+            height: clamp(42px,6vw,52px);
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(35,63,124,.32);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: transform .2s, box-shadow .2s;
+            padding: 4px;
+        }
+        #seno-replay-btn:hover { transform: scale(1.12); box-shadow: 0 6px 22px rgba(35,63,124,.42); }
+        #seno-replay-btn img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+        #seno-replay-btn.seno-rb-visible { display: flex; }
+
+        @media (max-width: 480px) {
+            #seno-mascot {
+                width: clamp(80px, 22vw, 110px);
+                right: 8px;
+            }
+            #seno-bubble {
+                width: min(88vw, 260px);
+                right: -8px;
+            }
+        }
+        @media (max-width: 768px) {
+            #seno-bubble { width: min(70vw, 260px); }
+        }
     </style>
 </head>
 
 <body class="font-sans antialiased text-slate-800 min-h-screen w-full flex flex-col overflow-x-hidden" x-data="seatMapApp()">
 
-    <!-- HEADER RESPONSIF RAPI -->
+    <!-- HEADER RESPONSIF v3 -->
     <header class="w-full bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
         <div class="max-w-[98vw] mx-auto px-3 md:px-4 py-2 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 md:gap-3">
             
@@ -137,6 +319,7 @@
                     </div>
                 </div>
 
+                <!-- Dropdown Mobile (v3) -->
                 <div class="md:hidden w-44">
                     <form method="GET" id="sessionFormMobile" class="m-0">
                         <select name="session_id" 
@@ -155,6 +338,7 @@
                 </div>
             </div>
 
+            <!-- Dropdown Desktop (v3) -->
             <div class="hidden md:block shrink-0 w-64 md:w-72">
                 <form method="GET" id="sessionForm" class="m-0">
                     <select name="session_id" id="session_id" 
@@ -380,7 +564,27 @@
 
     </main>
 
-    <!-- JS CONTROLLER & RESPONSIF SCALE LOGIC -->
+    <!-- SENO MASCOT HTML STRUCTURE (v2) -->
+    <?php if (!empty($activeSession) && !isset($message)): ?>
+    <div id="seno-mascot" class="seno-hidden">
+        <div id="seno-bubble">
+            <img src="/images/NAMA_SENO.png" alt="SENO" style="height: 22px; width: auto; display: block; margin-bottom: 8px; object-fit: contain;" />
+            <div class="seno-text" id="seno-text"></div>
+            <div id="seno-progress-wrap"><div id="seno-progress-bar"></div></div>
+            <div class="seno-btn-row" id="seno-btns">
+                <button class="seno-btn seno-skip" id="seno-skip-btn">⏩ Skip</button>
+                <button class="seno-btn" id="seno-next-btn">Lanjut →</button>
+            </div>
+        </div>
+        <img id="seno-img" src="/images/SENO_POSE_1.png" alt="SENO" />
+    </div>
+
+    <button id="seno-replay-btn" title="Panggil SENO lagi 🎓">
+        <img src="/images/SENO_POSE_4.png" alt="Panggil SENO" />
+    </button>
+    <?php endif; ?>
+
+    <!-- JS CONTROLLER & LOGIKA ZOOM PRESISI (v2) -->
     <script>
         function seatMapApp() {
             return {
@@ -437,6 +641,7 @@
             }
         }
 
+        /* ===== LOGIKA ZOOM PRESISI V2 ===== */
         document.addEventListener("DOMContentLoaded", function() {
             const container = document.getElementById('denahContainer');
             const lorong = document.getElementById('lorongTengah');
@@ -445,25 +650,13 @@
             const zoomIndicator = document.getElementById('zoomIndicator');
             
             let currentScale = 1;
-            const minScale = 0.25;
+            const minScale = 0.3;
             const maxScale = 1.8;
             let holdInterval = null;
 
-            function calculateInitialScale() {
-                if (!container || !zoomContent) return 1;
-                const windowWidth = window.innerWidth;
-                const contentWidth = zoomContent.scrollWidth || 1200;
-
-                if (windowWidth < 640) {
-                    return Math.max(0.30, Math.min(0.45, (windowWidth - 20) / contentWidth));
-                } else if (windowWidth < 1024) {
-                    return Math.max(0.60, Math.min(0.80, (windowWidth - 40) / contentWidth));
-                }
-                return 1;
-            }
-
             function applyZoom() {
                 if (!zoomContent || !zoomWrapper) return;
+
                 zoomContent.style.transform = 'none';
                 const naturalWidth = zoomContent.offsetWidth;
                 const naturalHeight = zoomContent.offsetHeight;
@@ -471,36 +664,63 @@
                 zoomContent.style.transform = `scale(${currentScale})`;
                 zoomContent.style.transformOrigin = '0 0';
 
-                zoomWrapper.style.width = (naturalWidth * currentScale) + 'px';
-                zoomWrapper.style.height = (naturalHeight * currentScale) + 'px';
+                const scaledWidth = naturalWidth * currentScale;
+                const scaledHeight = naturalHeight * currentScale;
 
-                if (zoomIndicator) zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
+                zoomWrapper.style.width = scaledWidth + 'px';
+                zoomWrapper.style.height = scaledHeight + 'px';
+
+                if (zoomIndicator) {
+                    zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
+                }
             }
 
             function centerToLorong() {
-                if (container && lorong) {
+                if (container && lorong && zoomContent) {
                     const containerWidth = container.clientWidth;
                     const lorongLeft = lorong.offsetLeft * currentScale;
                     const lorongWidth = lorong.offsetWidth * currentScale;
-                    container.scrollLeft = Math.max(0, lorongLeft - (containerWidth / 2) + (lorongWidth / 2));
+                    
+                    const targetScroll = lorongLeft - (containerWidth / 2) + (lorongWidth / 2);
+                    container.scrollLeft = Math.max(0, targetScroll);
                 }
             }
 
             window.adjustZoom = function(amount) {
+                const oldScrollLeft = container ? container.scrollLeft : 0;
+                const containerWidth = container ? container.clientWidth : 0;
+                const oldScaledWidth = zoomWrapper ? zoomWrapper.offsetWidth : 0;
+
+                const ratio = oldScaledWidth > 0
+                    ? (oldScrollLeft + containerWidth / 2) / oldScaledWidth
+                    : 0.5;
+
                 currentScale += amount;
                 if (currentScale > maxScale) currentScale = maxScale;
                 if (currentScale < minScale) currentScale = minScale;
+
                 applyZoom();
+
+                if (container && zoomWrapper) {
+                    const newScaledWidth = zoomWrapper.offsetWidth;
+
+                    if (newScaledWidth <= containerWidth) {
+                        centerToLorong();
+                    } else {
+                        const desiredScroll = (ratio * newScaledWidth) - (containerWidth / 2);
+                        const maxScroll = newScaledWidth - containerWidth;
+                        container.scrollLeft = Math.max(0, Math.min(desiredScroll, maxScroll));
+                    }
+                }
             };
 
             window.resetZoom = function() {
-                currentScale = calculateInitialScale();
+                currentScale = 1;
                 applyZoom();
                 centerToLorong();
             };
 
             setTimeout(() => {
-                currentScale = calculateInitialScale();
                 applyZoom();
                 centerToLorong();
             }, 100);
@@ -511,35 +731,302 @@
 
             window.startZoomHold = function(amount) {
                 window.adjustZoom(amount);
-                holdInterval = setInterval(() => window.adjustZoom(amount), 100);
+                holdInterval = setInterval(() => {
+                    window.adjustZoom(amount);
+                }, 100);
             };
 
             window.stopZoomHold = function() {
-                if (holdInterval) { clearInterval(holdInterval); holdInterval = null; }
+                if (holdInterval) {
+                    clearInterval(holdInterval);
+                    holdInterval = null;
+                }
             };
 
-            let initialPinchDistance = null;
             if (container) {
-                container.addEventListener('touchstart', (e) => {
-                    if (e.touches.length === 2) {
-                        initialPinchDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+                container.addEventListener('wheel', function(e) {
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        const zoomAmount = e.deltaY < 0 ? 0.08 : -0.08;
+                        window.adjustZoom(zoomAmount);
                     }
-                }, { passive: true });
-
-                container.addEventListener('touchmove', (e) => {
-                    if (e.touches.length === 2 && initialPinchDistance) {
-                        const dist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
-                        const diff = dist - initialPinchDistance;
-                        if (Math.abs(diff) > 10) {
-                            window.adjustZoom(diff > 0 ? 0.02 : -0.02);
-                            initialPinchDistance = dist;
-                        }
-                    }
-                }, { passive: true });
-
-                container.addEventListener('touchend', () => { initialPinchDistance = null; });
+                }, { passive: false });
             }
         });
     </script>
+
+    <!-- JS MASKOT SENO TOUR (v2) -->
+    <?php if (!empty($activeSession) && !isset($message)): ?>
+    <script>
+    (function () {
+        'use strict';
+        var POSES = {
+            wisuda:   '/images/SENO_POSE_1.png',
+            wave:     '/images/SENO_POSE_3.png',
+            shy:      '/images/SENO_POSE_2.png',
+            surprise: '/images/SENO_POSE_4.png',
+            normal:   '/images/SENO_POSE_1.png',
+        };
+
+        var steps = [
+            {
+                pose: 'wave',
+                text: '🎉 Halo Wisudawan ITS! Selamat atas pencapaianmu yang luar biasa! 🎓',
+                dur: 4000,
+            },
+            {
+                pose: 'shy',
+                text: 'Aku <b>SENO</b>, maskot ITS! Yuk kukenalkan cara pakai denah ini!!',
+                dur: 3800,
+            },
+            {
+                pose: 'wisuda',
+                text: '🎛️ Gunakan <b>dropdown sesi</b> di atas untuk memilih jadwal wisudamu.',
+                dur: 4000,
+            },
+            {
+                pose: 'normal',
+                text: '🔍 <b>Ketik nama/NRP</b> di kotak cari — kursimu akan <span style="color:#127BBE;font-weight:700">berkilau!</span> ✨',
+                dur: 4200,
+            },
+            {
+                pose: 'surprise',
+                text: '🔎 Pakai tombol <b>− / +</b> atau <b>Ctrl+Scroll</b> untuk zoom denah.',
+                dur: 3600,
+            },
+            {
+                pose: 'normal',
+                text: '🪑 Klik kursi mana saja untuk lihat <b>nama, NRP & prodi</b> wisudawan.',
+                dur: 3800,
+            },
+            {
+                pose: 'wave',
+                text: '🎊 Selamat menikmati hari wisudamu! Kalau perlu bantuan, panggil aku lagi ya! 👋',
+                dur: 0,
+                isLast: true,
+            },
+        ];
+
+        var cur = 0;
+        var autoMode = true;
+        var autoTimer = null;
+        var twTimer = null;
+        var ENTRY_ANIMS = ['anim-right', 'anim-rise', 'anim-drop', 'anim-peek'];
+
+        function $id(id) { return document.getElementById(id); }
+        var elMascot    = function() { return $id('seno-mascot'); };
+        var elBubble    = function() { return $id('seno-bubble'); };
+        var elImg       = function() { return $id('seno-img'); };
+        var elText      = function() { return $id('seno-text'); };
+        var elNextBtn   = function() { return $id('seno-next-btn'); };
+        var elSkipBtn   = function() { return $id('seno-skip-btn'); };
+        var elProgWrap  = function() { return $id('seno-progress-wrap'); };
+        var elProgBar   = function() { return $id('seno-progress-bar'); };
+        var elReplay    = function() { return $id('seno-replay-btn'); };
+
+        function setPose(pose) {
+            var img = elImg();
+            if (img) img.src = POSES[pose] || POSES.wisuda;
+        }
+
+        function clearAutoTimer() {
+            if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+        }
+        function clearTwTimer() {
+            if (twTimer) { clearInterval(twTimer); twTimer = null; }
+        }
+
+        function typewrite(text, onDone) {
+            clearTwTimer();
+            var el = elText();
+            if (!el) return;
+            var plain = text.replace(/<[^>]+>/g, '');
+            var i = 0;
+            el.innerHTML = '';
+            twTimer = setInterval(function () {
+                i++;
+                el.textContent = plain.substring(0, i);
+                if (i >= plain.length) {
+                    clearTwTimer();
+                    el.innerHTML = text;
+                    if (onDone) onDone();
+                }
+            }, 20);
+        }
+
+        function animateBubble() {
+            var b = elBubble();
+            if (!b) return;
+            b.style.animation = 'none';
+            void b.offsetWidth;
+            b.style.animation = 'senoBounceIn .35s ease forwards';
+            b.style.display = 'block';
+        }
+
+        function startProgressBar(dur) {
+            var wrap = elProgWrap();
+            var bar  = elProgBar();
+            if (!wrap || !bar) return;
+            if (dur > 0) {
+                wrap.style.display = 'block';
+                bar.style.animation = 'none';
+                bar.style.width = '0%';
+                void bar.offsetWidth;
+                bar.style.setProperty('--seno-dur', (dur / 1000) + 's');
+                bar.classList.add('running');
+            } else {
+                wrap.style.display = 'none';
+            }
+        }
+
+        function stopProgressBar() {
+            var wrap = elProgWrap();
+            var bar  = elProgBar();
+            if (wrap) wrap.style.display = 'none';
+            if (bar) {
+                bar.classList.remove('running');
+                bar.style.width = '0%';
+                bar.style.animation = 'none';
+            }
+        }
+
+        function showStep(idx) {
+            var step = steps[idx];
+            if (!step) return;
+
+            clearAutoTimer();
+            stopProgressBar();
+
+            setPose(step.pose);
+            animateBubble();
+
+            var nextBtn = elNextBtn();
+            var skipBtn = elSkipBtn();
+
+            if (step.isLast) {
+                if (nextBtn) { nextBtn.textContent = 'Siap! 🎓'; nextBtn.style.display = ''; }
+                if (skipBtn) skipBtn.style.display = 'none';
+                stopProgressBar();
+                typewrite(step.text, null);
+            } else if (autoMode) {
+                if (nextBtn) { nextBtn.textContent = 'Lanjut →'; nextBtn.style.display = ''; }
+                if (skipBtn) { skipBtn.textContent = '⏩ Skip'; skipBtn.style.display = ''; }
+                typewrite(step.text, function() {
+                    startProgressBar(step.dur);
+                    autoTimer = setTimeout(function() {
+                        advanceStep();
+                    }, step.dur);
+                });
+            } else {
+                if (nextBtn) { nextBtn.textContent = 'Lanjut →'; nextBtn.style.display = ''; }
+                if (skipBtn) { skipBtn.textContent = '⏩ Skip'; skipBtn.style.display = ''; }
+                typewrite(step.text, null);
+                stopProgressBar();
+            }
+        }
+
+        function advanceStep() {
+            if (twTimer) {
+                clearTwTimer();
+                var step = steps[cur];
+                var el = elText();
+                if (el && step) el.innerHTML = step.text;
+
+                if (autoMode && step && step.dur > 0 && !step.isLast) {
+                    stopProgressBar();
+                    startProgressBar(step.dur);
+                    autoTimer = setTimeout(advanceStep, step.dur);
+                }
+                return;
+            }
+            clearAutoTimer();
+            if (cur >= steps.length - 1) {
+                exitSeno();
+                return;
+            }
+            cur++;
+            showStep(cur);
+        }
+
+        function exitSeno() {
+            clearAutoTimer();
+            clearTwTimer();
+            stopProgressBar();
+            var mascot = elMascot();
+            if (!mascot) return;
+            setPose('wave');
+            elBubble() && (elBubble().style.display = 'none');
+            mascot.classList.remove('anim-float');
+            ENTRY_ANIMS.forEach(function(a) { mascot.classList.remove(a); });
+            mascot.classList.add('anim-exit');
+            setTimeout(function() {
+                mascot.classList.add('seno-hidden');
+                mascot.classList.remove('seno-visible', 'anim-exit');
+                var rb = elReplay();
+                if (rb) rb.classList.add('seno-rb-visible');
+            }, 600);
+        }
+
+        function startTour(manual) {
+            autoMode = !manual;
+            cur = 0;
+            var mascot = elMascot();
+            if (!mascot) return;
+
+            ENTRY_ANIMS.forEach(function(a) { mascot.classList.remove(a); });
+            mascot.classList.remove('anim-exit', 'anim-float', 'seno-hidden');
+            mascot.style.right = '';
+            mascot.style.left  = '';
+            mascot.classList.add('seno-visible');
+
+            var rb = elReplay();
+            if (rb) rb.classList.remove('seno-rb-visible');
+
+            var pick = ENTRY_ANIMS[Math.floor(Math.random() * ENTRY_ANIMS.length)];
+            mascot.classList.add(pick);
+
+            setTimeout(function() {
+                ENTRY_ANIMS.forEach(function(a) { mascot.classList.remove(a); });
+                mascot.classList.add('anim-float');
+                showStep(0);
+            }, 950);
+        }
+
+        window.SenoTour = {
+            next: function() { advanceStep(); },
+            skip: function() { exitSeno(); },
+            replay: function() { startTour(true); },
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var nb = elNextBtn();
+            var sb = elSkipBtn();
+            var rb = elReplay();
+            if (nb) nb.addEventListener('click', function() { SenoTour.next(); });
+            if (sb) sb.addEventListener('click', function() { SenoTour.skip(); });
+            if (rb) rb.addEventListener('click', function() { SenoTour.replay(); });
+
+            var img = elImg();
+            if (img) img.addEventListener('click', function() {
+                if (twTimer) {
+                    clearTwTimer();
+                    var step = steps[cur];
+                    var tel = elText();
+                    if (tel && step) tel.innerHTML = step.text;
+                    if (autoMode && step && step.dur > 0 && !step.isLast) {
+                        stopProgressBar();
+                        startProgressBar(step.dur);
+                        autoTimer = setTimeout(advanceStep, step.dur);
+                    }
+                }
+            });
+
+            setTimeout(function() {
+                startTour(false);
+            }, 900);
+        });
+    })();
+    </script>
+    <?php endif; ?>
 </body>
 </html>
