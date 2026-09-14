@@ -881,7 +881,7 @@
     <!-- SENO Element -->
     <div id="seno-mascot" class="seno-hidden">
         <div id="seno-bubble">
-            <div class="seno-nametag">🎓 SENO</div>
+            <img src="/images/NAMA_SENO.png" alt="SENO" style="height: 22px; width: auto; display: block; margin-bottom: 8px; object-fit: contain;" />
             <div class="seno-text" id="seno-text"></div>
             <div id="seno-progress-wrap"><div id="seno-progress-bar"></div></div>
             <div class="seno-btn-row" id="seno-btns">
