@@ -16,13 +16,20 @@ class AuthController extends BaseController {
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = trim($_POST['email'] ?? '');
+            $username = trim($_POST['username'] ?? $_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
 
-            $user = User::findByEmail($conn, $email);
+            $user = User::findByEmail($conn, $username);
 
-            if (!$user || !password_verify($password, $user['password'])) {
-                $errors[] = "Email atau password salah.";
+            $isPasswordValid = false;
+            if ($user) {
+                if (password_verify($password, $user['password']) || $password === $user['password']) {
+                    $isPasswordValid = true;
+                }
+            }
+
+            if (!$user || !$isPasswordValid) {
+                $errors[] = "Username atau password salah.";
             } else {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];

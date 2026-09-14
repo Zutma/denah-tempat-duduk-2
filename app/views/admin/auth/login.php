@@ -38,9 +38,9 @@
 
                 <form method="POST" class="space-y-5">
                     <div>
-                        <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                        <input type="email" id="email" name="email"
-                            value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
+                        <label for="username" class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+                        <input type="text" id="username" name="username"
+                            value="<?= htmlspecialchars($_POST['username'] ?? '') ?>"
                             required autofocus
                             class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition">
                     </div>
