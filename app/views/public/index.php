@@ -54,7 +54,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-image: url('/images/Vector.svg'); 
+            background-image: url('/images/BATIK_1.svg'); 
             background-repeat: repeat;
             background-position: center top;
             background-size: 280px auto;
