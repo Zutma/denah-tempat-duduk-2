@@ -178,20 +178,10 @@
                                                     <?php
                                                         $hasGraduate = !empty($seat['graduate_name']);
                                                         $facultyColor = $hasGraduate && !empty($seat['faculty_color']) ? $seat['faculty_color'] : '#cbd5e1';
-                                                        $graduateData = $hasGraduate ? [
-                                                            'seat_id'      => $seat['id'],
-                                                            'seat_code'    => $seatMapInfo[$seat['id']]['code'] ?? '-',
-                                                            'name'         => $seat['graduate_name'],
-                                                            'nrp'          => $seat['nrp'],
-                                                            'prodi'        => $seat['prodi_name'] ?? '-',
-                                                            'faculty'      => !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-'),
-                                                            'faculty_name' => $seat['faculty_name'] ?? '-',
-                                                            'color'        => $facultyColor,
-                                                        ] : null;
                                                     ?>
                                                     <div class="flex flex-col items-center relative" :class="{ 'z-30': searchedSeatIds.includes(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
                                                         <button type="button" id="seat-<?= $seat['id'] ?>"
-                                                            @click="selectSeat(<?= $seat['id'] ?>, <?= $graduateData ? htmlspecialchars(json_encode($graduateData), ENT_QUOTES, 'UTF-8') : 'null' ?>)"
+                                                            @click="selectSeat(<?= $seat['id'] ?>)"
                                                             :class="{ 'search-highlight-seat': searchedSeatIds.includes(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !searchedSeatIds.includes(<?= $seat['id'] ?>) }"
                                                             class="w-10 h-10 md:w-13 md:h-13 rounded-lg flex items-center justify-center font-extrabold text-[11px] md:text-xs shadow-2xs transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
                                                             style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#f1f5f9' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>; border: <?= $hasGraduate ? 'none' : '1px solid #cbd5e1' ?>;">
@@ -230,20 +220,10 @@
                                                     <?php
                                                         $hasGraduate = !empty($seat['graduate_name']);
                                                         $facultyColor = $hasGraduate && !empty($seat['faculty_color']) ? $seat['faculty_color'] : '#cbd5e1';
-                                                        $graduateData = $hasGraduate ? [
-                                                            'seat_id'      => $seat['id'],
-                                                            'seat_code'    => $seatMapInfo[$seat['id']]['code'] ?? '-',
-                                                            'name'         => $seat['graduate_name'],
-                                                            'nrp'          => $seat['nrp'],
-                                                            'prodi'        => $seat['prodi_name'] ?? '-',
-                                                            'faculty'      => !empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-'),
-                                                            'faculty_name' => $seat['faculty_name'] ?? '-',
-                                                            'color'        => $facultyColor,
-                                                        ] : null;
                                                     ?>
                                                     <div class="flex flex-col items-center relative" :class="{ 'z-30': searchedSeatIds.includes(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
                                                         <button type="button" id="seat-<?= $seat['id'] ?>"
-                                                            @click="selectSeat(<?= $seat['id'] ?>, <?= $graduateData ? htmlspecialchars(json_encode($graduateData), ENT_QUOTES, 'UTF-8') : 'null' ?>)"
+                                                            @click="selectSeat(<?= $seat['id'] ?>)"
                                                             :class="{ 'search-highlight-seat': searchedSeatIds.includes(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !searchedSeatIds.includes(<?= $seat['id'] ?>) }"
                                                             class="w-10 h-10 md:w-13 md:h-13 rounded-lg flex items-center justify-center font-extrabold text-[11px] md:text-xs shadow-2xs transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
                                                             style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#f1f5f9' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>; border: <?= $hasGraduate ? 'none' : '1px solid #cbd5e1' ?>;">

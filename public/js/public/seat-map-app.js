@@ -8,7 +8,12 @@ function seatMapApp() {
         filteredGraduates: [],
         searchedSeatIds: [],
 
+        gradMap: null,
+
         init() {
+            // Pre-index graduates by seat_id untuk lookup O(1) super cepat
+            this.buildGradMap();
+
             // Watcher cerdas: Hanya menghitung ulang hasil pencarian jika ketikan berubah (Bebas Lag 100%)
             this.$watch('searchQuery', (val) => {
                 this.searchedSeatIdClicked = null;
@@ -47,18 +52,43 @@ function seatMapApp() {
             }
         },
 
-        selectSeat(seatId, data) {
-            if (!data) return;
+        buildGradMap() {
+            this.gradMap = {};
+            if (Array.isArray(this.graduatesList)) {
+                for (let i = 0; i < this.graduatesList.length; i++) {
+                    const g = this.graduatesList[i];
+                    if (g && g.seat_id) {
+                        this.gradMap[Number(g.seat_id)] = g;
+                    }
+                }
+            }
+        },
+
+        getGradBySeatId(seatId) {
+            if (!this.gradMap) {
+                this.buildGradMap();
+            }
+            return this.gradMap[Number(seatId)] || null;
+        },
+
+        selectSeat(seatId) {
             const targetId = Number(seatId);
+            if (!targetId) return;
+
+            const gradData = this.getGradBySeatId(targetId);
+            if (!gradData) return; // Kursi kosong / tanpa wisudawan
+
             this.selectedSeatId = (this.selectedSeatId === targetId) ? null : targetId;
-            this.activeModalData = this.selectedSeatId ? data : null;
+            this.activeModalData = this.selectedSeatId ? gradData : null;
         },
 
         focusSeat(seatId, data) {
             if (!seatId) return;
             const targetId = Number(seatId);
+            const gradData = data || this.getGradBySeatId(targetId);
+
             this.selectedSeatId = targetId;
-            this.activeModalData = data;
+            this.activeModalData = gradData;
             this.searchedSeatIdClicked = targetId;
             this.searchedSeatIds = [targetId];
 
