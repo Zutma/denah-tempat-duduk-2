@@ -172,7 +172,7 @@
             
             <!-- Left: Logo & Wordmark Title -->
             <div class="flex items-center gap-3 flex-shrink-0">
-                <img src="/images/logo.png" alt="ITS Logo" class="w-9 h-9 object-contain drop-shadow-xs">
+                <img src="/images/LOGO.png" alt="ITS Logo" class="w-9 h-9 object-contain drop-shadow-xs">
                 <div class="h-8 w-px bg-slate-200"></div>
                 <div>
                     <p class="font-friz text-[10px] font-extrabold uppercase tracking-widest text-its-blue-light leading-none">
@@ -287,7 +287,7 @@
         <?php if (!$activeSession || isset($message)): ?>
             <div class="bg-white/95 backdrop-blur-md border border-its-blue-sky/40 text-slate-700 p-8 rounded-3xl max-w-md mx-auto my-auto text-center shadow-xl relative overflow-hidden">
                 <div class="relative w-28 h-28 mx-auto mb-5 flex items-center justify-center bg-its-blue/5 rounded-full border border-its-blue-sky/30 shadow-inner">
-                    <img src="/images/logo.png" alt="ITS Logo" class="w-16 h-16 object-contain drop-shadow-md">
+                    <img src="/images/LOGO.png" alt="ITS Logo" class="w-16 h-16 object-contain drop-shadow-md">
                 </div>
                 <h3 class="font-extrabold text-its-blue text-lg mb-2">Acara Wisuda Belum Dipilih</h3>
                 <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">
@@ -889,23 +889,23 @@
                 <button class="seno-btn" id="seno-next-btn">Lanjut →</button>
             </div>
         </div>
-        <img id="seno-img" src="/images/7_Wisuda.png" alt="SENO" />
+        <img id="seno-img" src="/images/SENO_POSE_1.png" alt="SENO" />
     </div>
 
     <!-- Replay Button -->
     <button id="seno-replay-btn" title="Panggil SENO lagi 🎓">
-        <img src="/images/SENO_POSE 4.png" alt="Panggil SENO" />
+        <img src="/images/SENO_POSE_4.png" alt="Panggil SENO" />
     </button>
 
     <script>
     (function () {
         'use strict';
         var POSES = {
-            wisuda:   '/images/7_Wisuda.png',
-            wave:     '/images/SENO_POSE 4.png',
-            shy:      '/images/SENO_POSE 2.png',
-            surprise: '/images/SENO_POSE 10.png',
-            normal:   '/images/SENO_POSE 1.png',
+            wisuda:   '/images/SENO_POSE_1.png',
+            wave:     '/images/SENO_POSE_3.png',
+            shy:      '/images/SENO_POSE_2.png',
+            surprise: '/images/SENO_POSE_4.png',
+            normal:   '/images/SENO_POSE_1.png',
         };
 
         /* ---------- DIALOG STEPS (ringkas) ---------- */
@@ -1054,8 +1054,8 @@
                 stopProgressBar();
                 typewrite(step.text, null);
             } else if (autoMode) {
-                // Auto mode: hide Next, show Skip only
-                if (nextBtn) nextBtn.style.display = 'none';
+                // Auto mode: show both Skip and Lanjut → buttons, while timer runs
+                if (nextBtn) { nextBtn.textContent = 'Lanjut →'; nextBtn.style.display = ''; }
                 if (skipBtn) { skipBtn.textContent = '⏩ Skip'; skipBtn.style.display = ''; }
                 typewrite(step.text, function() {
                     startProgressBar(step.dur);
