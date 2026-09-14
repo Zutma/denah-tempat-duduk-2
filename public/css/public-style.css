@@ -57,9 +57,16 @@ body::before {
     z-index: 1;
 }
 
-header, main, footer, div[x-data] {
+/* FIX STACKING CONTEXT: Header Dipaksa Di Atas Main */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100 !important;
+}
+
+main, footer {
     position: relative;
-    z-index: 2;
+    z-index: 1 !important;
 }
 
 .selected-seat-ring {
@@ -163,7 +170,7 @@ header, main, footer, div[x-data] {
 
 #seno-mascot.anim-right  { animation: senoSlideInRight 0.75s cubic-bezier(.34,1.56,.64,1) forwards; }
 #seno-mascot.anim-rise   { animation: senoRiseUp       0.7s  cubic-bezier(.34,1.56,.64,1) forwards; }
-#seno-mascot.anim-drop   { animation: senoDropDown     0.85s ease-out forwards; }
+#seno-mascot.anim-drop   { animation: senoDropDown       0.85s ease-out forwards; }
 #seno-mascot.anim-peek   { animation: senoPeekRight    1.1s  ease forwards; }
 #seno-mascot.anim-exit   { animation: senoExitRight    0.55s ease-in forwards; }
 #seno-mascot.anim-float  { animation: senoFloat        3s    ease-in-out infinite; }

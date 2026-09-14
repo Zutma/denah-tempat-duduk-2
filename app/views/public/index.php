@@ -5,19 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Denah Tempat Duduk Wisuda ITS - Interaktif</title>
-    
+
+    <!-- Passing Data PHP ke JS Global SEBELUM Alpine & Script App di-load -->
+    <script>
+        window.__seatMapData = {
+            searchQuery: <?= json_encode($searchQuery ?? '') ?>,
+            graduatesList: <?= json_encode($allGraduatesList ?? []) ?>
+        };
+    </script>
+
+    <!-- External JS Files (defer) -->
+    <script src="/js/public/seat-map-app.js" defer></script>
+    <script src="/js/public/zoom-controller.js" defer></script>
+    <?php if (!empty($activeSession) && !isset($message)): ?>
+        <script src="/js/public/seno-mascot.js" defer></script>
+    <?php endif; ?>
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
 
     <!-- External Custom CSS -->
     <link rel="stylesheet" href="/css/tailwind-built.css">
+    <link rel="stylesheet" href="/css/public-style.css">
 </head>
 
-<body class="font-sans antialiased text-slate-800 min-h-screen w-full flex flex-col overflow-x-hidden" x-data="seatMapApp()">
+<body class="font-sans antialiased text-slate-800 min-h-screen w-full flex flex-col overflow-x-hidden relative" x-data="seatMapApp()">
 
-    <!-- HEADER RESPONSIF v3 -->
-    <header class="w-full bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <!-- HEADER UTAMA (Z-Index Tertinggi) -->
+    <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-[100] shadow-xs overflow-visible">
         <div class="max-w-[98vw] mx-auto px-3 md:px-4 py-2 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 md:gap-3">
             
             <div class="flex items-center justify-between gap-3 shrink-0">
@@ -71,44 +86,52 @@
                 </form>
             </div>
 
-            <div class="flex items-center gap-2 w-full md:w-auto flex-1 max-w-none md:max-w-md">
+            <!-- SEARCH BAR RESPONSIF -->
+            <div class="flex items-center gap-2 w-full md:w-auto flex-1 max-w-none md:max-w-md relative z-[101]">
                 <div class="relative flex-1 min-w-0">
                     <div class="relative flex items-center">
                         <span class="absolute left-2.5 text-slate-400 text-xs">🔍</span>
                         <input type="text" 
                             x-model="searchQuery" 
-                            @input="searchedSeatIdClicked = null"
                             <?= empty($activeSession) ? 'disabled' : '' ?>
                             placeholder="<?= empty($activeSession) ? 'Pilih acara dulu...' : 'Cari nama, NRP, kursi...' ?>"
                             class="w-full pl-7 pr-2 py-1.5 border border-slate-300 rounded-lg text-xs font-medium bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all shadow-2xs disabled:bg-slate-100">
                     </div>
 
+                    <!-- DROPDOWN PENCARIAN HASIL -->
                     <?php if (!empty($activeSession)): ?>
-                        <div x-show="searchQuery.trim() !== ''" x-cloak 
-                             class="absolute top-full left-0 right-0 mt-1.5 bg-white border border-its-blue-sky/40 rounded-xl shadow-xl z-50 p-2 text-left max-h-64 overflow-y-auto custom-scrollbar divide-y divide-slate-100">
-                            <div class="flex items-center justify-between text-[10px] text-slate-500 px-1 pb-1">
-                                <span>Ditemukan <strong class="text-its-blue font-bold" x-text="filteredGraduates.length"></strong> wisudawan</span>
-                                <button type="button" @click="clearSelection()" class="text-its-blue-light font-bold hover:underline cursor-pointer">Reset</button>
-                            </div>
-
-                            <template x-if="filteredGraduates.length > 0">
-                                <div class="divide-y divide-slate-100">
-                                    <template x-for="g in filteredGraduates" :key="g.seat_id">
-                                        <button type="button" @click="focusSeat(g.seat_id, g)"
-                                            class="w-full p-1.5 hover:bg-its-blue/5 rounded-lg flex items-center justify-between group text-left">
-                                            <div class="pr-2 truncate">
-                                                <p class="text-xs font-bold text-slate-800 group-hover:text-its-blue-light truncate" x-text="g.name"></p>
-                                                <p class="text-[10px] text-slate-500 truncate">NRP: <span x-text="g.nrp"></span> • <span x-text="g.faculty"></span></p>
-                                            </div>
-                                            <span class="px-2 py-0.5 bg-its-yellow/20 text-its-blue border border-its-yellow/60 text-[10px] font-extrabold rounded-md whitespace-nowrap" x-text="'Kursi ' + g.seat_code"></span>
-                                        </button>
-                                    </template>
-                                </div>
-                            </template>
+                    <div x-show="searchQuery.trim() !== ''" x-cloak 
+                         class="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-300 rounded-xl shadow-2xl p-2 text-left max-h-72 overflow-y-auto custom-scrollbar"
+                         style="z-index: 99999 !important;">
+                        <div class="flex items-center justify-between text-[10px] text-slate-500 px-1 pb-1 border-b border-slate-100">
+                            <span>Ditemukan <strong class="text-its-blue font-bold" x-text="filteredGraduates.length"></strong> wisudawan</span>
+                            <button type="button" @click="clearSelection()" class="text-its-blue-light font-bold hover:underline cursor-pointer">Reset</button>
                         </div>
+
+                        <template x-if="filteredGraduates.length > 0">
+                            <div class="divide-y divide-slate-100 mt-1">
+                                <template x-for="g in filteredGraduates" :key="g.seat_id">
+                                    <button type="button" @click="focusSeat(g.seat_id, g)"
+                                        class="w-full p-2 hover:bg-slate-100 rounded-lg flex items-center justify-between group text-left cursor-pointer">
+                                        <div class="pr-2 truncate">
+                                            <p class="text-xs font-bold text-slate-800 group-hover:text-its-blue-light truncate" x-text="g.name"></p>
+                                            <p class="text-[10px] text-slate-500 truncate">NRP: <span x-text="g.nrp"></span> • <span x-text="g.faculty"></span></p>
+                                        </div>
+                                        <span class="px-2 py-0.5 bg-its-yellow/20 text-its-blue border border-its-yellow/60 text-[10px] font-extrabold rounded-md whitespace-nowrap" x-text="'Kursi ' + g.seat_code"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
+                        <template x-if="filteredGraduates.length === 0">
+                            <div class="p-3 text-center text-xs text-slate-400 font-medium">
+                                Wisudawan atau kursi tidak ditemukan
+                            </div>
+                        </template>
+                    </div>
                     <?php endif; ?>
                 </div>
 
+                <!-- CONTROLLER ZOOM -->
                 <div class="flex items-center gap-0.5 shrink-0 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs shadow-2xs <?= empty($activeSession) ? 'opacity-50 pointer-events-none' : '' ?>">
                     <button type="button" onmousedown="window.startZoomHold(-0.05)" onmouseup="window.stopZoomHold()" onmouseleave="window.stopZoomHold()" ontouchstart="window.startZoomHold(-0.05)" ontouchend="window.stopZoomHold()" class="w-6 h-6 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-bold text-slate-700 flex items-center justify-center">-</button>
                     <span id="zoomIndicator" class="w-10 text-center font-extrabold text-its-blue text-[11px]">100%</span>
@@ -120,8 +143,8 @@
         </div>
     </header>
 
-    <!-- MAIN AREA -->
-    <main class="w-full flex-grow px-2 md:px-6 pt-3 pb-8 flex flex-col items-center justify-start">
+    <!-- MAIN AREA (Z-Index Di Bawah Header) -->
+    <main class="w-full flex-grow px-2 md:px-6 pt-3 pb-8 flex flex-col items-center justify-start relative z-0">
 
         <?php if (empty($activeSession) || isset($message)): ?>
             <div class="bg-white/95 backdrop-blur-md border border-its-blue-sky/40 text-slate-700 p-6 rounded-3xl max-w-sm mx-auto my-auto text-center shadow-xl">
@@ -300,20 +323,5 @@
     </button>
     <?php endif; ?>
 
-    <!-- Passing Data PHP ke JS Global -->
-    <script>
-        window.__seatMapData = {
-            searchQuery: <?= json_encode($searchQuery ?? '') ?>,
-            graduatesList: <?= json_encode($allGraduatesList ?? []) ?>
-        };
-    </script>
-
-    <!-- External JS Files -->
-    <script src="/js/public/seat-map-app.js" defer></script>
-    <script src="/js/public/zoom-controller.js" defer></script>
-    <?php if (!empty($activeSession) && !isset($message)): ?>
-        <script src="/js/public/seno-mascot.js" defer></script>
-    <?php endif; ?>
 </body>
-
 </html>
