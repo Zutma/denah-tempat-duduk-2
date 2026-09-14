@@ -1,7 +1,32 @@
+@import "tailwindcss";
+
+@source "../../app/views/**/*.php";
+@source "../../public/**/*.php";
+
+/* 1. Konfigurasi Theme & Warna Kustom (Tailwind v4) */
+@theme {
+  --font-sans: 'Work Sans', sans-serif;
+  --font-friz: 'Friz Quadrata Std', serif;
+
+  --color-its-blue: #233F7C;
+  --color-its-blue-light: #127BBE;
+  --color-its-blue-sky: #75BDE0;
+  --color-its-yellow: #FDBB16;
+}
+
+/* 2. Deklarasi Font Lokal */
 @font-face {
     font-family: 'Friz Quadrata Std';
-    src: url('https://www.its.ac.id/wp-content/uploads/2026/01/friz-quadrata-std-medium.woff2') format('woff2');
+    src: url('/fonts/friz-quadrata.otf') format('opentype');
     font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Work Sans';
+    src: url('/fonts/work-sans.ttf') format('truetype');
+    font-weight: 100 900;
     font-style: normal;
     font-display: swap;
 }

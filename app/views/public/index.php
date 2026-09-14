@@ -6,37 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Denah Tempat Duduk Wisuda ITS - Interaktif</title>
     
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CDN & Config -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Work Sans', 'sans-serif'],
-                        friz: ['Friz Quadrata Std', 'serif']
-                    },
-                    colors: {
-                        'its-blue': '#233F7C',
-                        'its-blue-light': '#127BBE',
-                        'its-blue-sky': '#75BDE0',
-                        'its-yellow': '#FDBB16',
-                    },
-                },
-            },
-        }
-    </script>
 
     <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
 
     <!-- External Custom CSS -->
-    <link rel="stylesheet" href="/css/public-style.css">
+    <link rel="stylesheet" href="/css/tailwind-built.css">
 </head>
 
 <body class="font-sans antialiased text-slate-800 min-h-screen w-full flex flex-col overflow-x-hidden" x-data="seatMapApp()">
