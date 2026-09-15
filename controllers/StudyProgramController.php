@@ -71,4 +71,15 @@ class StudyProgramController extends BaseController {
 
         $this->redirect('/study-programs');
     }
+
+    public function bulkDelete($conn) {
+        $this->checkAuth();
+
+        $ids = $_POST['ids'] ?? [];
+        if (!empty($ids) && is_array($ids)) {
+            StudyProgram::bulkDelete($conn, array_map('intval', $ids));
+        }
+
+        $this->redirect('/study-programs');
+    }
 }

@@ -52,30 +52,80 @@ class Graduate {
         return $stmt->execute();
     }
 
-    public static function findOrCreateFaculty($conn, $code) {
-        $stmt = $conn->prepare("SELECT id FROM faculties WHERE code = ?");
-        $stmt->bind_param("s", $code);
-        $stmt->execute();
-        $row = $stmt->get_result()->fetch_assoc();
-        if ($row) return $row['id'];
-
-        $stmt = $conn->prepare("INSERT INTO faculties (code, created_at, updated_at) VALUES (?, NOW(), NOW())");
-        $stmt->bind_param("s", $code);
-        $stmt->execute();
-        return $conn->insert_id;
+    public static function bulkDelete($conn, array $ids) {
+        if (empty($ids)) return false;
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $types = str_repeat('i', count($ids));
+        $stmt = $conn->prepare("DELETE FROM graduates WHERE id IN ($placeholders)");
+        $stmt->bind_param($types, ...$ids);
+        return $stmt->execute();
     }
 
-    public static function findOrCreateStudyProgram($conn, $facultyId, $name, $degreeLevel) {
-        $stmt = $conn->prepare("SELECT id FROM study_programs WHERE faculty_id = ? AND name = ?");
-        $stmt->bind_param("is", $facultyId, $name);
+    public static function findOrCreateFaculty($conn, $code) {
+        $codeClean = strtoupper(trim($code));
+
+        // 1. Exact Match Code
+        $stmt = $conn->prepare("SELECT id, name FROM faculties WHERE UPPER(code) = ? OR UPPER(name) = ?");
+        $stmt->bind_param("ss", $codeClean, $codeClean);
         $stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();
-        if ($row) return $row['id'];
+        if ($row) return ['id' => $row['id'], 'created' => false, 'matched_name' => $row['name'] ?: $codeClean];
 
-        $stmt = $conn->prepare("INSERT INTO study_programs (faculty_id, name, degree_level, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())");
-        $stmt->bind_param("iss", $facultyId, $name, $degreeLevel);
+        // 2. Buat Baru
+        $stmt = $conn->prepare("INSERT INTO faculties (code, name, created_at, updated_at) VALUES (?, ?, NOW(), NOW())");
+        $stmt->bind_param("ss", $codeClean, $codeClean);
         $stmt->execute();
-        return $conn->insert_id;
+        return ['id' => $conn->insert_id, 'created' => true, 'matched_name' => $codeClean];
+    }
+
+    public static function findOrCreateStudyProgram($conn, $facultyId, $rawName, $degreeLevel) {
+        $rawClean = trim($rawName);
+        $degreeClean = strtoupper(trim($degreeLevel));
+
+        // Ambil semua prodi di fakultas ini (atau semua prodi jika fakultas baru)
+        $stmt = $conn->prepare("SELECT id, name, degree_level FROM study_programs WHERE faculty_id = ?");
+        $stmt->bind_param("i", $facultyId);
+        $stmt->execute();
+        $existingProdis = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        // Fungsi normalisasi string untuk perbandingan cerdas (hilangkan titik, dash, spasi ganda)
+        $normalize = function($str) {
+            $str = preg_replace('/(TEK|REK|KIM|IND|MAN|MANAJ|TEKNO|TEKNOL|KOMP|PEND|ADM|INF|INFORM|SIST|AKUN|FIST|BIO|MAT|STAT)\b/i', '$1', $str);
+            $str = preg_replace('/[^a-zA-Z0-9]/', ' ', $str);
+            return strtolower(trim(preg_replace('/\s+/', ' ', $str)));
+        };
+
+        $targetNormalized = $normalize($rawClean);
+
+        // 1. Check Exact atau Smart Match
+        foreach ($existingProdis as $p) {
+            $pNameNormalized = $normalize($p['name']);
+            
+            // Periksa jika persis sama (setelah dinormalisasi) ATAU salah satu mengandung kata kunci yang persis sama
+            if ($targetNormalized === $pNameNormalized || 
+                (strlen($targetNormalized) > 4 && strpos($pNameNormalized, $targetNormalized) !== false) ||
+                (strlen($pNameNormalized) > 4 && strpos($targetNormalized, $pNameNormalized) !== false)) {
+                
+                return [
+                    'id' => $p['id'],
+                    'created' => false,
+                    'matched_name' => $p['name'],
+                    'degree_level' => $p['degree_level']
+                ];
+            }
+        }
+
+        // 2. Jika tidak ditemukan yang cocok, buat baru dengan Source of Truth dari Excel
+        $stmt = $conn->prepare("INSERT INTO study_programs (faculty_id, name, degree_level, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())");
+        $stmt->bind_param("iss", $facultyId, $rawClean, $degreeClean);
+        $stmt->execute();
+
+        return [
+            'id' => $conn->insert_id,
+            'created' => true,
+            'matched_name' => $rawClean,
+            'degree_level' => $degreeClean
+        ];
     }
 
     public static function findSeatByPosition($conn, $sessionId, $row, $side, $position) {

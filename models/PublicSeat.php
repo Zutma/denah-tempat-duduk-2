@@ -33,7 +33,7 @@ class PublicSeat {
 
         foreach ($rows as &$row) {
             $seatStmt = $conn->prepare("
-                SELECT s.*, g.name AS graduate_name, g.nrp, sp.name AS prodi_name, f.name AS faculty_name, f.color AS faculty_color
+                SELECT s.*, g.name AS graduate_name, g.nrp, sp.name AS prodi_name, f.name AS faculty_name, f.code AS faculty_code, f.color AS faculty_color
                 FROM seats s
                 LEFT JOIN graduates g ON g.seat_id = s.id
                 LEFT JOIN study_programs sp ON g.study_program_id = sp.id
@@ -50,18 +50,17 @@ class PublicSeat {
     }
 
     public static function searchGraduates($conn, $sessionId, $keyword) {
-        $like = '%' . $keyword . '%';
         $stmt = $conn->prepare("
-            SELECT g.id AS seat_id_link, g.name, g.nrp, sp.name AS prodi_name, s.id AS seat_id, sr.`row`, s.number
+            SELECT g.name, g.nrp, sp.name AS prodi_name, s.id AS seat_id, sr.`row`, sr.`side`, s.number
             FROM graduates g
             JOIN study_programs sp ON g.study_program_id = sp.id
             LEFT JOIN seats s ON g.seat_id = s.id
             LEFT JOIN seat_rows sr ON s.seat_row_id = sr.id
-            WHERE g.graduation_session_id = ? AND (g.name LIKE ? OR g.nrp LIKE ?)
-            LIMIT 20
+            WHERE g.graduation_session_id = ?
+            LIMIT 500
         ");
-        $stmt->bind_param("iss", $sessionId, $like, $like);
+        $stmt->bind_param("i", $sessionId);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
-}
+}

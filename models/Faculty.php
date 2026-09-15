@@ -30,4 +30,13 @@ class Faculty {
         $stmt->bind_param("i", $id);
         return $stmt->execute();
     }
+
+    public static function bulkDelete($conn, array $ids) {
+        if (empty($ids)) return false;
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $types = str_repeat('i', count($ids));
+        $stmt = $conn->prepare("DELETE FROM faculties WHERE id IN ($placeholders)");
+        $stmt->bind_param($types, ...$ids);
+        return $stmt->execute();
+    }
 }

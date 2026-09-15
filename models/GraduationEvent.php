@@ -2,7 +2,12 @@
 
 class GraduationEvent {
     public static function all($conn) {
-        $result = $conn->query("SELECT * FROM graduation_events ORDER BY id DESC");
+        $result = $conn->query("
+            SELECT ge.*,
+                   (SELECT COUNT(*) FROM graduation_sessions gs WHERE gs.graduation_event_id = ge.id) AS session_count
+            FROM graduation_events ge
+            ORDER BY ge.id DESC
+        ");
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
@@ -28,6 +33,15 @@ class GraduationEvent {
     public static function delete($conn, $id) {
         $stmt = $conn->prepare("DELETE FROM graduation_events WHERE id = ?");
         $stmt->bind_param("i", $id);
+        return $stmt->execute();
+    }
+
+    public static function bulkDelete($conn, array $ids) {
+        if (empty($ids)) return false;
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $types = str_repeat('i', count($ids));
+        $stmt = $conn->prepare("DELETE FROM graduation_events WHERE id IN ($placeholders)");
+        $stmt->bind_param($types, ...$ids);
         return $stmt->execute();
     }
 }
