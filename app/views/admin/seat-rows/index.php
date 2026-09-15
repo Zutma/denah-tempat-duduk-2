@@ -43,7 +43,11 @@
     }
 ?>
 
-<div x-data="seatRowManager()" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+<div x-data='seatRowManager({
+        hasErrors: <?= !empty($errors) ? "true" : "false" ?>,
+        allLetters: <?= htmlspecialchars(json_encode(array_values($allLetters ?? [])), ENT_QUOTES, "UTF-8") ?>,
+        usedLetters: <?= htmlspecialchars(json_encode(array_values($usedLetters ?? [])), ENT_QUOTES, "UTF-8") ?>
+     })' class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
     <div class="p-5 border-b border-slate-100 bg-white flex items-center justify-between gap-4">
         <div class="relative flex-1 max-w-md">
             <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">🔍</span>
@@ -179,9 +183,14 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <a href="/seat-rows/delete?id=<?= $deleteParam ?>&session_id=<?= $session['id'] ?>" onclick="return confirm('Yakin menghapus Baris <?= htmlspecialchars($rLabel) ?>?')" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200/80 rounded-lg transition-colors cursor-pointer">
-                                    Hapus
-                                </a>
+                                <form method="POST" action="/seat-rows/delete" class="inline" onsubmit="return confirm('Yakin menghapus Baris <?= htmlspecialchars($rLabel) ?>?')">
+                                    <?= Csrf::field() ?>
+                                    <input type="hidden" name="id" value="<?= $deleteParam ?>">
+                                    <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
+                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200/80 rounded-lg transition-colors cursor-pointer">
+                                        Hapus
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -214,92 +223,10 @@
     </button>
 </div>
 
+<script src="/js/admin/seat-row-manager.js"></script>
 <script>
-    function seatRowManager() {
-        return {
-            showBulkForm: <?= !empty($errors) ? 'true' : 'false' ?>,
-            allLetters: <?= json_encode($allLetters) ?>,
-            usedLetters: <?= json_encode($usedLetters ?? []) ?>,
-            rows: [],
-            init() { if (this.showBulkForm && this.rows.length === 0) this.addRow(); },
-            toggleBulkForm() { this.showBulkForm = !this.showBulkForm; if (this.showBulkForm && this.rows.length === 0) this.addRow(); },
-            cancelBulkForm() { this.showBulkForm = false; this.rows = []; },
-            addRow() {
-                let lastRow = this.rows.length > 0 ? this.rows[this.rows.length - 1].row : '';
-                let currentIndex = lastRow ? this.allLetters.indexOf(lastRow) : -1;
-                let nextLetter = '';
-                for (let i = currentIndex + 1; i < this.allLetters.length; i++) {
-                    let letter = this.allLetters[i];
-                    if (!this.usedLetters.includes(letter) && !this.rows.some(r => r.row === letter)) {
-                        nextLetter = letter; break;
-                    }
-                }
-                if (!nextLetter) {
-                    nextLetter = this.allLetters.find(l => !this.usedLetters.includes(l) && !this.rows.some(r => r.row === l)) || 'A';
-                }
-                this.rows.push({ row: nextLetter, left_capacity: 20, right_capacity: 20 });
-            },
-            removeRow(index) {
-                this.rows.splice(index, 1);
-                if (this.rows.length === 0) this.showBulkForm = false;
-            }
-        }
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        const selectAll = document.getElementById('selectAll');
-        const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
-        const bulkToolbar = document.getElementById('bulkToolbar');
-        const selectedCount = document.getElementById('selectedCount');
-        const searchInput = document.getElementById('searchInput');
-
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                const term = this.value.toLowerCase().trim();
-                document.querySelectorAll('.seat-row-item').forEach(row => {
-                    row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
-                });
-            });
-        }
-
-        window.updateToolbarState = function() {
-            const checkedCount = document.querySelectorAll('.rowCheckbox:checked').length;
-            bulkToolbar.classList.toggle('hidden', checkedCount === 0);
-            bulkToolbar.classList.toggle('flex', checkedCount > 0);
-            if (selectedCount) selectedCount.textContent = checkedCount;
-        };
-
-        window.unselectAll = function() {
-            if (selectAll) selectAll.checked = false;
-            rowCheckboxes.forEach(cb => cb.checked = false);
-            window.updateToolbarState();
-        };
-
-        if (selectAll) {
-            selectAll.addEventListener('change', function() {
-                rowCheckboxes.forEach(cb => cb.checked = selectAll.checked);
-                window.updateToolbarState();
-            });
-            rowCheckboxes.forEach(cb => cb.addEventListener('change', window.updateToolbarState));
-        }
-    });
-
+    initSeatRowSearch();
     function submitBulkDelete() {
-        const checked = document.querySelectorAll('.rowCheckbox:checked');
-        if (checked.length === 0) return;
-        if (confirm(`Yakin mau hapus ${checked.length} baris kursi terpilih?`)) {
-            const form = document.getElementById('bulkDeleteForm');
-            form.querySelectorAll('input[name="ids[]"]').forEach(el => el.remove());
-            checked.forEach(cb => {
-                const ids = cb.value.split(',');
-                ids.forEach(id => {
-                    if (id.trim() !== '') {
-                        const input = document.createElement('input');
-                        input.type = 'hidden'; input.name = 'ids[]'; input.value = id.trim();
-                        form.appendChild(input);
-                    }
-                });
-            });
-            form.submit();
-        }
+        submitSeatRowBulkDelete();
     }
 </script>

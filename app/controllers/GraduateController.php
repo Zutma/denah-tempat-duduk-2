@@ -90,12 +90,13 @@ class GraduateController extends BaseController {
         $this->checkAuth();
         $this->checkCsrf();
 
-        $sessionId = $_GET['session_id'] ?? null;
-        $page = $_GET['page'] ?? 1;
+        $id = $_POST['id'] ?? $_GET['id'] ?? null;
+        $sessionId = $_POST['session_id'] ?? $_GET['session_id'] ?? null;
+        $page = $_POST['page'] ?? $_GET['page'] ?? 1;
 
-        if (isset($_GET['id'])) {
+        if ($id) {
             try {
-                Graduate::delete($conn, $_GET['id']);
+                Graduate::delete($conn, $id);
                 $_SESSION['success'] = "Data wisudawan berhasil dihapus.";
             } catch (\Throwable $e) {
                 $_SESSION['error'] = "Gagal menghapus data wisudawan.";

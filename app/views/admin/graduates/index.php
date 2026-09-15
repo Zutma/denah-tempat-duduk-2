@@ -160,9 +160,15 @@
                             </td>
                             <td class="px-6 py-4 text-center font-bold text-slate-800"><?= htmlspecialchars($g['number'] ?? '-') ?></td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <a href="/graduates/delete?id=<?= $g['id'] ?>&session_id=<?= $sessionId ?>&page=<?= $page ?? 1 ?>" onclick="return confirm('Yakin hapus data wisudawan ini?')" class="px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80">
-                                    Hapus
-                                </a>
+                                <form method="POST" action="/graduates/delete" class="inline" onsubmit="return confirm('Yakin hapus data wisudawan ini?')">
+                                    <?= Csrf::field() ?>
+                                    <input type="hidden" name="id" value="<?= $g['id'] ?>">
+                                    <input type="hidden" name="session_id" value="<?= $sessionId ?>">
+                                    <input type="hidden" name="page" value="<?= $page ?? 1 ?>">
+                                    <button type="submit" class="px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
+                                        Hapus
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

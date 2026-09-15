@@ -88,9 +88,14 @@
                                 <a href="/graduation-sessions/edit?id=<?= $session['id'] ?>" class="px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
                                     Edit
                                 </a>
-                                <a href="/graduation-sessions/delete?id=<?= $session['id'] ?>" onclick="return confirm('Yakin menghapus sesi ini beserta wisudawan & denah di dalamnya?')" class="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80">
-                                    Hapus
-                                </a>
+                                <form method="POST" action="/graduation-sessions/delete" class="inline" onsubmit="return confirm('Yakin menghapus sesi ini beserta wisudawan & denah di dalamnya?')">
+                                    <?= Csrf::field() ?>
+                                    <input type="hidden" name="id" value="<?= $session['id'] ?>">
+                                    <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
+                                    <button type="submit" class="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
+                                        Hapus
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

@@ -61,9 +61,11 @@ class StudyProgramController extends BaseController {
         $this->checkAuth();
         $this->checkCsrf();
 
-        if (isset($_GET['id'])) {
+        $id = $_POST['id'] ?? $_GET['id'] ?? null;
+
+        if ($id) {
             try {
-                StudyProgram::delete($conn, $_GET['id']);
+                StudyProgram::delete($conn, $id);
                 $_SESSION['success'] = "Program studi berhasil dihapus.";
             } catch (\mysqli_sql_exception $e) {
                 if ($e->getCode() === 1451) {

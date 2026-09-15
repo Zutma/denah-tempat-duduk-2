@@ -62,9 +62,13 @@
                     <a href="/graduation-events/edit?id=<?= $event['id'] ?>" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
                         Edit
                     </a>
-                    <a href="/graduation-events/delete?id=<?= $event['id'] ?>" onclick="return confirm('Yakin menghapus Periode <?= htmlspecialchars(addslashes($event['name'])) ?> beserta seluruh Sesi & Wisudawan di dalamnya?')" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80">
-                        Hapus
-                    </a>
+                    <form method="POST" action="/graduation-events/delete" class="inline" onsubmit="return confirm('Yakin menghapus Periode <?= htmlspecialchars(addslashes($event['name'])) ?> beserta seluruh Sesi & Wisudawan di dalamnya?')">
+                        <?= Csrf::field() ?>
+                        <input type="hidden" name="id" value="<?= $event['id'] ?>">
+                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
+                            Hapus
+                        </button>
+                    </form>
                 </div>
             </div>
         <?php endforeach; ?>

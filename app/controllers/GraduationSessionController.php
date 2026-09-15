@@ -67,11 +67,13 @@ class GraduationSessionController extends BaseController {
         $this->checkAuth();
         $this->checkCsrf();
 
-        if (isset($_GET['id'])) {
-            $session = GraduationSession::find($conn, $_GET['id']);
-            $eventId = $session ? $session['graduation_event_id'] : null;
+        $id = $_POST['id'] ?? $_GET['id'] ?? null;
+
+        if ($id) {
+            $session = GraduationSession::find($conn, $id);
+            $eventId = $_POST['event_id'] ?? ($session ? $session['graduation_event_id'] : null);
             try {
-                GraduationSession::delete($conn, $_GET['id']);
+                GraduationSession::delete($conn, $id);
                 $_SESSION['success'] = "Sesi wisuda beserta data wisudawan & denah di dalamnya berhasil dihapus.";
             } catch (Throwable $e) {
                 $_SESSION['error'] = "Gagal menghapus sesi wisuda: " . $e->getMessage();

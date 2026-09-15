@@ -85,11 +85,13 @@
                                     class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
                                     Edit
                                 </a>
-                                <a href="/study-programs/delete?id=<?= $sp['id'] ?>"
-                                    onclick="return confirm('Yakin hapus?')"
-                                    class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80">
-                                    Hapus
-                                </a>
+                                <form method="POST" action="/study-programs/delete" class="inline" onsubmit="return confirm('Yakin hapus?')">
+                                    <?= Csrf::field() ?>
+                                    <input type="hidden" name="id" value="<?= $sp['id'] ?>">
+                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
+                                        Hapus
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

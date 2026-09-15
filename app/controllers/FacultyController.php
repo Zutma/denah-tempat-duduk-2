@@ -62,9 +62,11 @@ class FacultyController extends BaseController {
         $this->checkAuth();
         $this->checkCsrf();
 
-        if (isset($_GET['id'])) {
+        $id = $_POST['id'] ?? $_GET['id'] ?? null;
+
+        if ($id) {
             try {
-                Faculty::delete($conn, $_GET['id']);
+                Faculty::delete($conn, $id);
                 $_SESSION['success'] = "Fakultas berhasil dihapus.";
             } catch (\mysqli_sql_exception $e) {
                 if ($e->getCode() === 1451) {

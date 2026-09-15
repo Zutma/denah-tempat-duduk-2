@@ -72,10 +72,11 @@ class SeatRowController extends BaseController {
         $this->checkAuth();
         $this->checkCsrf();
 
-        $sessionId = $_GET['session_id'] ?? null;
+        $idParam = $_POST['id'] ?? $_GET['id'] ?? null;
+        $sessionId = $_POST['session_id'] ?? $_GET['session_id'] ?? null;
 
-        if (isset($_GET['id'])) {
-            $ids = array_map('intval', explode(',', $_GET['id']));
+        if ($idParam) {
+            $ids = array_map('intval', explode(',', $idParam));
             $count = 0;
             try {
                 foreach ($ids as $id) {

@@ -52,9 +52,11 @@ class GraduationEventController extends BaseController {
         $this->checkAuth();
         $this->checkCsrf();
 
-        if (isset($_GET['id'])) {
+        $id = $_POST['id'] ?? $_GET['id'] ?? null;
+
+        if ($id) {
             try {
-                GraduationEvent::delete($conn, $_GET['id']);
+                GraduationEvent::delete($conn, $id);
                 $_SESSION['success'] = "Periode wisuda dan seluruh data di dalamnya berhasil dihapus.";
             } catch (Throwable $e) {
                 $_SESSION['error'] = "Gagal menghapus periode wisuda: " . $e->getMessage();
