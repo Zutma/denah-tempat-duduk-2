@@ -2,6 +2,7 @@
 
 class GraduateController extends BaseController {
     public function index($conn) {
+        $this->checkAuth();
         $sessionId = $_GET['session_id'] ?? null;
         if (!$sessionId) {
             $this->redirect('/graduation-events');

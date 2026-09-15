@@ -17,7 +17,7 @@
 <aside class="w-64 bg-its-blue text-white flex flex-col justify-between flex-shrink-0 border-r border-its-blue-light/20">
     <div>
         <div class="h-20 flex items-center px-6 border-b border-its-blue-light/20">
-            <img src="/images/LOGO.PNG" alt="ITS Logo" class="w-10 h-10 mr-3 object-contain flex-shrink-0 drop-shadow-xs">
+            <img src="/images/LOGO.png" alt="ITS Logo" class="w-10 h-10 mr-3 object-contain flex-shrink-0 drop-shadow-xs">
             <div>
                 <h1 class="font-bold text-base tracking-tight leading-snug">Denah Wisuda ITS</h1>
                 <p class="text-xs text-its-yellow font-semibold tracking-wider uppercase">Admin Portal</p>
