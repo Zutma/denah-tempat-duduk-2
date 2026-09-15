@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Denah Tempat Duduk Wisuda ITS - Interaktif</title>
+    <title>Denah Tempat Duduk Wisuda ITS</title>
 
     <!-- Passing Data PHP ke JS Global SEBELUM Alpine & Script App di-load -->
     <script>
