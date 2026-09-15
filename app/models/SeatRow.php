@@ -36,13 +36,22 @@ class SeatRow {
     }
 
     public static function delete($conn, $id) {
-        $stmtSeats = $conn->prepare("DELETE FROM seats WHERE seat_row_id = ?");
-        $stmtSeats->bind_param("i", $id);
-        $stmtSeats->execute();
+        $conn->begin_transaction();
+        try {
+            $stmtSeats = $conn->prepare("DELETE FROM seats WHERE seat_row_id = ?");
+            $stmtSeats->bind_param("i", $id);
+            $stmtSeats->execute();
 
-        $stmt = $conn->prepare("DELETE FROM seat_rows WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        return $stmt->execute();
+            $stmt = $conn->prepare("DELETE FROM seat_rows WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            $res = $stmt->execute();
+
+            $conn->commit();
+            return $res;
+        } catch (Throwable $e) {
+            $conn->rollback();
+            throw $e;
+        }
     }
 
     public static function bulkDelete($conn, array $ids) {
@@ -50,12 +59,21 @@ class SeatRow {
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $types = str_repeat('i', count($ids));
 
-        $stmtSeats = $conn->prepare("DELETE FROM seats WHERE seat_row_id IN ($placeholders)");
-        $stmtSeats->bind_param($types, ...$ids);
-        $stmtSeats->execute();
+        $conn->begin_transaction();
+        try {
+            $stmtSeats = $conn->prepare("DELETE FROM seats WHERE seat_row_id IN ($placeholders)");
+            $stmtSeats->bind_param($types, ...$ids);
+            $stmtSeats->execute();
 
-        $stmt = $conn->prepare("DELETE FROM seat_rows WHERE id IN ($placeholders)");
-        $stmt->bind_param($types, ...$ids);
-        return $stmt->execute();
+            $stmt = $conn->prepare("DELETE FROM seat_rows WHERE id IN ($placeholders)");
+            $stmt->bind_param($types, ...$ids);
+            $res = $stmt->execute();
+
+            $conn->commit();
+            return $res;
+        } catch (Throwable $e) {
+            $conn->rollback();
+            throw $e;
+        }
     }
 }

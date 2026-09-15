@@ -57,7 +57,6 @@ class GraduateController extends BaseController {
             if ($facultyId === '') $errors[] = "Fakultas wajib dipilih.";
             if ($studyProgramId === '') $errors[] = "Prodi wajib dipilih.";
 
-            // 1. Cek Duplikat NRP Eksplisit
             if (!empty($nrp) && Graduate::nrpExists($conn, $nrp)) {
                 $errors[] = "NRP '$nrp' sudah terdaftar di sistem! Gunakan NRP lain.";
             }
@@ -66,8 +65,6 @@ class GraduateController extends BaseController {
                 try {
                     Graduate::create($conn, $sessionId, $facultyId, $studyProgramId, $nrp, $name, $seatId);
                     $_SESSION['success'] = "Wisudawan ($name - $nrp) berhasil ditambahkan.";
-                    
-                    // Redirect langsung ke daftar wisudawan sesi tersebut
                     $this->redirect("/graduates?session_id=" . $sessionId);
                 } catch (\mysqli_sql_exception $e) {
                     $errors[] = "Gagal menyimpan data. Silakan coba lagi.";
@@ -90,6 +87,7 @@ class GraduateController extends BaseController {
 
     public function delete($conn) {
         $this->checkAuth();
+        $this->checkCsrf();
 
         $sessionId = $_GET['session_id'] ?? null;
         $page = $_GET['page'] ?? 1;
@@ -112,6 +110,7 @@ class GraduateController extends BaseController {
 
     public function bulkDelete($conn) {
         $this->checkAuth();
+        $this->checkCsrf();
 
         $sessionId = $_POST['session_id'] ?? $_GET['session_id'] ?? null;
         $page = $_POST['page'] ?? $_GET['page'] ?? 1;

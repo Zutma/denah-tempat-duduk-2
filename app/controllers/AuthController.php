@@ -7,7 +7,6 @@ class AuthController extends BaseController {
             session_start();
         }
 
-        // Jika sudah login, lempar ke dashboard
         if (isset($_SESSION['user_id'])) {
             header('Location: /dashboard');
             exit;
@@ -21,14 +20,8 @@ class AuthController extends BaseController {
 
             $user = User::findByEmail($conn, $username);
 
-            $isPasswordValid = false;
-            if ($user) {
-                if (password_verify($password, $user['password']) || $password === $user['password']) {
-                    $isPasswordValid = true;
-                }
-            }
-
-            if (!$user || !$isPasswordValid) {
+            // Wajib gunakan password_verify murni tanpa perbandingan plaintext
+            if (!$user || !password_verify($password, $user['password'])) {
                 $errors[] = "Username atau password salah.";
             } else {
                 $_SESSION['user_id'] = $user['id'];
@@ -40,8 +33,6 @@ class AuthController extends BaseController {
         }
 
         $pageTitle = 'Login Admin - Denah Wisuda ITS';
-
-        // Panggil view login dari app/views/admin/auth/login.php
         require_once BASE_PATH . '/app/views/admin/auth/login.php';
     }
 
@@ -53,7 +44,6 @@ class AuthController extends BaseController {
         session_unset();
         session_destroy();
 
-        // Redirect bersih ke route URL /login (bukan /login.php!)
         header('Location: /login');
         exit;
     }

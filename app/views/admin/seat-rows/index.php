@@ -98,10 +98,10 @@
                                     </select>
                                 </td>
                                 <td class="p-3">
-                                    <input type="number" :name="`rows[${index}][left_capacity]`" x-model.number="item.left_capacity" placeholder="20" min="1" max="100" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 focus:bg-white outline-none" required>
+                                    <input type="number" :name="`rows[${index}][left_capacity]`" x-model.number="item.left_capacity" placeholder="20" min="0" max="100" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 focus:bg-white outline-none" required>
                                 </td>
                                 <td class="p-3">
-                                    <input type="number" :name="`rows[${index}][right_capacity]`" x-model.number="item.right_capacity" placeholder="20" min="1" max="100" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 focus:bg-white outline-none" required>
+                                    <input type="number" :name="`rows[${index}][right_capacity]`" x-model.number="item.right_capacity" placeholder="20" min="0" max="100" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 focus:bg-white outline-none" required>
                                 </td>
                                 <td class="p-3 text-center">
                                     <button type="button" @click="removeRow(index)" class="w-9 h-9 inline-flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer" title="Hapus">

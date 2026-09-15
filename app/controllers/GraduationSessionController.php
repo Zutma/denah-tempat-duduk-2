@@ -65,6 +65,7 @@ class GraduationSessionController extends BaseController {
 
     public function delete($conn) {
         $this->checkAuth();
+        $this->checkCsrf();
 
         if (isset($_GET['id'])) {
             $session = GraduationSession::find($conn, $_GET['id']);
@@ -86,6 +87,7 @@ class GraduationSessionController extends BaseController {
 
     public function bulkDelete($conn) {
         $this->checkAuth();
+        $this->checkCsrf();
 
         $eventId = $_POST['event_id'] ?? $_GET['event_id'] ?? null;
         $ids = $_POST['ids'] ?? [];

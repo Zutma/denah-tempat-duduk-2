@@ -3,9 +3,10 @@
 class GraduationEvent {
     public static function all($conn) {
         $result = $conn->query("
-            SELECT ge.*,
-                   (SELECT COUNT(*) FROM graduation_sessions gs WHERE gs.graduation_event_id = ge.id) AS session_count
+            SELECT ge.*, COUNT(gs.id) AS session_count
             FROM graduation_events ge
+            LEFT JOIN graduation_sessions gs ON gs.graduation_event_id = ge.id
+            GROUP BY ge.id
             ORDER BY ge.id DESC
         ");
         return $result->fetch_all(MYSQLI_ASSOC);

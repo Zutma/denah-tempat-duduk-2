@@ -1,4 +1,8 @@
 <?php
+// Aktifkan Kompresi Output Server (Gzip)
+if (!ob_start("ob_gzhandler")) {
+    ob_start();
+}
 // 1. Deklarasikan Alamat Acuan Utama
 define('BASE_PATH', dirname(__DIR__));
 

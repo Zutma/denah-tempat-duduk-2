@@ -59,6 +59,7 @@ class StudyProgramController extends BaseController {
 
     public function delete($conn) {
         $this->checkAuth();
+        $this->checkCsrf();
 
         if (isset($_GET['id'])) {
             try {
@@ -78,6 +79,7 @@ class StudyProgramController extends BaseController {
 
     public function bulkDelete($conn) {
         $this->checkAuth();
+        $this->checkCsrf();
 
         $ids = $_POST['ids'] ?? [];
         if (!empty($ids) && is_array($ids)) {

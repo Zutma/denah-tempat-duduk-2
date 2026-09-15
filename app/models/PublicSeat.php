@@ -26,18 +26,16 @@ class PublicSeat {
     }
 
     public static function getSeatRowsWithSeats($conn, $sessionId, $side) {
-        // 1. Ambil baris dan seluruh kursi beserta relasinya dalam SEKALI query (JOIN)
+        // Ambil data kursi LENGKAP dengan JOIN ke faculties untuk mendapatkan faculty_color & faculty_code
         $stmt = $conn->prepare("
             SELECT 
                 sr.id AS row_id, sr.`row`, sr.side, sr.index, sr.capacity,
                 s.id AS seat_id, s.position, s.number, s.category,
-                g.name AS graduate_name, g.nrp, 
-                sp.name AS prodi_name, 
-                f.name AS faculty_name, f.code AS faculty_code, f.color AS faculty_color
+                g.id AS graduate_id, g.name AS graduate_name, g.nrp,
+                g.faculty_id, f.code AS faculty_code, f.color AS faculty_color
             FROM seat_rows sr
             LEFT JOIN seats s ON s.seat_row_id = sr.id
             LEFT JOIN graduates g ON g.seat_id = s.id
-            LEFT JOIN study_programs sp ON g.study_program_id = sp.id
             LEFT JOIN faculties f ON g.faculty_id = f.id
             WHERE sr.graduation_session_id = ? AND sr.side = ?
             ORDER BY sr.`row`, s.position
@@ -46,7 +44,6 @@ class PublicSeat {
         $stmt->execute();
         $results = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-        // 2. Grouping data di level PHP secara rapi
         $rowsMap = [];
         foreach ($results as $row) {
             $rowId = $row['row_id'];
@@ -61,20 +58,19 @@ class PublicSeat {
                 ];
             }
 
-            // Jika kursi ada, masukkan ke array seats
             if (!empty($row['seat_id'])) {
                 $rowsMap[$rowId]['seats'][] = [
-                    'id'            => $row['seat_id'],
-                    'seat_row_id'   => $rowId,
-                    'position'      => $row['position'],
-                    'number'        => $row['number'],
+                    'id'            => (int)$row['seat_id'],
+                    'seat_row_id'   => (int)$rowId,
+                    'position'      => (int)$row['position'],
+                    'number'        => (int)$row['number'],
                     'category'      => $row['category'],
-                    'graduate_name' => $row['graduate_name'],
-                    'nrp'           => $row['nrp'],
-                    'prodi_name'    => $row['prodi_name'],
-                    'faculty_name'  => $row['faculty_name'],
-                    'faculty_code'  => $row['faculty_code'],
-                    'faculty_color' => $row['faculty_color']
+                    'is_taken'      => !empty($row['graduate_id']),
+                    'graduate_name' => $row['graduate_name'] ?? null,
+                    'nrp'           => $row['nrp'] ?? null,
+                    'faculty_id'    => $row['faculty_id'] ? (int)$row['faculty_id'] : null,
+                    'faculty_code'  => $row['faculty_code'] ?? null,
+                    'faculty_color' => $row['faculty_color'] ?? '#cbd5e1'
                 ];
             }
         }
@@ -98,12 +94,27 @@ class PublicSeat {
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
-    /**
-     * Memproses mapping kode kursi global dan daftar wisudawan secara bersih di Model
-     */
     public static function getProcessedSeatData($conn, $sessionId) {
         $leftRows = self::getSeatRowsWithSeats($conn, $sessionId, 'left');
         $rightRows = self::getSeatRowsWithSeats($conn, $sessionId, 'right');
+
+        $stmtGrads = $conn->prepare("
+            SELECT g.seat_id, g.name, g.nrp, 
+                   sp.name AS prodi_name, 
+                   f.name AS faculty_name, f.code AS faculty_code, f.color AS faculty_color
+            FROM graduates g
+            JOIN study_programs sp ON g.study_program_id = sp.id
+            JOIN faculties f ON g.faculty_id = f.id
+            WHERE g.graduation_session_id = ? AND g.seat_id IS NOT NULL
+        ");
+        $stmtGrads->bind_param("i", $sessionId);
+        $stmtGrads->execute();
+        $rawGraduates = $stmtGrads->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        $graduatesBySeat = [];
+        foreach ($rawGraduates as $rg) {
+            $graduatesBySeat[$rg['seat_id']] = $rg;
+        }
 
         $seatMapInfo = [];
         $allGraduatesList = [];
@@ -140,30 +151,19 @@ class PublicSeat {
             }
         }
 
-        $collectGraduates = function($rows) use (&$allGraduatesList, $seatMapInfo) {
-            foreach ($rows as $r) {
-                if (!empty($r['seats'])) {
-                    foreach ($r['seats'] as $s) {
-                        if (!empty($s['graduate_name'])) {
-                            $facCode = !empty($s['faculty_code']) ? $s['faculty_code'] : ($s['faculty_name'] ?? '-');
-                            $allGraduatesList[] = [
-                                'seat_id'      => (int)$s['id'],
-                                'seat_code'    => $seatMapInfo[$s['id']]['code'] ?? '-',
-                                'name'         => $s['graduate_name'],
-                                'nrp'          => $s['nrp'],
-                                'prodi'        => $s['prodi_name'] ?? '-',
-                                'faculty'      => $facCode,
-                                'faculty_name' => $s['faculty_name'] ?? '-',
-                                'color'        => $s['faculty_color'] ?? '#cbd5e1'
-                            ];
-                        }
-                    }
-                }
-            }
-        };
-
-        $collectGraduates($leftRows);
-        $collectGraduates($rightRows);
+        foreach ($graduatesBySeat as $seatId => $g) {
+            $facCode = !empty($g['faculty_code']) ? $g['faculty_code'] : ($g['faculty_name'] ?? '-');
+            $allGraduatesList[] = [
+                'seat_id'      => (int)$seatId,
+                'seat_code'    => $seatMapInfo[$seatId]['code'] ?? '-',
+                'name'         => $g['name'],
+                'nrp'          => $g['nrp'],
+                'prodi'        => $g['prodi_name'] ?? '-',
+                'faculty'      => $facCode,
+                'faculty_name' => $g['faculty_name'] ?? '-',
+                'color'        => $g['faculty_color'] ?? '#cbd5e1'
+            ];
+        }
 
         return [
             'leftRows'         => $leftRows,

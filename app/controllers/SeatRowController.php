@@ -14,14 +14,14 @@ class SeatRowController extends BaseController {
         $messages = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Support both new Alpine format (rows[]) and legacy format (baris[])
+            $this->checkCsrf();
+
             $rowsList = $_POST['rows'] ?? $_POST['baris'] ?? [];
 
             $conn->begin_transaction();
             try {
                 foreach ($rowsList as $item) {
                     $rowLabel = strtoupper(trim($item['row'] ?? ''));
-                    // Alpine format: left_capacity/right_capacity; legacy: kapasitas_kiri/kapasitas_kanan
                     $kapasitasKiri  = (int) ($item['left_capacity']  ?? $item['kapasitas_kiri']  ?? 0);
                     $kapasitasKanan = (int) ($item['right_capacity'] ?? $item['kapasitas_kanan'] ?? 0);
 
@@ -51,7 +51,6 @@ class SeatRowController extends BaseController {
             }
         }
 
-
         $seatRows   = SeatRow::getBySession($conn, $sessionId);
         $allLetters = range('A', 'Z');
         $usedLetters = array_values(array_unique(array_column($seatRows, 'row')));
@@ -71,6 +70,7 @@ class SeatRowController extends BaseController {
 
     public function delete($conn) {
         $this->checkAuth();
+        $this->checkCsrf();
 
         $sessionId = $_GET['session_id'] ?? null;
 
@@ -97,6 +97,7 @@ class SeatRowController extends BaseController {
 
     public function bulkDelete($conn) {
         $this->checkAuth();
+        $this->checkCsrf();
 
         $sessionId = $_POST['session_id'] ?? $_GET['session_id'] ?? null;
         $ids = $_POST['ids'] ?? [];
