@@ -77,14 +77,18 @@ class SeatRowController extends BaseController {
         if (isset($_GET['id'])) {
             $ids = array_map('intval', explode(',', $_GET['id']));
             $count = 0;
-            foreach ($ids as $id) {
-                if ($id > 0) {
-                    SeatRow::delete($conn, $id);
-                    $count++;
+            try {
+                foreach ($ids as $id) {
+                    if ($id > 0) {
+                        SeatRow::delete($conn, $id);
+                        $count++;
+                    }
                 }
-            }
-            if ($count > 0) {
-                $_SESSION['success'] = "Baris kursi berhasil dihapus.";
+                if ($count > 0) {
+                    $_SESSION['success'] = "Baris kursi berhasil dihapus.";
+                }
+            } catch (Throwable $e) {
+                $_SESSION['error'] = "Gagal menghapus! Baris kursi ini masih digunakan oleh data wisudawan.";
             }
         }
 

@@ -33,8 +33,8 @@
     </div>
 
     <div class="bg-white rounded-2xl shadow-2xs border border-slate-200/80 p-6">
-        <?= Csrf::field() ?>
         <form method="POST" action="/imports/process" enctype="multipart/form-data" class="space-y-6">
+            <?= Csrf::field() ?>
             <input type="hidden" name="session_id" value="<?= htmlspecialchars($sessionId ?? '') ?>">
 
             <div>

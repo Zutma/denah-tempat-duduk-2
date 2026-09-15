@@ -1,10 +1,10 @@
 <?php
 
 class User {
-    public static function findByEmail($conn, $email) {
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->bind_param("s", $email);
+    public static function findByUsername($conn, $username) {
+        $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? LIMIT 1");
+        $stmt->bind_param("s", $username);
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc();
     }
-}
+}

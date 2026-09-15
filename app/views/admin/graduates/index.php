@@ -81,6 +81,7 @@
 
 <!-- Form Tersembunyi untuk Bulk Delete -->
 <form id="bulkDeleteForm" method="POST" action="/graduates/bulk-delete" class="hidden">
+    <?= Csrf::field() ?>
     <input type="hidden" name="session_id" value="<?= $sessionId ?>">
     <input type="hidden" name="page" value="<?= $page ?? 1 ?>">
 </form>

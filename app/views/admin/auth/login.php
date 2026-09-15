@@ -37,6 +37,7 @@
                 <?php endif; ?>
 
                 <form method="POST" class="space-y-5">
+                    <?= Csrf::field() ?>
                     <div>
                         <label for="username" class="block text-sm font-medium text-slate-700 mb-1">Username</label>
                         <input type="text" id="username" name="username"

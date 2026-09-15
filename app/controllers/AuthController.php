@@ -15,10 +15,11 @@ class AuthController extends BaseController {
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = trim($_POST['username'] ?? $_POST['email'] ?? '');
+            $this->checkCsrf();
+            $username = trim($_POST['username'] ?? '');
             $password = $_POST['password'] ?? '';
 
-            $user = User::findByEmail($conn, $username);
+            $user = User::findByUsername($conn, $username);
 
             // Wajib gunakan password_verify murni tanpa perbandingan plaintext
             if (!$user || !password_verify($password, $user['password'])) {
@@ -39,6 +40,10 @@ class AuthController extends BaseController {
     public function logout() {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->checkCsrf();
         }
 
         session_unset();

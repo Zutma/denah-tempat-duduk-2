@@ -14,6 +14,7 @@
 
 <!-- Form Tersembunyi untuk Bulk Delete -->
 <form id="bulkDeleteForm" method="POST" action="/study-programs/bulk-delete" class="hidden">
+    <?= Csrf::field() ?>
     <input type="hidden" name="_method" value="DELETE">
 </form>
 

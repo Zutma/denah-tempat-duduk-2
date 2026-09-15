@@ -13,6 +13,7 @@
 </div>
 
 <form id="bulkDeleteForm" method="POST" action="/faculties/bulk-delete" class="hidden">
+    <?= Csrf::field() ?>
     <input type="hidden" name="_method" value="DELETE">
 </form>
 

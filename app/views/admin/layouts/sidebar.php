@@ -55,6 +55,7 @@
 
     <div class="p-4 border-t border-its-blue-light/20">
         <form method="POST" action="/logout">
+            <?= Csrf::field() ?>
             <button type="submit" class="w-full flex items-center px-4 py-3 text-sm font-semibold text-red-300 hover:bg-red-500/15 hover:text-red-200 rounded-xl transition-all cursor-pointer">
                 <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>

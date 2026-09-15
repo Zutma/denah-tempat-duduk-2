@@ -72,6 +72,7 @@
         </div>
 
         <form method="POST" action="/seat-rows?session_id=<?= $session['id'] ?>">
+            <?= Csrf::field() ?>
             <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
 
             <div class="overflow-x-auto mb-4 border border-slate-200 rounded-xl bg-white">
@@ -192,6 +193,7 @@
 
 <!-- Form Tersembunyi untuk Bulk Delete -->
 <form id="bulkDeleteForm" method="POST" action="/seat-rows/bulk-delete" class="hidden">
+    <?= Csrf::field() ?>
     <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
     <input type="hidden" name="_method" value="DELETE">
 </form>
