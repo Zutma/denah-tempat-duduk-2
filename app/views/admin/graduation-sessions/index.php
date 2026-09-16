@@ -7,6 +7,7 @@
             <span class="text-slate-700 font-bold"><?= htmlspecialchars($event['name']) ?></span>
         </nav>
         <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Daftar Sesi Wisuda</h1>
+        <p class="text-sm text-slate-500 mt-1">Kelola semua sesi untuk periode ini.</p>
     </div>
 
     <a href="/graduation-sessions/create?event_id=<?= $event['id'] ?>"

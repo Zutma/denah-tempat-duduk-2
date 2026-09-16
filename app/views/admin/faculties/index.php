@@ -1,6 +1,6 @@
 <div class="flex items-center justify-between gap-4 mb-6">
     <div>
-        <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Data Fakultas</h1>
+        <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Daftar Fakultas</h1>
         <p class="text-sm text-slate-500 mt-1">Kelola data fakultas dan identitas warna penanda tempat duduk.</p>
     </div>
     <a href="/faculties/create"
