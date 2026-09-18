@@ -1,9 +1,9 @@
 <?php
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-$host     = 'localhost';
-$user     = 'root';
-$password = '';
+$host     = '127.0.0.1';
+$user     = 'dev_denah';
+$password = 'password123';
 $dbname   = 'db_denah_duduk';
 
 $conn = new mysqli($host, $user, $password, $dbname);

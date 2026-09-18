@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Aktifkan Kompresi Output Server (Gzip)
 if (!ob_start("ob_gzhandler")) {
     ob_start();
@@ -6,7 +10,7 @@ if (!ob_start("ob_gzhandler")) {
 
 // 1. Deklarasikan Alamat Acuan Utama
 define('BASE_PATH', dirname(__DIR__));
-define('BASE_URL', '/denah');
+define('BASE_URL', '/denah/public');
 
 function url(string $path = ''): string {
     return rtrim(BASE_URL, '/') . '/' . ltrim($path, '/');
@@ -44,9 +48,13 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = trim($uri, '/');
 
 // Potong prefix 'denah' jika ada di URL
-if (strpos($uri, 'denah') === 0) {
-    $uri = substr($uri, 5);
-    $uri = trim($uri, '/');
+$prefixes = ['denah-duduk/public', 'denah/public', 'denah'];
+foreach ($prefixes as $prefix) {
+    if (strpos($uri, $prefix) === 0) {
+        $uri = substr($uri, strlen($prefix));
+        $uri = trim($uri, '/');
+        break;
+    }
 }
 
 // 5. Daftar Rute Aplikasi (Clean Routes)
@@ -101,5 +109,5 @@ if (array_key_exists($uri, $routes)) {
     $controller->$method($conn);
 } else {
     http_response_code(404);
-    echo "404 - Halaman tidak ditemukan";
+    echo "404 - Halaman tidak ditemukan (URI terbaca: '$uri')";
 }
