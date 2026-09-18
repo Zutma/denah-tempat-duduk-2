@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistem Wisuda</title>
-    <link rel="stylesheet" href="/css/tailwind-built.css">
+    <link rel="stylesheet" href="<?= url('css/tailwind-built.css') ?>">
 </head>
 <body class="font-sans text-slate-800 antialiased">
 
     <!-- Container Utama dengan Background Gambar Denah -->
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-cover bg-center bg-no-repeat relative"
-         style="background-image: url('/images/BG_DENAH.png');">
+         style="background-image: url('<?= url('images/BG_DENAH.png') ?>');">
         
         <!-- Overlay tipis biar card login & logo lebih menonjol -->
         <div class="absolute inset-0 bg-slate-900/10 backdrop-blur-[1px]"></div>
@@ -18,7 +18,7 @@
         <div class="relative z-10 w-full flex flex-col items-center px-4">
             <!-- Logo -->
             <div class="mb-6 text-center">
-                <img src="/images/LOGO.png" alt="Logo" class="w-[140px] h-auto mx-auto drop-shadow-md">
+                <img src="<?= url('images/LOGO.png') ?>" alt="Logo" class="w-[140px] h-auto mx-auto drop-shadow-md">
             </div>
 
             <!-- Form Card -->

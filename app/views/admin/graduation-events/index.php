@@ -3,7 +3,7 @@
         <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Daftar Periode Wisuda</h1>
         <p class="text-sm text-slate-500 mt-1">Kelola seluruh periode acara wisuda ITS.</p>
     </div>
-    <a href="/graduation-events/create"
+    <a href="<?= url('graduation-events/create') ?>"
         class="inline-flex items-center gap-2 px-5 py-2.5 bg-its-blue-light text-white rounded-xl text-sm font-bold hover:bg-its-blue transition-all shadow-xs cursor-pointer whitespace-nowrap">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
         Tambah Periode
@@ -11,7 +11,7 @@
 </div>
 
 <!-- Form Tersembunyi untuk Bulk Delete -->
-<form id="bulkDeleteForm" method="POST" action="/graduation-events/bulk-delete" class="hidden">
+<form id="bulkDeleteForm" method="POST" action="<?= url('graduation-events/bulk-delete') ?>" class="hidden">
     <?= Csrf::field() ?>
     <input type="hidden" name="_method" value="DELETE">
 </form>
@@ -42,7 +42,7 @@
             <div class="bg-white rounded-2xl shadow-2xs border border-slate-200/80 p-6 hover:border-its-blue/30 transition-all flex flex-col justify-between relative group">
                 <div>
                     <div class="flex items-start justify-between gap-3 mb-3">
-                        <a href="/graduation-sessions?event_id=<?= $event['id'] ?>" class="flex items-start gap-3 flex-1 group">
+                        <a href="<?= url('graduation-sessions?event_id=' . $event['id']) ?>" class="flex items-start gap-3 flex-1 group">
                             <div class="w-10 h-10 rounded-xl bg-its-blue/10 text-its-blue flex items-center justify-center shrink-0 group-hover:bg-its-blue-light group-hover:text-white transition-colors">
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.5M4.5 21V10.5" /></svg>
                             </div>
@@ -56,13 +56,13 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-2 mt-6 pt-4 border-t border-slate-100">
-                    <a href="/graduation-sessions?event_id=<?= $event['id'] ?>" class="px-3 py-2 text-xs font-bold text-its-blue bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15 mr-auto">
+                    <a href="<?= url('graduation-sessions?event_id=' . $event['id']) ?>" class="px-3 py-2 text-xs font-bold text-its-blue bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15 mr-auto">
                         Lihat Sesi
                     </a>
-                    <a href="/graduation-events/edit?id=<?= $event['id'] ?>" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
+                    <a href="<?= url('graduation-events/edit?id=' . $event['id']) ?>" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
                         Edit
                     </a>
-                    <form method="POST" action="/graduation-events/delete" class="inline" onsubmit="return confirm('Yakin menghapus Periode <?= htmlspecialchars(addslashes($event['name'])) ?> beserta seluruh Sesi & Wisudawan di dalamnya?')">
+                    <form method="POST" action="<?= url('graduation-events/delete') ?>" class="inline" onsubmit="return confirm('Yakin menghapus Periode <?= htmlspecialchars(addslashes($event['name'])) ?> beserta seluruh Sesi & Wisudawan di dalamnya?')">
                         <?= Csrf::field() ?>
                         <input type="hidden" name="id" value="<?= $event['id'] ?>">
                         <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
@@ -75,7 +75,7 @@
     <?php endif; ?>
 </div>
 
-<script src="/js/admin/table-utils.js"></script>
+<script src="<?= url('js/admin/table-utils.js') ?>"></script>
 <script>
     initBulkTable();
     function submitBulkDelete() {

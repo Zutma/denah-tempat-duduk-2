@@ -1,7 +1,7 @@
 <nav class="flex items-center gap-2 text-sm font-medium text-slate-400 mb-1">
-    <a href="/graduation-events" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
+    <a href="<?= url('graduation-events') ?>" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
     <span class="text-slate-300">/</span>
-    <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>" class="hover:text-its-blue transition-colors">
+    <a href="<?= url('graduation-sessions?event_id=' . ($session['graduation_event_id'] ?? '')) ?>" class="hover:text-its-blue transition-colors">
         <?= htmlspecialchars($session['event_name'] ?? 'Detail Event') ?>
     </a>
     <span class="text-slate-300">/</span>
@@ -75,7 +75,7 @@
             <span class="text-xs text-slate-500">Isi data baris lalu klik simpan</span>
         </div>
 
-        <form method="POST" action="/seat-rows?session_id=<?= $session['id'] ?>">
+        <form method="POST" action="<?= url('seat-rows?session_id=' . $session['id']) ?>">
             <?= Csrf::field() ?>
             <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
 
@@ -183,14 +183,14 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <form method="POST" action="/seat-rows/delete" class="inline" onsubmit="return confirm('Yakin menghapus Baris <?= htmlspecialchars($rLabel) ?>?')">
-                                    <?= Csrf::field() ?>
-                                    <input type="hidden" name="id" value="<?= $deleteParam ?>">
-                                    <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
-                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200/80 rounded-lg transition-colors cursor-pointer">
-                                        Hapus
-                                    </button>
-                                </form>
+                                <form method="POST" action="<?= url('seat-rows/delete') ?>" class="inline" onsubmit="return confirm('Yakin menghapus Baris <?= htmlspecialchars($rLabel) ?>?')">
+                                     <?= Csrf::field() ?>
+                                     <input type="hidden" name="id" value="<?= $deleteParam ?>">
+                                     <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
+                                     <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200/80 rounded-lg transition-colors cursor-pointer">
+                                         Hapus
+                                     </button>
+                                 </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -201,7 +201,7 @@
 </div>
 
 <!-- Form Tersembunyi untuk Bulk Delete -->
-<form id="bulkDeleteForm" method="POST" action="/seat-rows/bulk-delete" class="hidden">
+<form id="bulkDeleteForm" method="POST" action="<?= url('seat-rows/bulk-delete') ?>" class="hidden">
     <?= Csrf::field() ?>
     <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
     <input type="hidden" name="_method" value="DELETE">
@@ -223,7 +223,7 @@
     </button>
 </div>
 
-<script src="/js/admin/seat-row-manager.js"></script>
+<script src="<?= url('js/admin/seat-row-manager.js') ?>"></script>
 <script>
     initSeatRowSearch();
     function submitBulkDelete() {

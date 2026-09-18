@@ -8,8 +8,7 @@ class AuthController extends BaseController {
         }
 
         if (isset($_SESSION['user_id'])) {
-            header('Location: /dashboard');
-            exit;
+            $this->redirect('/dashboard');
         }
 
         $errors = [];
@@ -42,8 +41,7 @@ class AuthController extends BaseController {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
                 
-                header('Location: /dashboard');
-                exit;
+                $this->redirect('/dashboard');
             }
         }
 
@@ -63,7 +61,6 @@ class AuthController extends BaseController {
         session_unset();
         session_destroy();
 
-        header('Location: /login');
-        exit;
+        $this->redirect('/login');
     }
 }

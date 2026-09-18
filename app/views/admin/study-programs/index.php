@@ -3,7 +3,7 @@
         <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Daftar Program Studi</h1>
         <p class="text-sm text-slate-500 mt-1">Kelola daftar program studi dan jenjang pendidikan.</p>
     </div>
-    <a href="/study-programs/create"
+    <a href="<?= url('study-programs/create') ?>"
         class="inline-flex items-center gap-2 px-5 py-2.5 bg-its-blue-light text-white rounded-xl text-sm font-bold hover:bg-its-blue transition-all shadow-xs cursor-pointer whitespace-nowrap self-start sm:self-auto">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
             <path fill-rule="evenodd" d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z" clip-rule="evenodd" />
@@ -13,7 +13,7 @@
 </div>
 
 <!-- Form Tersembunyi untuk Bulk Delete -->
-<form id="bulkDeleteForm" method="POST" action="/study-programs/bulk-delete" class="hidden">
+<form id="bulkDeleteForm" method="POST" action="<?= url('study-programs/bulk-delete') ?>" class="hidden">
     <?= Csrf::field() ?>
     <input type="hidden" name="_method" value="DELETE">
 </form>
@@ -81,17 +81,17 @@
                             </td>
                             <td class="px-6 py-4 font-semibold text-slate-700"><?= htmlspecialchars($sp['faculty_name'] ?? '-') ?></td>
                             <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                                <a href="/study-programs/edit?id=<?= $sp['id'] ?>"
-                                    class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
-                                    Edit
+                                <a href="<?= url('study-programs/edit?id=' . $sp['id']) ?>"
+                                     class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
+                                     Edit
                                 </a>
-                                <form method="POST" action="/study-programs/delete" class="inline" onsubmit="return confirm('Yakin hapus?')">
-                                    <?= Csrf::field() ?>
-                                    <input type="hidden" name="id" value="<?= $sp['id'] ?>">
-                                    <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
-                                        Hapus
-                                    </button>
-                                </form>
+                                <form method="POST" action="<?= url('study-programs/delete') ?>" class="inline" onsubmit="return confirm('Yakin hapus?')">
+                                     <?= Csrf::field() ?>
+                                     <input type="hidden" name="id" value="<?= $sp['id'] ?>">
+                                     <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
+                                         Hapus
+                                     </button>
+                                 </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -101,7 +101,7 @@
     </div>
 </div>
 
-<script src="/js/admin/table-utils.js"></script>
+<script src="<?= url('js/admin/table-utils.js') ?>"></script>
 <script>
     initBulkTable();
     function submitBulkDelete() {

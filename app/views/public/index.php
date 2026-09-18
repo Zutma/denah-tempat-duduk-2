@@ -15,18 +15,18 @@
     </script>
 
     <!-- External JS Files (defer) -->
-    <script src="/js/public/seat-map-app.js" defer></script>
-    <script src="/js/public/zoom-controller.js" defer></script>
+    <script src="<?= url('js/public/seat-map-app.js') ?>" defer></script>
+    <script src="<?= url('js/public/zoom-controller.js') ?>" defer></script>
     <?php if (!empty($activeSession) && !isset($message)): ?>
-        <script src="/js/public/seno-mascot.js" defer></script>
+        <script src="<?= url('js/public/seno-mascot.js') ?>" defer></script>
     <?php endif; ?>
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
 
     <!-- External Custom CSS -->
-    <link rel="stylesheet" href="/css/tailwind-built.css">
-    <link rel="stylesheet" href="/css/public-style.css">
+    <link rel="stylesheet" href="<?= url('css/tailwind-built.css') ?>">
+    <link rel="stylesheet" href="<?= url('css/public-style.css') ?>">
 </head>
 
 <body class="font-sans antialiased text-slate-800 min-h-screen w-full flex flex-col overflow-x-hidden relative" x-data="seatMapApp()">
@@ -37,7 +37,7 @@
             
             <div class="flex items-center justify-between gap-3 shrink-0">
                 <div class="flex items-center gap-2.5">
-                    <img src="/images/LOGO.png" alt="ITS Logo" class="w-8 h-8 md:w-9 md:h-9 object-contain">
+                    <img src="<?= url('images/LOGO.png') ?>" alt="ITS Logo" class="w-8 h-8 md:w-9 md:h-9 object-contain">
                     <div class="h-8 w-px bg-slate-200"></div>
                     <div class="flex flex-col justify-center leading-none">
                         <p class="font-friz text-[9px] md:text-[11px] font-bold uppercase tracking-wider text-its-blue-light mb-0.5">
@@ -149,7 +149,7 @@
         <?php if (empty($activeSession) || isset($message)): ?>
             <div class="bg-white/95 backdrop-blur-md border border-its-blue-sky/40 text-slate-700 p-6 rounded-3xl max-w-sm mx-auto my-auto text-center shadow-xl">
                 <div class="relative w-20 h-20 mx-auto mb-3 flex items-center justify-center bg-its-blue/5 rounded-full border border-its-blue-sky/30">
-                    <img src="/images/LOGO.png" alt="ITS Logo" class="w-12 h-12 object-contain">
+                    <img src="<?= url('images/LOGO.png') ?>" alt="ITS Logo" class="w-12 h-12 object-contain">
                 </div>
                 <h3 class="font-extrabold text-its-blue text-base mb-1">Acara Wisuda Belum Dipilih</h3>
                 <p class="text-xs text-slate-500 leading-relaxed">
@@ -287,7 +287,7 @@
     <?php if (!empty($activeSession) && !isset($message)): ?>
     <div id="seno-mascot" class="seno-hidden">
         <div id="seno-bubble">
-            <img src="/images/NAMA_SENO.png" alt="SENO" style="height: 22px; width: auto; display: block; margin-bottom: 8px; object-fit: contain;" />
+            <img src="<?= url('images/NAMA_SENO.png') ?>" alt="SENO" style="height: 22px; width: auto; display: block; margin-bottom: 8px; object-fit: contain;" />
             <div class="seno-text" id="seno-text"></div>
             <div id="seno-progress-wrap"><div id="seno-progress-bar"></div></div>
             <div class="seno-btn-row" id="seno-btns">
@@ -295,11 +295,11 @@
                 <button class="seno-btn" id="seno-next-btn">Lanjut →</button>
             </div>
         </div>
-        <img id="seno-img" src="/images/SENO_POSE_1.png" alt="SENO" />
+        <img id="seno-img" src="<?= url('images/SENO_POSE_1.png') ?>" alt="SENO" />
     </div>
 
     <button id="seno-replay-btn" title="Panggil SENO lagi 🎓">
-        <img src="/images/SENO_POSE_4.png" alt="Panggil SENO" />
+        <img src="<?= url('images/SENO_POSE_4.png') ?>" alt="Panggil SENO" />
     </button>
     <?php endif; ?>
 

@@ -64,7 +64,7 @@
     <div class="col-span-2 bg-white rounded-2xl shadow-2xs border border-slate-200/80 overflow-hidden">
         <div class="p-5 bg-white border-b border-slate-100 flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700">Daftar Periode Wisuda</h2>
-            <a href="/graduation-events" class="text-xs font-bold text-its-blue hover:underline">Lihat Semua →</a>
+            <a href="<?= url('graduation-events') ?>" class="text-xs font-bold text-its-blue hover:underline">Lihat Semua →</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left text-slate-800 border-collapse">
@@ -94,7 +94,7 @@
                                     <?= number_format($e['graduate_count'] ?? 0) ?> Orang
                                 </td>
                                 <td class="px-6 py-4 text-right whitespace-nowrap">
-                                    <a href="/graduation-sessions?event_id=<?= $e['id'] ?>" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-its-blue bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
+                                    <a href="<?= url('graduation-sessions?event_id=' . $e['id']) ?>" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-its-blue bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
                                         Kelola Sesi
                                     </a>
                                 </td>
@@ -111,7 +111,7 @@
         <div>
             <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-4">Akses Cepat</h2>
             <div class="space-y-3">
-                <a href="/graduation-events/create" class="flex items-center justify-between p-4 rounded-xl bg-slate-50 hover:bg-its-blue/5 border border-slate-200/80 group transition-all">
+                <a href="<?= url('graduation-events/create') ?>" class="flex items-center justify-between p-4 rounded-xl bg-slate-50 hover:bg-its-blue/5 border border-slate-200/80 group transition-all">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-lg bg-its-blue-light/10 text-its-blue-light flex items-center justify-center font-bold text-base">
                             +
@@ -124,7 +124,7 @@
                     <span class="text-slate-400 group-hover:text-its-blue text-sm font-bold transition-colors">→</span>
                 </a>
 
-                <a href="/" target="_blank" class="flex items-center justify-between p-4 rounded-xl bg-its-blue text-white group transition-all hover:bg-its-blue-light">
+                <a href="<?= url('') ?>" target="_blank" class="flex items-center justify-between p-4 rounded-xl bg-its-blue text-white group transition-all hover:bg-its-blue-light">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center text-base">
                             🌐

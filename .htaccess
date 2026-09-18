@@ -1,7 +1,8 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-
-    # Redirect all requests to public/ directory if not already starting with /public/
-    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteBase /denah/
+    RewriteRule ^app/ - [F,L]
+    RewriteCond %{DOCUMENT_ROOT}/denah/public/$1 -f
     RewriteRule ^(.*)$ public/$1 [L]
+    RewriteRule ^(.*)$ public/index.php [QSA,L]
 </IfModule>

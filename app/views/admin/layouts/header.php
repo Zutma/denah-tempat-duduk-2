@@ -7,7 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/tailwind-built.css">
+    <link rel="stylesheet" href="<?= url('css/tailwind-built.css') ?>">
+    <script>window.APP_BASE_URL = '<?= BASE_URL ?>';</script>
     <script>
         tailwind.config = {
             theme: {

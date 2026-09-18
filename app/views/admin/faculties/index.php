@@ -3,7 +3,7 @@
         <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Daftar Fakultas</h1>
         <p class="text-sm text-slate-500 mt-1">Kelola data fakultas dan identitas warna penanda tempat duduk.</p>
     </div>
-    <a href="/faculties/create"
+    <a href="<?= url('faculties/create') ?>"
         class="inline-flex items-center gap-2 px-5 py-2.5 bg-its-blue-light text-white rounded-xl text-sm font-bold hover:bg-its-blue transition-all shadow-xs cursor-pointer whitespace-nowrap">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -12,7 +12,7 @@
     </a>
 </div>
 
-<form id="bulkDeleteForm" method="POST" action="/faculties/bulk-delete" class="hidden">
+<form id="bulkDeleteForm" method="POST" action="<?= url('faculties/bulk-delete') ?>" class="hidden">
     <?= Csrf::field() ?>
     <input type="hidden" name="_method" value="DELETE">
 </form>
@@ -82,10 +82,10 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                                <a href="/faculties/edit?id=<?= $faculty['id'] ?>" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
+                                <a href="<?= url('faculties/edit?id=' . $faculty['id']) ?>" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
                                     Edit
                                 </a>
-                                <form method="POST" action="/faculties/delete" class="inline" onsubmit="return confirm('Yakin hapus fakultas ini?')">
+                                <form method="POST" action="<?= url('faculties/delete') ?>" class="inline" onsubmit="return confirm('Yakin hapus fakultas ini?')">
                                     <?= Csrf::field() ?>
                                     <input type="hidden" name="id" value="<?= $faculty['id'] ?>">
                                     <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
@@ -101,7 +101,7 @@
     </div>
 </div>
 
-<script src="/js/admin/table-utils.js"></script>
+<script src="<?= url('js/admin/table-utils.js') ?>"></script>
 <script>
     initBulkTable();
     function submitBulkDelete() {

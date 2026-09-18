@@ -2,16 +2,16 @@
 <div class="flex items-center justify-between gap-4 mb-6">
     <div>
         <nav class="flex items-center gap-2 text-sm font-medium text-slate-400 mb-1">
-            <a href="/graduation-events" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
+            <a href="<?= url('graduation-events') ?>" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
             <span class="text-slate-300">/</span>
-            <a href="/graduates?session_id=<?= htmlspecialchars($sessionId ?? '') ?>" class="hover:text-its-blue transition-colors">Wisudawan</a>
+            <a href="<?= url('graduates?session_id=' . htmlspecialchars($sessionId ?? '')) ?>" class="hover:text-its-blue transition-colors">Wisudawan</a>
             <span class="text-slate-300">/</span>
             <span class="text-slate-700 font-bold">Import CSV</span>
         </nav>
         <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Import Data Wisudawan</h1>
         <p class="text-sm text-slate-500 mt-1">Unggah file CSV sesuai template untuk mengimpor data mahasiswa sekaligus.</p>
     </div>
-    <a href="/imports/template" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 hover:bg-slate-50 rounded-xl text-sm font-bold transition-all border border-slate-200 shadow-2xs">
+    <a href="<?= url('imports/template') ?>" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 hover:bg-slate-50 rounded-xl text-sm font-bold transition-all border border-slate-200 shadow-2xs">
         <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
         Download Template CSV
     </a>
@@ -33,7 +33,7 @@
     </div>
 
     <div class="bg-white rounded-2xl shadow-2xs border border-slate-200/80 p-6">
-        <form method="POST" action="/imports/process" enctype="multipart/form-data" class="space-y-6">
+        <form method="POST" action="<?= url('imports/process') ?>" enctype="multipart/form-data" class="space-y-6">
             <?= Csrf::field() ?>
             <input type="hidden" name="session_id" value="<?= htmlspecialchars($sessionId ?? '') ?>">
 
@@ -43,7 +43,7 @@
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                <a href="/graduates?session_id=<?= htmlspecialchars($sessionId ?? '') ?>" class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all">
+                <a href="<?= url('graduates?session_id=' . htmlspecialchars($sessionId ?? '')) ?>" class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all">
                     Batal
                 </a>
                 <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-its-blue-light text-white rounded-xl text-sm font-bold hover:bg-its-blue transition-all shadow-xs cursor-pointer">

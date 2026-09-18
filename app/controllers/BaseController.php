@@ -57,9 +57,13 @@ class BaseController {
     }
 
     /**
-     * Helper Redirect
+     * Helper Redirect (Otomatis Menyesuaikan Subfolder /denah)
      */
     protected function redirect(string $url): void {
+        if (strpos($url, '/') === 0) {
+            $url = url($url);
+        }
+        
         header("Location: {$url}");
         exit;
     }

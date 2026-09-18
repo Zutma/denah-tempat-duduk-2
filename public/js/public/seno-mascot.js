@@ -2,11 +2,11 @@
 (function () {
     'use strict';
     var POSES = {
-        wisuda:   '/images/SENO_POSE_1.png',
-        wave:     '/images/SENO_POSE_3.png',
-        shy:      '/images/SENO_POSE_2.png',
-        surprise: '/images/SENO_POSE_4.png',
-        normal:   '/images/SENO_POSE_1.png',
+        wisuda:   (window.APP_BASE_URL || '') + '/images/SENO_POSE_1.png',
+        wave:     (window.APP_BASE_URL || '') + '/images/SENO_POSE_3.png',
+        shy:      (window.APP_BASE_URL || '') + '/images/SENO_POSE_2.png',
+        surprise: (window.APP_BASE_URL || '') + '/images/SENO_POSE_4.png',
+        normal:   (window.APP_BASE_URL || '') + '/images/SENO_POSE_1.png',
     };
 
     var steps = [

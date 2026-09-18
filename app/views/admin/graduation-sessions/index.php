@@ -2,7 +2,7 @@
 <div class="flex items-center justify-between gap-4 mb-6">
     <div>
         <nav class="flex items-center gap-2 text-sm font-medium text-slate-400 mb-1">
-            <a href="/graduation-events" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
+            <a href="<?= url('graduation-events') ?>" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
             <span class="text-slate-300">/</span>
             <span class="text-slate-700 font-bold"><?= htmlspecialchars($event['name']) ?></span>
         </nav>
@@ -10,7 +10,7 @@
         <p class="text-sm text-slate-500 mt-1">Kelola semua sesi untuk periode ini.</p>
     </div>
 
-    <a href="/graduation-sessions/create?event_id=<?= $event['id'] ?>"
+    <a href="<?= url('graduation-sessions/create?event_id=' . $event['id']) ?>"
         class="inline-flex items-center gap-2 px-5 py-2.5 bg-its-blue-light text-white rounded-xl text-sm font-bold hover:bg-its-blue transition-all shadow-xs cursor-pointer whitespace-nowrap">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
         Tambah Sesi Baru
@@ -18,7 +18,7 @@
 </div>
 
 <!-- Form Tersembunyi untuk Bulk Delete -->
-<form id="bulkDeleteForm" method="POST" action="/graduation-sessions/bulk-delete" class="hidden">
+<form id="bulkDeleteForm" method="POST" action="<?= url('graduation-sessions/bulk-delete') ?>" class="hidden">
     <?= Csrf::field() ?>
     <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
     <input type="hidden" name="_method" value="DELETE">
@@ -80,23 +80,23 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                                <a href="/seat-rows?session_id=<?= $session['id'] ?>" class="px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
-                                    Kelola Kursi
-                                </a>
-                                <a href="/graduates?session_id=<?= $session['id'] ?>" class="px-3 py-1.5 text-xs font-bold text-its-blue bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
-                                    Wisudawan
-                                </a>
-                                <a href="/graduation-sessions/edit?id=<?= $session['id'] ?>" class="px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
-                                    Edit
-                                </a>
-                                <form method="POST" action="/graduation-sessions/delete" class="inline" onsubmit="return confirm('Yakin menghapus sesi ini beserta wisudawan & denah di dalamnya?')">
-                                    <?= Csrf::field() ?>
-                                    <input type="hidden" name="id" value="<?= $session['id'] ?>">
-                                    <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
-                                    <button type="submit" class="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
-                                        Hapus
-                                    </button>
-                                </form>
+                                <a href="<?= url('seat-rows?session_id=' . $session['id']) ?>" class="px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
+                                     Kelola Kursi
+                                 </a>
+                                 <a href="<?= url('graduates?session_id=' . $session['id']) ?>" class="px-3 py-1.5 text-xs font-bold text-its-blue bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
+                                     Wisudawan
+                                 </a>
+                                 <a href="<?= url('graduation-sessions/edit?id=' . $session['id']) ?>" class="px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
+                                     Edit
+                                 </a>
+                                 <form method="POST" action="<?= url('graduation-sessions/delete') ?>" class="inline" onsubmit="return confirm('Yakin menghapus sesi ini beserta wisudawan & denah di dalamnya?')">
+                                     <?= Csrf::field() ?>
+                                     <input type="hidden" name="id" value="<?= $session['id'] ?>">
+                                     <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
+                                     <button type="submit" class="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
+                                         Hapus
+                                     </button>
+                                 </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -106,7 +106,7 @@
     </div>
 </div>
 
-<script src="/js/admin/table-utils.js"></script>
+<script src="<?= url('js/admin/table-utils.js') ?>"></script>
 <script>
     initBulkTable();
     function submitBulkDelete() {

@@ -81,7 +81,7 @@
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
-            <a href="/graduates?session_id=<?= $sessionId ?>"
+            <a href="<?= url('graduates?session_id=' . $sessionId) ?>"
                 class="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-medium transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
