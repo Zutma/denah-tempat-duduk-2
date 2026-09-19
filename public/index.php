@@ -11,7 +11,7 @@ if (!ob_start("ob_gzhandler")) {
 
 // set path acuan dan base url
 define('BASE_PATH', dirname(__DIR__));
-define('BASE_URL', '/denah/public');
+define('BASE_URL', '/denah');
 
 function url(string $path = ''): string {
     return rtrim(BASE_URL, '/') . '/' . ltrim($path, '/');
