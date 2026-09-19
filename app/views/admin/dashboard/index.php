@@ -1,11 +1,8 @@
-
-<!-- Page Header & Meta Ringkas -->
 <div class="flex items-center justify-between gap-4 mb-8">
     <div>
         <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Dashboard Overview</h1>
         <p class="text-sm text-slate-500 mt-1">Ringkasan status sesi wisuda dan alokasi tempat duduk.</p>
     </div>
-    <!-- Meta Info Sekunder: Data Master -->
     <div class="flex items-center gap-4 px-4 py-2.5 bg-white rounded-xl border border-slate-200/80 shadow-2xs">
         <div class="text-sm text-slate-600 font-medium">
             <span class="font-bold text-slate-800 text-base"><?= $totalFaculties ?></span> Fakultas
@@ -17,9 +14,7 @@
     </div>
 </div>
 
-<!-- STAT METRICS GRID: STATUS SESI -->
 <div class="grid grid-cols-3 gap-6 mb-8">
-    <!-- Card 1: Draft Sesi -->
     <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs flex items-center justify-between">
         <div>
             <p class="text-xs font-bold uppercase tracking-wider text-amber-600">Sesi Draft</p>
@@ -31,7 +26,6 @@
         </div>
     </div>
 
-    <!-- Card 2: Published / Aktif -->
     <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs flex items-center justify-between">
         <div>
             <p class="text-xs font-bold uppercase tracking-wider text-emerald-600">Sesi Aktif (Published)</p>
@@ -45,7 +39,6 @@
         </div>
     </div>
 
-    <!-- Card 3: Archived -->
     <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs flex items-center justify-between">
         <div>
             <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Sesi Diarsipkan</p>
@@ -58,14 +51,13 @@
     </div>
 </div>
 
-<!-- SECTION DUA KOLOM: DAFTAR PERIODE & QUICK ACTIONS -->
 <div class="grid grid-cols-3 gap-6">
-    <!-- Tabel Periode Wisuda -->
     <div class="col-span-2 bg-white rounded-2xl shadow-2xs border border-slate-200/80 overflow-hidden">
         <div class="p-5 bg-white border-b border-slate-100 flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700">Daftar Periode Wisuda</h2>
             <a href="<?= url('graduation-events') ?>" class="text-xs font-bold text-its-blue hover:underline">Lihat Semua →</a>
         </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left text-slate-800 border-collapse">
                 <thead class="bg-slate-50 text-slate-500 uppercase font-bold text-xs tracking-wider border-b border-slate-200/80">
@@ -106,7 +98,6 @@
         </div>
     </div>
 
-    <!-- Quick Actions -->
     <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-2xs flex flex-col justify-between">
         <div>
             <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-4">Akses Cepat</h2>
@@ -137,10 +128,6 @@
                     <span class="text-white text-sm font-bold">→</span>
                 </a>
             </div>
-        </div>
-
-        <div class="pt-4 border-t border-slate-100 text-center">
-            <p class="text-xs text-slate-400 font-medium">Sistem Denah Tempat Duduk Wisuda ITS</p>
         </div>
     </div>
 </div>

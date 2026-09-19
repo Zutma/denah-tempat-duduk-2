@@ -1,6 +1,7 @@
 <?php
 
 class GraduationEventController extends BaseController {
+    // daftar periode event wisuda
     public function index($conn) {
         $events = GraduationEvent::all($conn);
         $pageTitle = 'Daftar Periode Wisuda';
@@ -11,9 +12,9 @@ class GraduationEventController extends BaseController {
         ]);
     }
 
+    // simpan / update event wisuda
     public function form($conn) {
         $this->checkAuth();
-        $this->checkCsrf();
         $event = null;
         if (isset($_GET['id'])) {
             $event = GraduationEvent::find($conn, $_GET['id']);
@@ -22,6 +23,7 @@ class GraduationEventController extends BaseController {
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->checkCsrf();
             $name = trim($_POST['name'] ?? '');
 
             if ($name === '') $errors[] = "Nama periode wajib diisi.";
@@ -48,6 +50,7 @@ class GraduationEventController extends BaseController {
         ]);
     }
 
+    // hapus event wisuda
     public function delete($conn) {
         $this->checkAuth();
         $this->checkCsrf();
@@ -66,6 +69,7 @@ class GraduationEventController extends BaseController {
         $this->redirect('/graduation-events');
     }
 
+    // hapus masal event wisuda
     public function bulkDelete($conn) {
         $this->checkAuth();
         $this->checkCsrf();

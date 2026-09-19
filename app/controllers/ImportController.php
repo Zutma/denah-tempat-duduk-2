@@ -1,17 +1,7 @@
 <?php
 
 class ImportController extends BaseController {
-    public function form($conn) {
-        $this->checkAuth();
-        $sessionId = $_GET['session_id'] ?? null;
-        $pageTitle = 'Import Data Wisudawan';
-
-        $this->renderAdmin('imports/form', [
-            'sessionId' => $sessionId,
-            'pageTitle' => $pageTitle
-        ]);
-    }
-
+    // proses pembacaan dan penyimpan data csv
     public function process($conn) {
         $this->checkAuth();
         $this->checkCsrf();
@@ -144,6 +134,7 @@ class ImportController extends BaseController {
         $this->redirect("/graduates?session_id=$sessionId");
     }
 
+    // unduh berkas template csv
     public function downloadTemplate($conn) {
         $this->checkAuth();
         header('Content-Type: text/csv; charset=utf-8');

@@ -1,6 +1,7 @@
 <?php
 
 class GraduationSessionController extends BaseController {
+    // daftar sesi per event
     public function index($conn) {
         if (!isset($_GET['event_id'])) {
             $this->redirect('/graduation-events');
@@ -17,9 +18,9 @@ class GraduationSessionController extends BaseController {
         ]);
     }
 
+    // simpan / update sesi wisuda
     public function form($conn) {
         $this->checkAuth();
-        $this->checkCsrf();
         $session = null;
         $eventId = $_GET['event_id'] ?? null;
 
@@ -33,6 +34,7 @@ class GraduationSessionController extends BaseController {
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->checkCsrf();
             $date = trim($_POST['date'] ?? '');
             $sessionNumber = $_POST['session'] !== '' ? (int)$_POST['session'] : null;
             $status = $_POST['status'] ?? 'draft';
@@ -63,6 +65,7 @@ class GraduationSessionController extends BaseController {
         ]);
     }
 
+    // hapus 1 sesi wisuda
     public function delete($conn) {
         $this->checkAuth();
         $this->checkCsrf();
@@ -87,6 +90,7 @@ class GraduationSessionController extends BaseController {
         $this->redirect('/graduation-events');
     }
 
+    // hapus masal sesi wisuda
     public function bulkDelete($conn) {
         $this->checkAuth();
         $this->checkCsrf();

@@ -2,6 +2,7 @@
 
 class StudyProgramController extends BaseController {
     public function index($conn) {
+        // list prodi
         $studyPrograms = StudyProgram::all($conn);
         $pageTitle = 'Daftar Program Studi';
 
@@ -13,17 +14,19 @@ class StudyProgramController extends BaseController {
 
     public function form($conn) {
         $this->checkAuth();
-        $this->checkCsrf();
         $faculties = Faculty::all($conn);
         $studyProgram = null;
 
+        // ambil data prodi kalau edit
         if (isset($_GET['id'])) {
             $studyProgram = StudyProgram::find($conn, $_GET['id']);
         }
 
         $errors = [];
 
+        // simpan/update data prodi
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->checkCsrf();
             $facultyId = $_POST['faculty_id'] ?? '';
             $name = trim($_POST['name'] ?? '');
             $degreeLevel = trim($_POST['degree_level'] ?? '');
@@ -63,6 +66,7 @@ class StudyProgramController extends BaseController {
 
         $id = $_POST['id'] ?? $_GET['id'] ?? null;
 
+        // hapus 1 prodi
         if ($id) {
             try {
                 StudyProgram::delete($conn, $id);
@@ -84,6 +88,7 @@ class StudyProgramController extends BaseController {
         $this->checkCsrf();
 
         $ids = $_POST['ids'] ?? [];
+        // hapus masal prodi
         if (!empty($ids) && is_array($ids)) {
             $deleted = 0;
             $failed = 0;
@@ -111,4 +116,4 @@ class StudyProgramController extends BaseController {
 
         $this->redirect('/study-programs');
     }
-}
+}

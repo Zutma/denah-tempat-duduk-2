@@ -12,13 +12,10 @@
     </a>
 </div>
 
-<!-- Form Tersembunyi untuk Bulk Delete -->
 <form id="bulkDeleteForm" method="POST" action="<?= url('study-programs/bulk-delete') ?>" class="hidden">
     <?= Csrf::field() ?>
     <input type="hidden" name="_method" value="DELETE">
 </form>
-
-<!-- Floating Bulk Action Bar -->
 <div id="bulkToolbar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white rounded-full shadow-2xl px-6 py-3 border border-slate-700 hidden items-center gap-5 z-50 transition-all">
     <div class="flex items-center gap-2 text-sm font-medium text-slate-300">
         <span id="selectedCount" class="bg-its-blue-light text-white px-2.5 py-0.5 rounded-full font-bold text-xs">0</span>

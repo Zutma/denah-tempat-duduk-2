@@ -2,13 +2,13 @@
     RewriteEngine On
     RewriteBase /denah/
 
-    # 1. Blokir akses ke folder app
+    # larang akses folder app
     RewriteRule ^app/ - [F,L]
 
-    # 2. Jika mengakses root /denah/, paksa langsung lempar ke public/index.php
+    # redirect root denah ke front controller public
     RewriteRule ^$ public/index.php [QSA,L]
 
-    # 3. Jika mengakses URL lain yang bukan file/folder asli, lempar ke public/index.php
+    # selebihnya oper ke public index php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ public/index.php [QSA,L]

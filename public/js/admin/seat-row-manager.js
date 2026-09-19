@@ -1,3 +1,4 @@
+// komponan alpine buat ngatur form generator baris kursi
 function seatRowManager(config = {}) {
     return {
         showBulkForm: config.hasErrors || false,
@@ -16,6 +17,7 @@ function seatRowManager(config = {}) {
             this.rows = [];
         },
         addRow() {
+            // cari abjad berikutnya yang belum dipakai
             let lastRow = this.rows.length > 0 ? this.rows[this.rows.length - 1].row : '';
             let currentIndex = lastRow ? this.allLetters.indexOf(lastRow) : -1;
             let nextLetter = '';
@@ -38,6 +40,7 @@ function seatRowManager(config = {}) {
     };
 }
 
+// listener filter & checkbox tabel baris
 function initSeatRowSearch() {
     const selectAll = document.getElementById('selectAll');
     const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
@@ -45,6 +48,7 @@ function initSeatRowSearch() {
     const selectedCount = document.getElementById('selectedCount');
     const searchInput = document.getElementById('searchInput');
 
+    // pencarian baris realtime
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             const term = this.value.toLowerCase().trim();
@@ -54,6 +58,7 @@ function initSeatRowSearch() {
         });
     }
 
+    // toggle toolbar hapus masal
     window.updateToolbarState = function() {
         const checkedCount = document.querySelectorAll('.rowCheckbox:checked').length;
         if (bulkToolbar) {
@@ -78,6 +83,7 @@ function initSeatRowSearch() {
     }
 }
 
+// submit hapus masal baris terpilih
 function submitSeatRowBulkDelete() {
     const checked = document.querySelectorAll('.rowCheckbox:checked');
     if (checked.length === 0) return;
@@ -99,3 +105,4 @@ function submitSeatRowBulkDelete() {
         form.submit();
     }
 }
+

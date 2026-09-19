@@ -1,5 +1,3 @@
-
-<!-- Breadcrumb -->
 <nav class="flex items-center gap-2 text-sm font-medium text-slate-400 mb-1">
     <a href="<?= url('graduation-events') ?>" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
     <span class="text-slate-300">/</span>
@@ -22,7 +20,6 @@
     </a>
 </div>
 
-<!-- Import Card Form (Tombol Upload & Import Hijau) -->
 <div class="bg-white rounded-2xl shadow-2xs border border-slate-200/80 p-5 mb-6">
     <div class="flex items-center justify-between gap-3 mb-3">
         <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
@@ -42,12 +39,11 @@
     </form>
 </div>
 
-<!-- Rekapitulasi Hasil Impor (Logika Terbaru) -->
 <?php if (isset($_SESSION['import_success'])): ?>
     <div class="mb-6 p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-3">
         <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
             <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Hasil Rekapitulasi Impor CSV
+            Hasil Impor CSV
         </h3>
 
         <div class="flex flex-wrap gap-2 text-xs font-semibold">
@@ -79,14 +75,11 @@
     ?>
 <?php endif; ?>
 
-<!-- Form Tersembunyi untuk Bulk Delete -->
 <form id="bulkDeleteForm" method="POST" action="<?= url('graduates/bulk-delete') ?>" class="hidden">
     <?= Csrf::field() ?>
     <input type="hidden" name="session_id" value="<?= $sessionId ?>">
     <input type="hidden" name="page" value="<?= $page ?? 1 ?>">
 </form>
-
-<!-- Floating Bulk Action Bar (Gaya Melayang Versi Lama) -->
 <div id="bulkToolbar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white rounded-full shadow-2xl px-5 py-3 border border-slate-700 hidden items-center gap-4 z-50 transition-all transform duration-200">
     <div class="flex items-center gap-2 text-xs font-medium text-slate-300">
         <span id="selectedCount" class="bg-its-blue-light text-white px-2 py-0.5 rounded-full font-bold text-xs">0</span>
@@ -177,7 +170,6 @@
         </table>
     </div>
 
-    <!-- Pagination Stabil (Logika Terbaru) -->
     <?php if (($totalPages ?? 1) > 1): ?>
         <div class="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-white">
             <p class="text-xs font-medium text-slate-500">

@@ -4,26 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle ?? 'Admin Portal - Sistem Wisuda ITS') ?></title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= url('css/tailwind-built.css') ?>">
     <script>window.APP_BASE_URL = '<?= BASE_URL ?>';</script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Work Sans', 'sans-serif'] },
-                    colors: {
-                        'its-blue': '#233F7C',
-                        'its-blue-light': '#127BBE',
-                        'its-blue-sky': '#75BDE0',
-                        'its-yellow': '#FDBB16',
-                    },
-                },
-            },
-        }
-    </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
     <style>[x-cloak] { display: none !important; }</style>
 </head>
@@ -35,8 +17,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 ?>
 
-<!-- Container Toast Notifikasi Global (Muncul otomatis jika Controller mengirim pesan) -->
-<div class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none">
+<!-- notif -->
+<div class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 max-w-md w-full px-4 pointer-events-none">
     <?php if (isset($_SESSION['success'])): ?>
         <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" x-cloak
              class="pointer-events-auto p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm shadow-lg flex items-center justify-between transition-all">

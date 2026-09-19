@@ -1,3 +1,4 @@
+// aplikasi alpine buat peta denah publik
 function seatMapApp() {
     return {
         selectedSeatId: null,
@@ -11,10 +12,10 @@ function seatMapApp() {
         gradMap: null,
 
         init() {
-            // Pre-index graduates by seat_id untuk lookup O(1) super cepat
+            // rakit index wisudawan per seat_id biar gampang dicari
             this.buildGradMap();
 
-            // Watcher cerdas: Hanya menghitung ulang hasil pencarian jika ketikan berubah (Bebas Lag 100%)
+            // pantau input pencarian biar realtime
             this.$watch('searchQuery', (val) => {
                 this.searchedSeatIdClicked = null;
                 const q = (val || '').toString().trim().toLowerCase();
@@ -25,7 +26,7 @@ function seatMapApp() {
                     return;
                 }
 
-                // Filter data wisudawan
+                // saring wisudawan cocok
                 this.filteredGraduates = this.graduatesList.filter(g => {
                     if (!g) return false;
                     const nameMatch = g.name && g.name.toString().toLowerCase().includes(q);
@@ -34,11 +35,11 @@ function seatMapApp() {
                     return nameMatch || nrpMatch || seatMatch;
                 });
 
-                // Set array ID kursi yang di-highlight
+                // kumpulin id kursi buat sorotan
                 this.searchedSeatIds = this.filteredGraduates.map(g => Number(g.seat_id)).filter(Boolean);
             });
 
-            // Trigger pencarian pertama kali jika ada query awal dari URL/backend
+            // cek awal kalo ada keyword dari param url
             if (this.searchQuery.trim() !== '') {
                 this.$nextTick(() => {
                     const q = this.searchQuery.trim().toLowerCase();
@@ -76,7 +77,7 @@ function seatMapApp() {
             if (!targetId) return;
 
             const gradData = this.getGradBySeatId(targetId);
-            if (!gradData) return; // Kursi kosong / tanpa wisudawan
+            if (!gradData) return; // skip kalo kursi tak terisi
 
             this.selectedSeatId = (this.selectedSeatId === targetId) ? null : targetId;
             this.activeModalData = this.selectedSeatId ? gradData : null;
@@ -92,6 +93,7 @@ function seatMapApp() {
             this.searchedSeatIdClicked = targetId;
             this.searchedSeatIds = [targetId];
 
+            // scroll smooth ke posisi kursi
             this.$nextTick(() => {
                 const el = document.getElementById(`seat-${targetId}`);
                 if (el) {
@@ -114,4 +116,4 @@ function seatMapApp() {
             this.searchedSeatIds = [];
         }
     };
-}
+}

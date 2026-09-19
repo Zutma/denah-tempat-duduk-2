@@ -8,20 +8,16 @@
 </head>
 <body class="font-sans text-slate-800 antialiased">
 
-    <!-- Container Utama dengan Background Gambar Denah -->
     <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-cover bg-center bg-no-repeat relative"
          style="background-image: url('<?= url('images/BG_DENAH.png') ?>');">
         
-        <!-- Overlay tipis biar card login & logo lebih menonjol -->
         <div class="absolute inset-0 bg-slate-900/10 backdrop-blur-[1px]"></div>
 
         <div class="relative z-10 w-full flex flex-col items-center px-4">
-            <!-- Logo -->
             <div class="mb-6 text-center">
                 <img src="<?= url('images/LOGO.png') ?>" alt="Logo" class="w-[140px] h-auto mx-auto drop-shadow-md">
             </div>
 
-            <!-- Form Card -->
             <div class="w-full sm:max-w-md px-6 py-8 bg-white/95 backdrop-blur-md shadow-2xl overflow-hidden sm:rounded-2xl border border-white/20">
                 <h2 class="text-xl font-bold text-slate-800 mb-1">Masuk ke Admin Portal</h2>
                 <p class="text-sm text-slate-500 mb-6">Sistem Informasi Denah Tempat Duduk Wisuda</p>
@@ -62,7 +58,6 @@
                 </form>
             </div>
         </div>
-
     </div>
 </body>
 </html>

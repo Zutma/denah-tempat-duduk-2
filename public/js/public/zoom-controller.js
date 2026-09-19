@@ -1,4 +1,4 @@
-/* ===== LOGIKA ZOOM PRESISI V2 ===== */
+// pengatur zoom denah (in/out/reset & mouse wheel)
 document.addEventListener("DOMContentLoaded", function() {
     const container = document.getElementById('denahContainer');
     const lorong = document.getElementById('lorongTengah');
@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const maxScale = 1.8;
     let holdInterval = null;
 
+    // terapin skala ke elemen wrapper
     function applyZoom() {
         if (!zoomContent || !zoomWrapper) return;
 
@@ -32,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    // posisikan scroll pas di tengah lorong
     function centerToLorong() {
         if (container && lorong && zoomContent) {
             const containerWidth = container.clientWidth;
@@ -43,6 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    // atur perbesaran/pengecilan denah
     window.adjustZoom = function(amount) {
         const oldScrollLeft = container ? container.scrollLeft : 0;
         const containerWidth = container ? container.clientWidth : 0;
@@ -71,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     };
 
+    // kembalikan zoom ke 100%
     window.resetZoom = function() {
         currentScale = 1;
         applyZoom();
@@ -86,6 +90,7 @@ document.addEventListener("DOMContentLoaded", function() {
         applyZoom();
     });
 
+    // tahan tombol zoom in/out
     window.startZoomHold = function(amount) {
         window.adjustZoom(amount);
         holdInterval = setInterval(() => {
@@ -100,6 +105,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     };
 
+    // zoom pakai scroll + ctrl
     if (container) {
         container.addEventListener('wheel', function(e) {
             if (e.ctrlKey) {
@@ -109,4 +115,4 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }, { passive: false });
     }
-});
+});

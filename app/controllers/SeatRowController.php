@@ -13,6 +13,7 @@ class SeatRowController extends BaseController {
         $errors = [];
         $messages = [];
 
+        // simpan baris baru kalo ada submit post
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->checkCsrf();
 
@@ -30,6 +31,7 @@ class SeatRowController extends BaseController {
                         continue;
                     }
 
+                    // bikin baris kiri
                     if (SeatRow::exists($conn, $sessionId, $rowLabel, 'left')) {
                         $errors[] = "Baris $rowLabel Kiri sudah ada, dilewati.";
                     } else {
@@ -37,6 +39,7 @@ class SeatRowController extends BaseController {
                         $messages[] = "Baris $rowLabel Kiri berhasil dibuat ($kapasitasKiri kursi).";
                     }
 
+                    // bikin baris kanan
                     if (SeatRow::exists($conn, $sessionId, $rowLabel, 'right')) {
                         $errors[] = "Baris $rowLabel Kanan sudah ada, dilewati.";
                     } else {
@@ -51,6 +54,7 @@ class SeatRowController extends BaseController {
             }
         }
 
+        // siapin data buat view
         $seatRows   = SeatRow::getBySession($conn, $sessionId);
         $allLetters = range('A', 'Z');
         $usedLetters = array_values(array_unique(array_column($seatRows, 'row')));
@@ -75,6 +79,7 @@ class SeatRowController extends BaseController {
         $idParam = $_POST['id'] ?? $_GET['id'] ?? null;
         $sessionId = $_POST['session_id'] ?? $_GET['session_id'] ?? null;
 
+        // hapus baris spesifik
         if ($idParam) {
             $ids = array_map('intval', explode(',', $idParam));
             $count = 0;
@@ -107,6 +112,7 @@ class SeatRowController extends BaseController {
         $sessionId = $_POST['session_id'] ?? $_GET['session_id'] ?? null;
         $ids = $_POST['ids'] ?? [];
 
+        // hapus banyak baris sekaligus
         if (!empty($ids) && is_array($ids)) {
             try {
                 SeatRow::bulkDelete($conn, array_map('intval', $ids));
@@ -122,4 +128,4 @@ class SeatRowController extends BaseController {
 
         $this->redirect('/graduation-events');
     }
-}
+}

@@ -62,16 +62,17 @@
                 <span class="text-slate-600 font-semibold"><?= $totalSeatCountAll ?> Kursi</span>
             </span>
 
-            <button type="button" @click="toggleBulkForm()" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-its-blue hover:bg-its-blue-light rounded-xl shadow-xs transition-all cursor-pointer select-none">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <button type="button" @click="toggleBulkForm()" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-its-blue-light hover:bg-its-blue rounded-xl shadow-xs transition-all cursor-pointer select-none">
+                <svg x-show="!showBulkForm" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                <svg x-show="showBulkForm" x-cloak class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 <span x-text="showBulkForm ? 'Tutup Form' : 'Tambah Baris'"></span>
             </button>
         </div>
     </div>
 
-    <div x-show="showBulkForm" x-cloak class="m-5 p-5 bg-slate-50/90 rounded-2xl border border-slate-200/90">
+    <div x-show="showBulkForm" x-cloak class="m-5 p-5 bg-slate-50/80 rounded-2xl border border-slate-200/80">
         <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-200/60">
-            <h4 class="text-sm font-extrabold uppercase tracking-wider text-its-blue">Form Input Baris Baru</h4>
+            <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Form Input Baris Baru</h4>
             <span class="text-xs text-slate-500">Isi data baris lalu klik simpan</span>
         </div>
 
@@ -79,7 +80,7 @@
             <?= Csrf::field() ?>
             <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
 
-            <div class="overflow-x-auto mb-4 border border-slate-200 rounded-xl bg-white">
+            <div class="overflow-x-auto mb-4 border border-slate-200 rounded-xl bg-white shadow-2xs">
                 <table class="w-full text-sm text-left border-collapse">
                     <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 uppercase font-bold text-xs tracking-wider">
                         <tr>
@@ -93,7 +94,7 @@
                         <template x-for="(item, index) in rows" :key="index">
                             <tr class="hover:bg-slate-50/50 transition-colors">
                                 <td class="p-3">
-                                    <select :name="`rows[${index}][row]`" x-model="item.row" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 outline-none cursor-pointer" required>
+                                    <select :name="`rows[${index}][row]`" x-model="item.row" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light outline-none cursor-pointer" required>
                                         <option value="" disabled>Pilih Baris</option>
                                         <?php foreach ($allLetters as $letter): ?>
                                             <option value="<?= $letter ?>" :disabled="usedLetters.includes('<?= $letter ?>')">
@@ -103,13 +104,13 @@
                                     </select>
                                 </td>
                                 <td class="p-3">
-                                    <input type="number" :name="`rows[${index}][left_capacity]`" x-model.number="item.left_capacity" placeholder="20" min="0" max="100" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 focus:bg-white outline-none" required>
+                                    <input type="number" :name="`rows[${index}][left_capacity]`" x-model.number="item.left_capacity" placeholder="20" min="0" max="100" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light outline-none" required>
                                 </td>
                                 <td class="p-3">
-                                    <input type="number" :name="`rows[${index}][right_capacity]`" x-model.number="item.right_capacity" placeholder="20" min="0" max="100" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 focus:bg-white outline-none" required>
+                                    <input type="number" :name="`rows[${index}][right_capacity]`" x-model.number="item.right_capacity" placeholder="20" min="0" max="100" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light outline-none" required>
                                 </td>
                                 <td class="p-3 text-center">
-                                    <button type="button" @click="removeRow(index)" class="w-9 h-9 inline-flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer" title="Hapus">
+                                    <button type="button" @click="removeRow(index)" class="w-9 h-9 inline-flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer" title="Hapus">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                     </button>
                                 </td>
@@ -120,15 +121,15 @@
             </div>
 
             <div class="flex items-center justify-between gap-3 pt-2">
-                <button type="button" @click="addRow()" class="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-its-blue bg-white hover:bg-its-blue/5 border border-its-blue-sky/40 rounded-xl transition-all cursor-pointer shadow-2xs">
+                <button type="button" @click="addRow()" class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 border border-its-blue/15 rounded-xl transition-all cursor-pointer">
                     + Tambah Form Baris Lagi
                 </button>
 
                 <div class="flex items-center gap-2">
-                    <button type="button" @click="cancelBulkForm()" class="px-4 py-2.5 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-200/60 rounded-xl transition-colors cursor-pointer">
+                    <button type="button" @click="cancelBulkForm()" class="px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer">
                         Batal
                     </button>
-                    <button type="submit" :disabled="rows.length === 0" class="inline-flex items-center gap-2 px-6 py-2.5 bg-its-blue hover:bg-its-blue-light disabled:opacity-50 text-white text-xs font-extrabold rounded-xl shadow-xs transition-all cursor-pointer">
+                    <button type="submit" :disabled="rows.length === 0" class="inline-flex items-center gap-2 px-5 py-2.5 bg-its-blue-light hover:bg-its-blue disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer">
                         Simpan Semua
                     </button>
                 </div>
@@ -200,14 +201,11 @@
     </div>
 </div>
 
-<!-- Form Tersembunyi untuk Bulk Delete -->
 <form id="bulkDeleteForm" method="POST" action="<?= url('seat-rows/bulk-delete') ?>" class="hidden">
     <?= Csrf::field() ?>
     <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
     <input type="hidden" name="_method" value="DELETE">
 </form>
-
-<!-- Floating Bulk Action Bar -->
 <div id="bulkToolbar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white rounded-full shadow-2xl px-6 py-3 border border-slate-700 hidden items-center gap-5 z-50 transition-all">
     <div class="flex items-center gap-2 text-sm font-medium text-slate-300">
         <span id="selectedCount" class="bg-its-blue-light text-white px-2.5 py-0.5 rounded-full font-bold text-xs">0</span>

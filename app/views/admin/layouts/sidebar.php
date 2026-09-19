@@ -66,6 +66,5 @@
     </div>
 </aside>
 
-<!-- Buka Pembungkus Konten Utama -->
 <div class="flex-1 flex flex-col overflow-hidden">
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-8">

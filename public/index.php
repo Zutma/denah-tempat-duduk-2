@@ -1,14 +1,15 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+ini_set('log_errors', 1);
 error_reporting(E_ALL);
 
-// Aktifkan Kompresi Output Server (Gzip)
+// aktifin kompresi gzip
 if (!ob_start("ob_gzhandler")) {
     ob_start();
 }
 
-// 1. Deklarasikan Alamat Acuan Utama
+// set path acuan dan base url
 define('BASE_PATH', dirname(__DIR__));
 define('BASE_URL', '/denah/public');
 
@@ -16,26 +17,23 @@ function url(string $path = ''): string {
     return rtrim(BASE_URL, '/') . '/' . ltrim($path, '/');
 }
 
-// 2. Load Koneksi Database
+// konek database
 require_once BASE_PATH . '/app/config/database.php';
 
-// 3. Autoloader Otomatis untuk Controller, Model & Helper
+// autoload kelas controller model ama helper
 spl_autoload_register(function ($class) {
-    // Cek di folder controllers
     $controllerFile = BASE_PATH . '/app/controllers/' . $class . '.php';
     if (file_exists($controllerFile)) {
         require_once $controllerFile;
         return;
     }
 
-    // Cek di folder models
     $modelFile = BASE_PATH . '/app/models/' . $class . '.php';
     if (file_exists($modelFile)) {
         require_once $modelFile;
         return;
     }
 
-    // Cek di folder helpers
     $helperFile = BASE_PATH . '/app/helpers/' . $class . '.php';
     if (file_exists($helperFile)) {
         require_once $helperFile;
@@ -43,21 +41,17 @@ spl_autoload_register(function ($class) {
     }
 });
 
-// 4. Tangkap URI Browser & Bersihkan Subfolder /denah/
+// tangkap uri lalu bersihin prefix subfolder
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = trim($uri, '/');
 
-// Potong prefix 'denah' jika ada di URL
-$prefixes = ['denah-duduk/public', 'denah/public', 'denah'];
-foreach ($prefixes as $prefix) {
-    if (strpos($uri, $prefix) === 0) {
-        $uri = substr($uri, strlen($prefix));
-        $uri = trim($uri, '/');
-        break;
-    }
+$basePath = trim(BASE_URL, '/');
+if ($basePath !== '' && strpos($uri, $basePath) === 0) {
+    $uri = substr($uri, strlen($basePath));
+    $uri = trim($uri, '/');
 }
 
-// 5. Daftar Rute Aplikasi (Clean Routes)
+// daftar route clean
 $routes = [
     ''                              => [PublicController::class, 'denah'],
     'login'                         => [AuthController::class, 'login'],
@@ -97,12 +91,11 @@ $routes = [
     'graduates/delete'              => [GraduateController::class, 'delete'],
     'graduates/bulk-delete'         => [GraduateController::class, 'bulkDelete'],
 
-    'imports/create'                => [ImportController::class, 'form'],
     'imports/process'               => [ImportController::class, 'process'],
     'imports/template'              => [ImportController::class, 'downloadTemplate'],
 ];
 
-// 6. Eksekusi Router
+// eksekusi controller sesuai route
 if (array_key_exists($uri, $routes)) {
     [$controllerClass, $method] = $routes[$uri];
     $controller = new $controllerClass();

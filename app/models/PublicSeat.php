@@ -1,6 +1,7 @@
 <?php
 
 class PublicSeat {
+    // ambil sesi status published
     public static function getPublishedSessions($conn) {
         $stmt = $conn->prepare("
             SELECT gs.*, ge.name AS event_name
@@ -13,6 +14,7 @@ class PublicSeat {
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
+    // ambil detail 1 sesi published
     public static function getPublishedSessionById($conn, $id) {
         $stmt = $conn->prepare("
             SELECT gs.*, ge.name AS event_name
@@ -25,8 +27,8 @@ class PublicSeat {
         return $stmt->get_result()->fetch_assoc();
     }
 
+    // ambil susunan baris dan kursi per sayap
     public static function getSeatRowsWithSeats($conn, $sessionId, $side) {
-        // Ambil data kursi LENGKAP dengan JOIN ke faculties untuk mendapatkan faculty_color & faculty_code
         $stmt = $conn->prepare("
             SELECT 
                 sr.id AS row_id, sr.`row`, sr.side, sr.index, sr.capacity,
@@ -78,6 +80,7 @@ class PublicSeat {
         return array_values($rowsMap);
     }
 
+    // pencarian nama/nrp wisudawan di denah publik
     public static function searchGraduates($conn, $sessionId, $keyword) {
         $searchTerm = '%' . $keyword . '%';
         $stmt = $conn->prepare("
@@ -94,6 +97,7 @@ class PublicSeat {
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
+    // olah data denah lengkap buat ditampilkan di halaman publik
     public static function getProcessedSeatData($conn, $sessionId) {
         $leftRows = self::getSeatRowsWithSeats($conn, $sessionId, 'left');
         $rightRows = self::getSeatRowsWithSeats($conn, $sessionId, 'right');

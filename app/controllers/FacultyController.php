@@ -1,6 +1,7 @@
 <?php
 
 class FacultyController extends BaseController {
+    // daftar fakultas
     public function index($conn) {
         $faculties = Faculty::all($conn);
         $pageTitle = 'Daftar Fakultas';
@@ -11,9 +12,9 @@ class FacultyController extends BaseController {
         ]);
     }
 
+    // simpan / update fakultas
     public function form($conn) {
         $this->checkAuth();
-        $this->checkCsrf();
         $faculty = null;
         if (isset($_GET['id'])) {
             $faculty = Faculty::find($conn, $_GET['id']);
@@ -22,6 +23,7 @@ class FacultyController extends BaseController {
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->checkCsrf();
             $code = trim($_POST['code'] ?? '');
             $name = trim($_POST['name'] ?? '');
             $color = trim($_POST['color'] ?? '');
@@ -58,6 +60,7 @@ class FacultyController extends BaseController {
         ]);
     }
 
+    // hapus 1 fakultas
     public function delete($conn) {
         $this->checkAuth();
         $this->checkCsrf();
@@ -80,6 +83,7 @@ class FacultyController extends BaseController {
         $this->redirect('/faculties');
     }
 
+    // hapus masal fakultas
     public function bulkDelete($conn) {
         $this->checkAuth();
         $this->checkCsrf();
