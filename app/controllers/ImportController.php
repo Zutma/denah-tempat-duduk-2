@@ -104,8 +104,15 @@ class ImportController extends BaseController {
                     $seatId = null;
                     if ($baris && $nomor) {
                         $seatId = Graduate::findSeatByPosition($conn, $sessionId, $baris, $sisi, $nomor);
-                        if ($seatId && Graduate::seatIsTaken($conn, $seatId)) {
-                            $seatId = null; 
+                        if (!$seatId) {
+                            $sisiLabel = ($sisi === 'left') ? 'Kiri' : 'Kanan';
+                            $failed[] = "Baris $rowNum ($nama - $nrp): Kursi Baris $baris ($sisiLabel) No $nomor TIDAK DITEMUKAN di denah (kapasitas kurang).";
+                            continue;
+                        }
+                        if (Graduate::seatIsTaken($conn, $seatId)) {
+                            $sisiLabel = ($sisi === 'left') ? 'Kiri' : 'Kanan';
+                            $failed[] = "Baris $rowNum ($nama - $nrp): Kursi Baris $baris ($sisiLabel) No $nomor SUDAH DIPAKAI wisudawan lain.";
+                            continue;
                         }
                     }
 

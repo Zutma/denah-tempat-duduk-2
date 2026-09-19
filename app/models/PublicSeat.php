@@ -34,11 +34,13 @@ class PublicSeat {
                 sr.id AS row_id, sr.`row`, sr.side, sr.index, sr.capacity,
                 s.id AS seat_id, s.position, s.number, s.category,
                 g.id AS graduate_id, g.name AS graduate_name, g.nrp,
-                g.faculty_id, f.code AS faculty_code, f.color AS faculty_color
+                g.faculty_id, f.code AS faculty_code, f.color AS faculty_color,
+                sp.name AS prodi_name
             FROM seat_rows sr
             LEFT JOIN seats s ON s.seat_row_id = sr.id
             LEFT JOIN graduates g ON g.seat_id = s.id
             LEFT JOIN faculties f ON g.faculty_id = f.id
+            LEFT JOIN study_programs sp ON g.study_program_id = sp.id
             WHERE sr.graduation_session_id = ? AND sr.side = ?
             ORDER BY sr.`row`, s.position
         ");
@@ -70,6 +72,7 @@ class PublicSeat {
                     'is_taken'      => !empty($row['graduate_id']),
                     'graduate_name' => $row['graduate_name'] ?? null,
                     'nrp'           => $row['nrp'] ?? null,
+                    'prodi_name'    => $row['prodi_name'] ?? null,
                     'faculty_id'    => $row['faculty_id'] ? (int)$row['faculty_id'] : null,
                     'faculty_code'  => $row['faculty_code'] ?? null,
                     'faculty_color' => $row['faculty_color'] ?? '#cbd5e1'
