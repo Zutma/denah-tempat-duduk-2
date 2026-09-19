@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle ?? 'Admin Portal - Sistem Wisuda ITS') ?></title>
     <link rel="stylesheet" href="<?= url('css/tailwind-built.css') ?>">
+    <link rel="stylesheet" href="<?= url('css/public-style.css') ?>">
     <script>window.APP_BASE_URL = '<?= BASE_URL ?>';</script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js"></script>
     <style>[x-cloak] { display: none !important; }</style>

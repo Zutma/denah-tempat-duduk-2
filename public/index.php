@@ -11,7 +11,7 @@ if (!ob_start("ob_gzhandler")) {
 
 // set path acuan dan base url
 define('BASE_PATH', dirname(__DIR__));
-define('BASE_URL', '/denah');
+define('BASE_URL', '/denah/public');
 
 function url(string $path = ''): string {
     return rtrim(BASE_URL, '/') . '/' . ltrim($path, '/');
@@ -45,10 +45,13 @@ spl_autoload_register(function ($class) {
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = trim($uri, '/');
 
-$basePath = trim(BASE_URL, '/');
-if ($basePath !== '' && strpos($uri, $basePath) === 0) {
-    $uri = substr($uri, strlen($basePath));
-    $uri = trim($uri, '/');
+$prefixes = ['denah-duduk/public', 'denah/public', 'denah-duduk', 'denah'];
+foreach ($prefixes as $prefix) {
+    if (strpos($uri, $prefix) === 0) {
+        $uri = substr($uri, strlen($prefix));
+        $uri = trim($uri, '/');
+        break;
+    }
 }
 
 // daftar route clean

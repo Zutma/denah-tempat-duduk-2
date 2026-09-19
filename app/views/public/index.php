@@ -8,6 +8,7 @@
 
     <!-- Passing Data PHP ke JS Global SEBELUM Alpine & Script App di-load -->
     <script>
+        window.APP_BASE_URL = '<?= BASE_URL ?>';
         window.__seatMapData = {
             searchQuery: <?= json_encode($searchQuery ?? '') ?>,
             graduatesList: <?= json_encode($allGraduatesList ?? []) ?>
@@ -90,7 +91,9 @@
             <div class="flex items-center gap-2 w-full md:w-auto flex-1 max-w-none md:max-w-md relative z-[101]">
                 <div class="relative flex-1 min-w-0">
                     <div class="relative flex items-center">
-                        <span class="absolute left-2.5 text-slate-400 text-xs">🔍</span>
+                        <svg class="absolute left-2.5 w-3.5 h-3.5 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
                         <input type="text" 
                             x-model="searchQuery" 
                             <?= empty($activeSession) ? 'disabled' : '' ?>
@@ -291,14 +294,14 @@
             <div class="seno-text" id="seno-text"></div>
             <div id="seno-progress-wrap"><div id="seno-progress-bar"></div></div>
             <div class="seno-btn-row" id="seno-btns">
-                <button class="seno-btn seno-skip" id="seno-skip-btn">⏩ Skip</button>
+                <button class="seno-btn seno-skip" id="seno-skip-btn">Skip</button>
                 <button class="seno-btn" id="seno-next-btn">Lanjut →</button>
             </div>
         </div>
         <img id="seno-img" src="<?= url('images/SENO_POSE_1.png') ?>" alt="SENO" />
     </div>
 
-    <button id="seno-replay-btn" title="Panggil SENO lagi 🎓">
+    <button id="seno-replay-btn" title="Panggil SENO lagi">
         <img src="<?= url('images/SENO_POSE_4.png') ?>" alt="Panggil SENO" />
     </button>
     <?php endif; ?>
