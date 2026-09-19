@@ -1,14 +1,16 @@
-/* ===== JS MASKOT SENO TOUR (v2) ===== */
+// tur interaktif maskot seno di denah publik
 (function () {
     'use strict';
+    // lokasi file gambar ekspresi seno
     var POSES = {
-        wisuda:   '/images/SENO_POSE_1.png',
-        wave:     '/images/SENO_POSE_3.png',
-        shy:      '/images/SENO_POSE_2.png',
-        surprise: '/images/SENO_POSE_4.png',
-        normal:   '/images/SENO_POSE_1.png',
+        wisuda:   (window.APP_BASE_URL || '') + '/images/SENO_POSE_1.png',
+        wave:     (window.APP_BASE_URL || '') + '/images/SENO_POSE_3.png',
+        shy:      (window.APP_BASE_URL || '') + '/images/SENO_POSE_2.png',
+        surprise: (window.APP_BASE_URL || '') + '/images/SENO_POSE_4.png',
+        normal:   (window.APP_BASE_URL || '') + '/images/SENO_POSE_1.png',
     };
 
+    // daftar dialog tur
     var steps = [
         {
             pose: 'wave',
@@ -65,6 +67,7 @@
     var elProgBar   = function() { return $id('seno-progress-bar'); };
     var elReplay    = function() { return $id('seno-replay-btn'); };
 
+    // ganti ekspresi pose
     function setPose(pose) {
         var img = elImg();
         if (img) img.src = POSES[pose] || POSES.wisuda;
@@ -77,6 +80,7 @@
         if (twTimer) { clearInterval(twTimer); twTimer = null; }
     }
 
+    // efek ketik teks dialog
     function typewrite(text, onDone) {
         clearTwTimer();
         var el = elText();
@@ -104,6 +108,7 @@
         b.style.display = 'block';
     }
 
+    // bar durasi dialog
     function startProgressBar(dur) {
         var wrap = elProgWrap();
         var bar  = elProgBar();
@@ -131,6 +136,7 @@
         }
     }
 
+    // tampilkan dialog urutan ke-idx
     function showStep(idx) {
         var step = steps[idx];
         if (!step) return;
@@ -166,6 +172,7 @@
         }
     }
 
+    // lanjut ke dialog berikutnya
     function advanceStep() {
         if (twTimer) {
             clearTwTimer();
@@ -189,6 +196,7 @@
         showStep(cur);
     }
 
+    // sembunyikan maskot (exit animation)
     function exitSeno() {
         clearAutoTimer();
         clearTwTimer();
@@ -208,6 +216,7 @@
         }, 600);
     }
 
+    // jalankan tur dari awal
     function startTour(manual) {
         autoMode = !manual;
         cur = 0;
@@ -239,6 +248,7 @@
         replay: function() { startTour(true); },
     };
 
+    // bind event listener pas dom siap
     document.addEventListener('DOMContentLoaded', function() {
         var nb = elNextBtn();
         var sb = elSkipBtn();

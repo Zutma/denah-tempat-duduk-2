@@ -1,6 +1,7 @@
 <?php
 
 class PublicSeat {
+    // ambil sesi status published
     public static function getPublishedSessions($conn) {
         $stmt = $conn->prepare("
             SELECT gs.*, ge.name AS event_name
@@ -13,6 +14,7 @@ class PublicSeat {
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
+    // ambil detail 1 sesi published
     public static function getPublishedSessionById($conn, $id) {
         $stmt = $conn->prepare("
             SELECT gs.*, ge.name AS event_name
@@ -25,18 +27,20 @@ class PublicSeat {
         return $stmt->get_result()->fetch_assoc();
     }
 
+    // ambil susunan baris dan kursi per sayap
     public static function getSeatRowsWithSeats($conn, $sessionId, $side) {
-        // Ambil data kursi LENGKAP dengan JOIN ke faculties untuk mendapatkan faculty_color & faculty_code
         $stmt = $conn->prepare("
             SELECT 
                 sr.id AS row_id, sr.`row`, sr.side, sr.index, sr.capacity,
                 s.id AS seat_id, s.position, s.number, s.category,
                 g.id AS graduate_id, g.name AS graduate_name, g.nrp,
-                g.faculty_id, f.code AS faculty_code, f.color AS faculty_color
+                g.faculty_id, f.code AS faculty_code, f.color AS faculty_color,
+                sp.name AS prodi_name
             FROM seat_rows sr
             LEFT JOIN seats s ON s.seat_row_id = sr.id
             LEFT JOIN graduates g ON g.seat_id = s.id
             LEFT JOIN faculties f ON g.faculty_id = f.id
+            LEFT JOIN study_programs sp ON g.study_program_id = sp.id
             WHERE sr.graduation_session_id = ? AND sr.side = ?
             ORDER BY sr.`row`, s.position
         ");
@@ -68,6 +72,7 @@ class PublicSeat {
                     'is_taken'      => !empty($row['graduate_id']),
                     'graduate_name' => $row['graduate_name'] ?? null,
                     'nrp'           => $row['nrp'] ?? null,
+                    'prodi_name'    => $row['prodi_name'] ?? null,
                     'faculty_id'    => $row['faculty_id'] ? (int)$row['faculty_id'] : null,
                     'faculty_code'  => $row['faculty_code'] ?? null,
                     'faculty_color' => $row['faculty_color'] ?? '#cbd5e1'
@@ -78,6 +83,7 @@ class PublicSeat {
         return array_values($rowsMap);
     }
 
+    // pencarian nama/nrp wisudawan di denah publik
     public static function searchGraduates($conn, $sessionId, $keyword) {
         $searchTerm = '%' . $keyword . '%';
         $stmt = $conn->prepare("
@@ -94,6 +100,7 @@ class PublicSeat {
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
+    // olah data denah lengkap buat ditampilkan di halaman publik
     public static function getProcessedSeatData($conn, $sessionId) {
         $leftRows = self::getSeatRowsWithSeats($conn, $sessionId, 'left');
         $rightRows = self::getSeatRowsWithSeats($conn, $sessionId, 'right');

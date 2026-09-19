@@ -2,6 +2,7 @@
 
 class PublicController extends BaseController {
     public function denah($conn) {
+        // ambil sesi wisuda rilis
         $publishedSessions = PublicSeat::getPublishedSessions($conn);
         $activeSession = null;
         $searchQuery = trim($_GET['search'] ?? '');
@@ -22,7 +23,7 @@ class PublicController extends BaseController {
                 $activeSession = PublicSeat::getPublishedSessionById($conn, $sessionId);
 
                 if ($activeSession) {
-                    // Panggil hasil olahan data dari Model secara bersih
+                    // sedot data denah dari model
                     $seatData = PublicSeat::getProcessedSeatData($conn, $activeSession['id']);
                     
                     $leftRows         = $seatData['leftRows'];
@@ -31,6 +32,7 @@ class PublicController extends BaseController {
                     $allGraduatesList = $seatData['allGraduatesList'];
 
                     if ($searchQuery !== '') {
+                        // filter pencarian wisudawan
                         $searchResults = PublicSeat::searchGraduates($conn, $activeSession['id'], $searchQuery);
                     }
                 } else {
@@ -43,6 +45,7 @@ class PublicController extends BaseController {
             }
         }
 
+        // render ke halaman denah publik
         $this->renderPublic('index', [
             'publishedSessions' => $publishedSessions,
             'activeSession'     => $activeSession,
@@ -56,4 +59,4 @@ class PublicController extends BaseController {
             'pageTitle'         => 'Denah Kursi Wisuda'
         ]);
     }
-}
+}

@@ -1,9 +1,7 @@
-
-<!-- Breadcrumb -->
 <nav class="flex items-center gap-2 text-sm font-medium text-slate-400 mb-1">
-    <a href="/graduation-events" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
+    <a href="<?= url('graduation-events') ?>" class="hover:text-its-blue transition-colors">Periode Wisuda</a>
     <span class="text-slate-300">/</span>
-    <a href="/graduation-sessions?event_id=<?= $session['graduation_event_id'] ?? '' ?>" class="hover:text-its-blue transition-colors">
+    <a href="<?= url('graduation-sessions?event_id=' . ($session['graduation_event_id'] ?? '')) ?>" class="hover:text-its-blue transition-colors">
         <?= htmlspecialchars($session['event_name'] ?? 'Detail Event') ?>
     </a>
     <span class="text-slate-300">/</span>
@@ -15,24 +13,23 @@
         Data Wisudawan — Sesi <?= !empty($session['date']) ? date('d F Y', strtotime($session['date'])) : '' ?>
     </h1>
 
-    <a href="/graduates/create?session_id=<?= $sessionId ?>"
+    <a href="<?= url('graduates/create?session_id=' . $sessionId) ?>"
         class="inline-flex items-center gap-2 px-5 py-2.5 bg-its-blue-light text-white rounded-xl text-sm font-bold hover:bg-its-blue transition-all shadow-xs cursor-pointer whitespace-nowrap">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
         Tambah Wisudawan
     </a>
 </div>
 
-<!-- Import Card Form (Tombol Upload & Import Hijau) -->
 <div class="bg-white rounded-2xl shadow-2xs border border-slate-200/80 p-5 mb-6">
     <div class="flex items-center justify-between gap-3 mb-3">
         <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
             Import Data Wisudawan
             <span class="px-2.5 py-0.5 text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 rounded-md">CSV Format</span>
         </h3>
-        <a href="/imports/template" class="text-xs font-bold text-its-blue hover:underline">Download Template CSV</a>
+        <a href="<?= url('imports/template') ?>" class="text-xs font-bold text-its-blue hover:underline">Download Template CSV</a>
     </div>
 
-    <form method="POST" action="/imports/process" enctype="multipart/form-data" class="flex items-center gap-4">
+    <form method="POST" action="<?= url('imports/process') ?>" enctype="multipart/form-data" class="flex items-center gap-4">
         <?= Csrf::field() ?>
         <input type="hidden" name="session_id" value="<?= $sessionId ?>">
         <input type="file" name="file" accept=".csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 border border-slate-200 rounded-xl cursor-pointer bg-slate-50" required>
@@ -42,12 +39,11 @@
     </form>
 </div>
 
-<!-- Rekapitulasi Hasil Impor (Logika Terbaru) -->
 <?php if (isset($_SESSION['import_success'])): ?>
     <div class="mb-6 p-5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-3">
         <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
             <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Hasil Rekapitulasi Impor CSV
+            Hasil Impor CSV
         </h3>
 
         <div class="flex flex-wrap gap-2 text-xs font-semibold">
@@ -79,14 +75,11 @@
     ?>
 <?php endif; ?>
 
-<!-- Form Tersembunyi untuk Bulk Delete -->
-<form id="bulkDeleteForm" method="POST" action="/graduates/bulk-delete" class="hidden">
+<form id="bulkDeleteForm" method="POST" action="<?= url('graduates/bulk-delete') ?>" class="hidden">
     <?= Csrf::field() ?>
     <input type="hidden" name="session_id" value="<?= $sessionId ?>">
     <input type="hidden" name="page" value="<?= $page ?? 1 ?>">
 </form>
-
-<!-- Floating Bulk Action Bar (Gaya Melayang Versi Lama) -->
 <div id="bulkToolbar" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-md text-white rounded-full shadow-2xl px-5 py-3 border border-slate-700 hidden items-center gap-4 z-50 transition-all transform duration-200">
     <div class="flex items-center gap-2 text-xs font-medium text-slate-300">
         <span id="selectedCount" class="bg-its-blue-light text-white px-2 py-0.5 rounded-full font-bold text-xs">0</span>
@@ -105,7 +98,9 @@
 <div class="bg-white rounded-2xl shadow-2xs border border-slate-200/80 overflow-hidden">
     <div class="p-5 bg-white border-b border-slate-100 flex items-center justify-between gap-4">
         <div class="relative flex-1 max-w-md">
-            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">🔍</span>
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">
+                <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </span>
             <input type="text" id="searchInput" placeholder="Cari NRP, Nama, Fakultas, Prodi..."
                 class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all outline-none">
         </div>
@@ -160,15 +155,15 @@
                             </td>
                             <td class="px-6 py-4 text-center font-bold text-slate-800"><?= htmlspecialchars($g['number'] ?? '-') ?></td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <form method="POST" action="/graduates/delete" class="inline" onsubmit="return confirm('Yakin hapus data wisudawan ini?')">
-                                    <?= Csrf::field() ?>
-                                    <input type="hidden" name="id" value="<?= $g['id'] ?>">
-                                    <input type="hidden" name="session_id" value="<?= $sessionId ?>">
-                                    <input type="hidden" name="page" value="<?= $page ?? 1 ?>">
-                                    <button type="submit" class="px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
-                                        Hapus
-                                    </button>
-                                </form>
+                                <form method="POST" action="<?= url('graduates/delete') ?>" class="inline" onsubmit="return confirm('Yakin hapus data wisudawan ini?')">
+                                     <?= Csrf::field() ?>
+                                     <input type="hidden" name="id" value="<?= $g['id'] ?>">
+                                     <input type="hidden" name="session_id" value="<?= $sessionId ?>">
+                                     <input type="hidden" name="page" value="<?= $page ?? 1 ?>">
+                                     <button type="submit" class="px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
+                                         Hapus
+                                     </button>
+                                 </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -177,7 +172,6 @@
         </table>
     </div>
 
-    <!-- Pagination Stabil (Logika Terbaru) -->
     <?php if (($totalPages ?? 1) > 1): ?>
         <div class="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-white">
             <p class="text-xs font-medium text-slate-500">
@@ -185,14 +179,14 @@
             </p>
             <div class="flex items-center gap-1.5">
                 <?php if ($page > 1): ?>
-                    <a href="/graduates?session_id=<?= $sessionId ?>&page=<?= $page - 1 ?>"
+                    <a href="<?= url('graduates?session_id=' . $sessionId . '&page=' . ($page - 1)) ?>"
                         class="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
                         ← Sebelumnya
                     </a>
                 <?php endif; ?>
 
                 <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <a href="/graduates?session_id=<?= $sessionId ?>&page=<?= $i ?>"
+                    <a href="<?= url('graduates?session_id=' . $sessionId . '&page=' . $i) ?>"
                         class="w-8 h-8 inline-flex items-center justify-center text-xs font-bold rounded-lg transition-colors border
                             <?= $i == $page
                                 ? 'bg-its-blue-light text-white border-its-blue-light'
@@ -202,7 +196,7 @@
                 <?php endfor; ?>
 
                 <?php if ($page < $totalPages): ?>
-                    <a href="/graduates?session_id=<?= $sessionId ?>&page=<?= $page + 1 ?>"
+                    <a href="<?= url('graduates?session_id=' . $sessionId . '&page=' . ($page + 1)) ?>"
                         class="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
                         Selanjutnya →
                     </a>
@@ -212,7 +206,7 @@
     <?php endif; ?>
 </div>
 
-<script src="/js/admin/table-utils.js"></script>
+<script src="<?= url('js/admin/table-utils.js') ?>"></script>
 <script>
     initBulkTable();
     function submitBulkDelete() {

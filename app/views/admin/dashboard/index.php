@@ -1,11 +1,8 @@
-
-<!-- Page Header & Meta Ringkas -->
 <div class="flex items-center justify-between gap-4 mb-8">
     <div>
         <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Dashboard Overview</h1>
         <p class="text-sm text-slate-500 mt-1">Ringkasan status sesi wisuda dan alokasi tempat duduk.</p>
     </div>
-    <!-- Meta Info Sekunder: Data Master -->
     <div class="flex items-center gap-4 px-4 py-2.5 bg-white rounded-xl border border-slate-200/80 shadow-2xs">
         <div class="text-sm text-slate-600 font-medium">
             <span class="font-bold text-slate-800 text-base"><?= $totalFaculties ?></span> Fakultas
@@ -17,9 +14,7 @@
     </div>
 </div>
 
-<!-- STAT METRICS GRID: STATUS SESI -->
 <div class="grid grid-cols-3 gap-6 mb-8">
-    <!-- Card 1: Draft Sesi -->
     <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs flex items-center justify-between">
         <div>
             <p class="text-xs font-bold uppercase tracking-wider text-amber-600">Sesi Draft</p>
@@ -31,7 +26,6 @@
         </div>
     </div>
 
-    <!-- Card 2: Published / Aktif -->
     <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs flex items-center justify-between">
         <div>
             <p class="text-xs font-bold uppercase tracking-wider text-emerald-600">Sesi Aktif (Published)</p>
@@ -45,7 +39,6 @@
         </div>
     </div>
 
-    <!-- Card 3: Archived -->
     <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs flex items-center justify-between">
         <div>
             <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Sesi Diarsipkan</p>
@@ -58,14 +51,13 @@
     </div>
 </div>
 
-<!-- SECTION DUA KOLOM: DAFTAR PERIODE & QUICK ACTIONS -->
 <div class="grid grid-cols-3 gap-6">
-    <!-- Tabel Periode Wisuda -->
     <div class="col-span-2 bg-white rounded-2xl shadow-2xs border border-slate-200/80 overflow-hidden">
         <div class="p-5 bg-white border-b border-slate-100 flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700">Daftar Periode Wisuda</h2>
-            <a href="/graduation-events" class="text-xs font-bold text-its-blue hover:underline">Lihat Semua →</a>
+            <a href="<?= url('graduation-events') ?>" class="text-xs font-bold text-its-blue hover:underline">Lihat Semua →</a>
         </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left text-slate-800 border-collapse">
                 <thead class="bg-slate-50 text-slate-500 uppercase font-bold text-xs tracking-wider border-b border-slate-200/80">
@@ -94,7 +86,7 @@
                                     <?= number_format($e['graduate_count'] ?? 0) ?> Orang
                                 </td>
                                 <td class="px-6 py-4 text-right whitespace-nowrap">
-                                    <a href="/graduation-sessions?event_id=<?= $e['id'] ?>" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-its-blue bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
+                                    <a href="<?= url('graduation-sessions?event_id=' . $e['id']) ?>" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-its-blue bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15">
                                         Kelola Sesi
                                     </a>
                                 </td>
@@ -106,12 +98,11 @@
         </div>
     </div>
 
-    <!-- Quick Actions -->
     <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-2xs flex flex-col justify-between">
         <div>
             <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-4">Akses Cepat</h2>
             <div class="space-y-3">
-                <a href="/graduation-events/create" class="flex items-center justify-between p-4 rounded-xl bg-slate-50 hover:bg-its-blue/5 border border-slate-200/80 group transition-all">
+                <a href="<?= url('graduation-events/create') ?>" class="flex items-center justify-between p-4 rounded-xl bg-slate-50 hover:bg-its-blue/5 border border-slate-200/80 group transition-all">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-lg bg-its-blue-light/10 text-its-blue-light flex items-center justify-center font-bold text-base">
                             +
@@ -124,7 +115,7 @@
                     <span class="text-slate-400 group-hover:text-its-blue text-sm font-bold transition-colors">→</span>
                 </a>
 
-                <a href="/" target="_blank" class="flex items-center justify-between p-4 rounded-xl bg-its-blue text-white group transition-all hover:bg-its-blue-light">
+                <a href="<?= url('') ?>" target="_blank" class="flex items-center justify-between p-4 rounded-xl bg-its-blue text-white group transition-all hover:bg-its-blue-light">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center text-base">
                             🌐
@@ -137,10 +128,6 @@
                     <span class="text-white text-sm font-bold">→</span>
                 </a>
             </div>
-        </div>
-
-        <div class="pt-4 border-t border-slate-100 text-center">
-            <p class="text-xs text-slate-400 font-medium">Sistem Denah Tempat Duduk Wisuda ITS</p>
         </div>
     </div>
 </div>

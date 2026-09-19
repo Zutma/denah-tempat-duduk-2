@@ -2,14 +2,14 @@
 
 class AuthController extends BaseController {
 
+    // proses login admin
     public function login($conn) {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
         if (isset($_SESSION['user_id'])) {
-            header('Location: /dashboard');
-            exit;
+            $this->redirect('/dashboard');
         }
 
         $errors = [];
@@ -26,8 +26,7 @@ class AuthController extends BaseController {
                 if (password_verify($password, $user['password'])) {
                     $authenticated = true;
                 } elseif ($password === $user['password']) {
-                    // Fallback jika password di DB diisi manual berupa plaintext.
-                    // Otomatis re-hash ke Bcrypt demi keamanan.
+                    // rehash jika password db masih plaintext
                     $authenticated = true;
                     $newHash = password_hash($password, PASSWORD_DEFAULT);
                     $updateStmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
@@ -41,9 +40,8 @@ class AuthController extends BaseController {
             } else {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
-                
-                header('Location: /dashboard');
-                exit;
+
+                $this->redirect('/dashboard');
             }
         }
 
@@ -51,6 +49,7 @@ class AuthController extends BaseController {
         require_once BASE_PATH . '/app/views/admin/auth/login.php';
     }
 
+    // hapus session logout
     public function logout() {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -63,7 +62,6 @@ class AuthController extends BaseController {
         session_unset();
         session_destroy();
 
-        header('Location: /login');
-        exit;
+        $this->redirect('/login');
     }
 }

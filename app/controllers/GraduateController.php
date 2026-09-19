@@ -1,6 +1,7 @@
 <?php
 
 class GraduateController extends BaseController {
+    // tampilkan daftar wisudawan per sesi
     public function index($conn) {
         $this->checkAuth();
         $sessionId = $_GET['session_id'] ?? null;
@@ -30,12 +31,12 @@ class GraduateController extends BaseController {
         ]);
     }
 
+    // form tambah wisudawan
     public function form($conn) {
         $this->checkAuth();
-        $this->checkCsrf();
 
         $sessionId = $_GET['session_id'] ?? $_POST['session_id'] ?? null;
-        
+
         if (!$sessionId) {
             $this->redirect('/graduation-events');
         }
@@ -47,6 +48,7 @@ class GraduateController extends BaseController {
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $this->checkCsrf();
             $nrp = trim($_POST['nrp'] ?? '');
             $name = trim($_POST['name'] ?? '');
             $facultyId = $_POST['faculty_id'] ?? '';
@@ -74,7 +76,7 @@ class GraduateController extends BaseController {
         }
 
         $pageTitle = 'Tambah Wisudawan';
-        
+
         $this->renderAdmin('graduates/form', [
             'sessionId'     => $sessionId,
             'session'       => $session,
@@ -86,6 +88,7 @@ class GraduateController extends BaseController {
         ]);
     }
 
+    // hapus wisudawan
     public function delete($conn) {
         $this->checkAuth();
         $this->checkCsrf();
@@ -110,6 +113,7 @@ class GraduateController extends BaseController {
         $this->redirect('/graduation-events');
     }
 
+    // hapus masal wisudawan
     public function bulkDelete($conn) {
         $this->checkAuth();
         $this->checkCsrf();

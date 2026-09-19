@@ -1,8 +1,8 @@
 <?php
 
 class DashboardController extends BaseController {
+    // tampilkan statistik dashboard admin
     public function index($conn) {
-        // Ambil data statistik murni via Model (Thin Controller)
         $totalFaculties         = Faculty::count($conn);
         $totalProdi             = StudyProgram::count($conn);
         $draftSessionsCount     = GraduationSession::countByStatus($conn, 'draft');

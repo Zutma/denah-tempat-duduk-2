@@ -1,9 +1,7 @@
 <?php
 
 class BaseController {
-    /**
-     * Pengecekan Session Login Admin
-     */
+    // cek session login user
     protected function checkAuth(): void {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -14,6 +12,7 @@ class BaseController {
         }
     }
 
+    // validasi token csrf form post
     protected function checkCsrf(): void {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!Csrf::validate()) {
@@ -23,31 +22,26 @@ class BaseController {
         }
     }
 
-    /**
-     * Render Tampilan Admin (Otomatis Proteksi Auth + Include Layout)
-     */
+    // render halaman admin bawaan layout
     public function renderAdmin(string $view, array $data = []): void {
         $this->checkAuth();
-        
         extract($data);
-        
+
         $viewPath = BASE_PATH . "/app/views/admin/{$view}.php";
         if (!file_exists($viewPath)) {
             $viewPath = BASE_PATH . "/app/views/admin/{$view}/index.php";
         }
-        
+
         require_once BASE_PATH . '/app/views/admin/layouts/header.php';
         require_once BASE_PATH . '/app/views/admin/layouts/sidebar.php';
         require_once $viewPath;
         require_once BASE_PATH . '/app/views/admin/layouts/footer.php';
     }
 
-    /**
-     * Render Tampilan Publik (Bebas Tanpa Auth & Layout Admin)
-     */
+    // render tampilan publik tanpa auth
     public function renderPublic(string $view, array $data = []): void {
         extract($data);
-        
+
         $viewPath = BASE_PATH . "/app/views/public/{$view}.php";
         if (!file_exists($viewPath)) {
             $viewPath = BASE_PATH . "/app/views/public/{$view}/index.php";
@@ -56,10 +50,12 @@ class BaseController {
         require_once $viewPath;
     }
 
-    /**
-     * Helper Redirect
-     */
+    // helper buat redirect halaman
     protected function redirect(string $url): void {
+        if (strpos($url, '/') === 0) {
+            $url = url($url);
+        }
+
         header("Location: {$url}");
         exit;
     }
