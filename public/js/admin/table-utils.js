@@ -1,4 +1,3 @@
-// helper umum buat tabel admin (checkbox & search)
 function initBulkTable() {
     document.addEventListener("DOMContentLoaded", function() {
         const selectAll = document.getElementById('selectAll');
@@ -7,17 +6,15 @@ function initBulkTable() {
         const selectedCount = document.getElementById('selectedCount');
         const searchInput = document.getElementById('searchInput');
 
-        // pencarian baris tabel
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 const query = this.value.toLowerCase().trim();
-                document.querySelectorAll('tbody tr').forEach(row => {
-                    row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+                document.querySelectorAll('tbody tr, .event-card').forEach(item => {
+                    item.style.display = item.textContent.toLowerCase().includes(query) ? '' : 'none';
                 });
             });
         }
 
-        // update tampilan toolbar aksi masal
         window.updateToolbarState = function() {
             const checkedCount = document.querySelectorAll('.rowCheckbox:checked').length;
             bulkToolbar.classList.toggle('hidden', checkedCount === 0);
@@ -41,7 +38,6 @@ function initBulkTable() {
     });
 }
 
-// utilitas submit form hapus masal
 function submitBulkDeleteForm(formId, confirmMessage) {
     const checked = document.querySelectorAll('.rowCheckbox:checked');
     if (checked.length === 0) return;
@@ -57,4 +53,4 @@ function submitBulkDeleteForm(formId, confirmMessage) {
         });
         form.submit();
     }
-}
+}

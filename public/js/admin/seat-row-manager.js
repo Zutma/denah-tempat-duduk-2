@@ -5,14 +5,53 @@ function seatRowManager(config = {}) {
         allLetters: config.allLetters || [],
         usedLetters: config.usedLetters || [],
         rows: [],
+        isEditMode: false,
+        editRowLabel: '',
+        editLeftId: 0,
+        editLeftCap: 0,
+        editLeftOld: 0,
+        editRightId: 0,
+        editRightCap: 0,
+        editRightOld: 0,
         init() {
-            if (this.showBulkForm && this.rows.length === 0) this.addRow();
+            if (this.showBulkForm && !this.isEditMode && this.rows.length === 0) this.addRow();
         },
         toggleBulkForm() {
+            if (this.isEditMode) {
+                this.cancelEditMode();
+                return;
+            }
             this.showBulkForm = !this.showBulkForm;
             if (this.showBulkForm && this.rows.length === 0) this.addRow();
         },
         cancelBulkForm() {
+            this.showBulkForm = false;
+            this.rows = [];
+            this.isEditMode = false;
+        },
+        startEditMode(label, leftId, leftCap, rightId, rightCap) {
+            this.isEditMode = true;
+            this.showBulkForm = true;
+            this.editRowLabel = label;
+            this.editLeftId = leftId;
+            this.editLeftCap = leftCap;
+            this.editLeftOld = leftCap;
+            this.editRightId = rightId;
+            this.editRightCap = rightCap;
+            this.editRightOld = rightCap;
+            this.$nextTick(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        },
+        cancelEditMode() {
+            this.isEditMode = false;
+            this.editRowLabel = '';
+            this.editLeftId = 0;
+            this.editLeftCap = 0;
+            this.editLeftOld = 0;
+            this.editRightId = 0;
+            this.editRightCap = 0;
+            this.editRightOld = 0;
             this.showBulkForm = false;
             this.rows = [];
         },

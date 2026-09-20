@@ -96,16 +96,28 @@
 </div>
 
 <div class="bg-white rounded-2xl shadow-2xs border border-slate-200/80 overflow-hidden">
-    <div class="p-5 bg-white border-b border-slate-100 flex items-center justify-between gap-4">
-        <div class="relative flex-1 max-w-md">
-            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">
-                <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            </span>
-            <input type="text" id="searchInput" placeholder="Cari NRP, Nama, Fakultas, Prodi..."
-                class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all outline-none">
-        </div>
+    <div class="p-5 bg-white border-b border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+        <form method="GET" class="relative flex-1 w-full max-w-md flex items-center gap-2">
+            <input type="hidden" name="session_id" value="<?= htmlspecialchars($sessionId) ?>">
+            <input type="hidden" name="per_page" value="<?= htmlspecialchars($perPage ?? 20) ?>">
+            <div class="relative flex-1">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </span>
+                <input type="text" name="q" value="<?= htmlspecialchars($searchQuery ?? '') ?>" placeholder="Cari NRP, Nama, Fakultas, Prodi, Kursi, Baris..."
+                    class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all outline-none">
+            </div>
+            <button type="submit" class="px-4 py-2.5 bg-its-blue-light text-white text-xs font-bold rounded-xl hover:bg-its-blue transition-all cursor-pointer">
+                Cari
+            </button>
+            <?php if (!empty($searchQuery)): ?>
+                <a href="<?= url('graduates?session_id=' . $sessionId) ?>" class="px-3 py-2.5 text-slate-500 hover:text-slate-700 text-xs font-bold transition-all">
+                    Reset
+                </a>
+            <?php endif; ?>
+        </form>
         <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-bold bg-its-blue/5 text-its-blue border border-its-blue/15">
-            Total: <?= count($graduates ?? []) ?> Wisudawan
+            Total: <?= $total ?? count($graduates ?? []) ?> Wisudawan
         </span>
     </div>
 
@@ -113,54 +125,53 @@
         <table class="w-full text-sm text-left text-slate-800 border-collapse">
             <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 uppercase font-bold text-xs tracking-wider">
                 <tr>
-                    <th class="px-5 py-4 text-center w-12"><input type="checkbox" id="selectAll" class="w-4 h-4 text-its-blue-light border-slate-300 rounded cursor-pointer"></th>
-                    <th class="px-6 py-4 text-left">NRP</th>
-                    <th class="px-6 py-4 text-left">Nama</th>
-                    <th class="px-6 py-4 text-left">Fakultas</th>
-                    <th class="px-6 py-4 text-center">Jenjang</th>
-                    <th class="px-6 py-4 text-left">Prodi</th>
-                    <th class="px-6 py-4 text-center">Baris</th>
-                    <th class="px-6 py-4 text-center">Sisi</th>
-                    <th class="px-6 py-4 text-center">Kursi</th>
-                    <th class="px-6 py-4 text-right">Aksi</th>
+                    <th class="px-4 py-3.5 text-center w-10"><input type="checkbox" id="selectAll" class="w-4 h-4 text-its-blue-light border-slate-300 rounded cursor-pointer"></th>
+                    <th class="px-4 py-3.5 text-left">NRP</th>
+                    <th class="px-4 py-3.5 text-left">NAMA</th>
+                    <th class="px-4 py-3.5 text-left">FAKULTAS</th>
+                    <th class="px-4 py-3.5 text-left">PRODI</th>
+                    <th class="px-4 py-3.5 text-center">KURSI</th>
+                    <th class="px-4 py-3.5 text-left">POSISI</th>
+                    <th class="px-4 py-3.5 text-right">AKSI</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 bg-white">
                 <?php if (empty($graduates)): ?>
                     <tr>
-                        <td colspan="10" class="px-6 py-12 text-center text-sm text-slate-400 italic">Belum ada data wisudawan untuk sesi ini.</td>
+                        <td colspan="8" class="px-6 py-12 text-center text-sm text-slate-400 italic">
+                            <?= !empty($searchQuery) ? 'Tidak ditemukan wisudawan dengan kata kunci "' . htmlspecialchars($searchQuery) . '"' : 'Belum ada data wisudawan untuk sesi ini.' ?>
+                        </td>
                     </tr>
                 <?php else: ?>
                     <?php foreach ($graduates as $g): ?>
                         <tr class="hover:bg-slate-50/80 transition-colors">
-                            <td class="px-5 py-4 text-center"><input type="checkbox" class="rowCheckbox w-4 h-4 text-its-blue-light border-slate-300 rounded cursor-pointer" value="<?= $g['id'] ?>"></td>
-                            <td class="px-6 py-4 font-mono font-bold text-slate-800"><?= htmlspecialchars($g['nrp']) ?></td>
-                            <td class="px-6 py-4 font-bold text-slate-800"><?= htmlspecialchars($g['name']) ?></td>
-                            <td class="px-6 py-4 font-semibold text-slate-700"><?= htmlspecialchars($g['faculty_name'] ?? '-') ?></td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="inline-block px-2.5 py-0.5 text-xs font-bold font-mono rounded bg-slate-100 text-slate-700 border border-slate-200">
-                                    <?= htmlspecialchars($g['degree_level'] ?? '-') ?>
-                                </span>
+                            <td class="px-4 py-3.5 text-center"><input type="checkbox" class="rowCheckbox w-4 h-4 text-its-blue-light border-slate-300 rounded cursor-pointer" value="<?= $g['id'] ?>"></td>
+                            <td class="px-4 py-3.5 font-mono font-bold text-slate-800"><?= htmlspecialchars($g['nrp']) ?></td>
+                            <td class="px-4 py-3.5 font-bold text-slate-800"><?= htmlspecialchars($g['name']) ?></td>
+                            <td class="px-4 py-3.5 font-bold text-slate-700"><?= htmlspecialchars($g['faculty_code'] ?? ($g['faculty_name'] ?? '-')) ?></td>
+                            <td class="px-4 py-3.5 font-bold text-slate-700">
+                                <?= htmlspecialchars(($g['degree_level'] ? $g['degree_level'] . ' ' : '') . ($g['prodi_name'] ?? '-')) ?>
                             </td>
-                            <td class="px-6 py-4 font-semibold text-slate-700"><?= htmlspecialchars($g['prodi_name'] ?? '-') ?></td>
-                            <td class="px-6 py-4 text-center font-bold text-slate-800"><?= htmlspecialchars($g['row'] ?? '-') ?></td>
-                            <td class="px-6 py-4 text-center">
-                                <?php if (!empty($g['side'])): ?>
-                                    <span class="inline-block px-2.5 py-0.5 text-xs font-bold rounded <?= $g['side'] == 'left' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'bg-purple-50 text-purple-700 border border-purple-200' ?>">
-                                        <?= $g['side'] == 'left' ? 'Kiri' : 'Kanan' ?>
-                                    </span>
+                            <td class="px-4 py-3.5 text-center font-bold text-slate-800">
+                                <?= ($g['row'] && isset($g['global']) && $g['global'] !== null) ? htmlspecialchars($g['row'] . sprintf('%03d', $g['global'])) : '-' ?>
+                            </td>
+                            <td class="px-4 py-3.5 font-bold text-slate-800">
+                                <?php if (!empty($g['row'])): ?>
+                                    Baris <?= htmlspecialchars($g['row']) ?> - <?= $g['side'] == 'left' ? 'Kiri' : 'Kanan' ?> (#<?= htmlspecialchars($g['local'] ?? '-') ?>)
                                 <?php else: ?>
                                     <span class="text-slate-400">-</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="px-6 py-4 text-center font-bold text-slate-800"><?= htmlspecialchars($g['number'] ?? '-') ?></td>
-                            <td class="px-6 py-4 text-right whitespace-nowrap">
+                            <td class="px-4 py-3.5 text-right whitespace-nowrap">
+                                <a href="<?= url('graduates/create?session_id=' . $sessionId . '&id=' . $g['id']) ?>" class="px-3 py-1.5 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 rounded-lg transition-colors border border-its-blue/15 inline-block mr-1">
+                                    Edit
+                                </a>
                                 <form method="POST" action="<?= url('graduates/delete') ?>" class="inline" onsubmit="return confirm('Yakin hapus data wisudawan ini?')">
                                      <?= Csrf::field() ?>
                                      <input type="hidden" name="id" value="<?= $g['id'] ?>">
                                      <input type="hidden" name="session_id" value="<?= $sessionId ?>">
                                      <input type="hidden" name="page" value="<?= $page ?? 1 ?>">
-                                     <button type="submit" class="px-3.5 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
+                                     <button type="submit" class="px-3 py-1.5 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200/80 cursor-pointer">
                                          Hapus
                                      </button>
                                  </form>
@@ -172,38 +183,73 @@
         </table>
     </div>
 
-    <?php if (($totalPages ?? 1) > 1): ?>
-        <div class="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-white">
+    <div class="px-6 py-4 border-t border-slate-100 bg-white flex flex-col md:flex-row items-center justify-between gap-4">
+        <?php
+            $totalEntries = $total ?? count($graduates ?? []);
+            $currentPerPage = $perPage ?? 20;
+            $startEntry = $totalEntries > 0 ? ($page - 1) * $currentPerPage + 1 : 0;
+            $endEntry = min($page * $currentPerPage, $totalEntries);
+            $qParam = !empty($searchQuery) ? '&q=' . urlencode($searchQuery) : '';
+        ?>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 text-xs font-semibold text-slate-600">
+                <span>Tampilkan</span>
+                <select onchange="window.location.href='<?= url('graduates?session_id=' . $sessionId . '&page=1&per_page=') ?>' + this.value + '<?= $qParam ?>'" class="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none cursor-pointer focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50">
+                    <?php foreach ([10, 25, 50, 100] as $option): ?>
+                        <option value="<?= $option ?>" <?= $currentPerPage == $option ? 'selected' : '' ?>><?= $option ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <span>data per halaman</span>
+            </div>
+            <span class="hidden md:inline text-slate-300">•</span>
             <p class="text-xs font-medium text-slate-500">
-                Halaman <span class="font-bold text-slate-700"><?= $page ?></span> dari <span class="font-bold text-slate-700"><?= $totalPages ?></span>
+                Showing <span class="font-bold text-slate-800"><?= $startEntry ?></span> to <span class="font-bold text-slate-800"><?= $endEntry ?></span> of <span class="font-bold text-slate-800"><?= $totalEntries ?></span> entries
             </p>
+        </div>
+
+        <?php if (($totalPages ?? 1) > 1): ?>
             <div class="flex items-center gap-1.5">
                 <?php if ($page > 1): ?>
-                    <a href="<?= url('graduates?session_id=' . $sessionId . '&page=' . ($page - 1)) ?>"
+                    <a href="<?= url('graduates?session_id=' . $sessionId . '&page=' . ($page - 1) . '&per_page=' . $currentPerPage . $qParam) ?>"
                         class="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
                         ← Sebelumnya
                     </a>
                 <?php endif; ?>
 
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <a href="<?= url('graduates?session_id=' . $sessionId . '&page=' . $i) ?>"
-                        class="w-8 h-8 inline-flex items-center justify-center text-xs font-bold rounded-lg transition-colors border
-                            <?= $i == $page
-                                ? 'bg-its-blue-light text-white border-its-blue-light'
-                                : 'text-slate-600 bg-white hover:bg-slate-100 border-slate-200' ?>">
-                        <?= $i ?>
-                    </a>
-                <?php endfor; ?>
+                <?php
+                    $range = 2; // jumlah halaman di kiri-kanan halaman aktif
+                    $pagesToShow = [];
+                    for ($i = 1; $i <= $totalPages; $i++) {
+                        if ($i == 1 || $i == $totalPages || ($i >= $page - $range && $i <= $page + $range)) {
+                            $pagesToShow[] = $i;
+                        }
+                    }
+
+                    $lastP = 0;
+                    foreach ($pagesToShow as $p):
+                        if ($lastP > 0 && $p - $lastP > 1):
+                ?>
+                            <span class="px-2 py-1 text-xs text-slate-400 font-bold">...</span>
+                        <?php endif; ?>
+                        <a href="<?= url('graduates?session_id=' . $sessionId . '&page=' . $p . '&per_page=' . $currentPerPage . $qParam) ?>"
+                            class="w-8 h-8 inline-flex items-center justify-center text-xs font-bold rounded-lg transition-colors border
+                                <?= $p == $page
+                                    ? 'bg-its-blue-light text-white border-its-blue-light'
+                                    : 'text-slate-600 bg-white hover:bg-slate-100 border-slate-200' ?>">
+                            <?= $p ?>
+                        </a>
+                        <?php $lastP = $p; ?>
+                    <?php endforeach; ?>
 
                 <?php if ($page < $totalPages): ?>
-                    <a href="<?= url('graduates?session_id=' . $sessionId . '&page=' . ($page + 1)) ?>"
+                    <a href="<?= url('graduates?session_id=' . $sessionId . '&page=' . ($page + 1) . '&per_page=' . $currentPerPage . $qParam) ?>"
                         class="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200">
                         Selanjutnya →
                     </a>
                 <?php endif; ?>
             </div>
-        </div>
-    <?php endif; ?>
+        <?php endif; ?>
+    </div>
 </div>
 
 <script src="<?= url('js/admin/table-utils.js') ?>"></script>

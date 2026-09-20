@@ -9,7 +9,6 @@ if (!ob_start("ob_gzhandler")) {
     ob_start();
 }
 
-// set path acuan dan base url
 define('BASE_PATH', dirname(__DIR__));
 define('BASE_URL', '/denah/public');
 
@@ -86,6 +85,9 @@ $routes = [
     'graduation-sessions/bulk-delete' => [GraduationSessionController::class, 'bulkDelete'],
 
     'seat-rows'                     => [SeatRowController::class, 'index'],
+    'seat-rows/update'              => [SeatRowController::class, 'updateCapacity'],
+    'seat-rows/extend'              => [SeatRowController::class, 'extend'],
+    'seat-rows/shrink'              => [SeatRowController::class, 'shrink'],
     'seat-rows/delete'              => [SeatRowController::class, 'delete'],
     'seat-rows/bulk-delete'         => [SeatRowController::class, 'bulkDelete'],
 

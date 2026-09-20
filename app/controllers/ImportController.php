@@ -37,6 +37,7 @@ class ImportController extends BaseController {
             $headerMap = [];
             $rowNum = 0;
             $headerFound = false;
+            $rowsData = [];
 
             $conn->begin_transaction();
             try {
@@ -53,9 +54,11 @@ class ImportController extends BaseController {
                                 if (strpos($colName, 'fakultas') !== false) $headerMap['fakultas'] = $idx;
                                 elseif (strpos($colName, 'prodi') !== false || strpos($colName, 'program studi') !== false) $headerMap['prodi'] = $idx;
                                 elseif (strpos($colName, 'jenjang') !== false) $headerMap['jenjang'] = $idx;
+                                elseif (strpos($colName, 'kursi_global') !== false || strpos($colName, 'global') !== false) $headerMap['kursi_global'] = $idx;
                                 elseif (strpos($colName, 'kursi') !== false) $headerMap['kursi'] = $idx;
                                 elseif (strpos($colName, 'sisi') !== false) $headerMap['sisi'] = $idx;
-                                elseif (strpos($colName, 'nomor') !== false || strpos($colName, 'urut') !== false || strpos($colName, 'no') !== false) $headerMap['nomor'] = $idx;
+                                elseif (strpos($colName, 'nomor') !== false && !isset($headerMap['nomor'])) $headerMap['nomor'] = $idx;
+                                elseif (strpos($colName, 'urut') !== false || strpos($colName, 'no') !== false) $headerMap['urut'] = $idx;
                                 elseif (strpos($colName, 'nrp') !== false) $headerMap['nrp'] = $idx;
                                 elseif (strpos($colName, 'nama') !== false) $headerMap['nama'] = $idx;
                             }
@@ -81,7 +84,18 @@ class ImportController extends BaseController {
                     $baris = isset($headerMap['kursi']) ? strtoupper($cleanData[$headerMap['kursi']]) : '';
                     $sisiRaw = isset($headerMap['sisi']) ? strtolower($cleanData[$headerMap['sisi']]) : '';
                     $sisi = ($sisiRaw === 'kiri' || $sisiRaw === 'left') ? 'left' : 'right';
-                    $nomor = isset($headerMap['nomor']) ? (int)$cleanData[$headerMap['nomor']] : 0;
+                    
+                    // urut = posisi lokal (reset per baris+sisi)
+                    // nomor = nomor global
+                    $urutIdx = $headerMap['urut'] ?? ($headerMap['nomor'] ?? null);
+                    $urut = ($urutIdx !== null && isset($cleanData[$urutIdx])) ? (int)$cleanData[$urutIdx] : 0;
+
+                    $kursiGlobal = null;
+                    if (isset($headerMap['kursi_global']) && isset($cleanData[$headerMap['kursi_global']]) && $cleanData[$headerMap['kursi_global']] !== '') {
+                        $kursiGlobal = (int)$cleanData[$headerMap['kursi_global']];
+                    } elseif (isset($headerMap['nomor']) && isset($headerMap['urut']) && isset($cleanData[$headerMap['nomor']]) && $cleanData[$headerMap['nomor']] !== '') {
+                        $kursiGlobal = (int)$cleanData[$headerMap['nomor']];
+                    }
 
                     $jenjang = 'S1';
                     $prodiNama = $prodiRaw;
@@ -101,19 +115,83 @@ class ImportController extends BaseController {
                     $studyProgramRes = Graduate::findOrCreateStudyProgram($conn, $facultyId, $prodiNama, $jenjang);
                     $studyProgramId = $studyProgramRes['id'];
 
+                    $rowsData[] = [
+                        'rowNum' => $rowNum,
+                        'nrp' => $nrp,
+                        'nama' => $nama,
+                        'facultyId' => $facultyId,
+                        'studyProgramId' => $studyProgramId,
+                        'baris' => $baris,
+                        'sisi' => $sisi,
+                        'urut' => $urut,
+                        'kursiGlobal' => $kursiGlobal
+                    ];
+                }
+
+                // Scan seluruh kombinasi unik (baris, sisi) dan nilai URUT maksimum dari CSV
+                $maxUrutMap = []; // key: "BARIS_SISI" => max urut (posisi lokal)
+                foreach ($rowsData as $rItem) {
+                    if (!empty($rItem['baris']) && !empty($rItem['urut'])) {
+                        $key = $rItem['baris'] . '_' . $rItem['sisi'];
+                        if (!isset($maxUrutMap[$key]) || $rItem['urut'] > $maxUrutMap[$key]) {
+                            $maxUrutMap[$key] = $rItem['urut'];
+                        }
+                    }
+                }
+
+                // Cek atau buat seat_row untuk setiap kombinasi
+                foreach ($maxUrutMap as $key => $maxUrut) {
+                    [$rLabel, $rSide] = explode('_', $key);
+                    $sideLabel = ($rSide === 'left') ? 'Kiri' : 'Kanan';
+
+                    if (!SeatRow::exists($conn, $sessionId, $rLabel, $rSide)) {
+                        SeatRow::createWithSeats($conn, $sessionId, $rLabel, $rSide, $maxUrut);
+                    } else {
+                        // Ambil kapasitas existing
+                        $stmtCheckCap = $conn->prepare("SELECT capacity FROM seat_rows WHERE graduation_session_id = ? AND `row` = ? AND `side` = ?");
+                        $stmtCheckCap->bind_param("iss", $sessionId, $rLabel, $rSide);
+                        $stmtCheckCap->execute();
+                        $existingCapRow = $stmtCheckCap->get_result()->fetch_assoc();
+                        $existingCapacity = $existingCapRow ? (int)$existingCapRow['capacity'] : 0;
+
+                        if ($existingCapacity < $maxUrut) {
+                            $failedCount = 0;
+                            foreach ($rowsData as $rItem) {
+                                if ($rItem['baris'] === $rLabel && $rItem['sisi'] === $rSide && $rItem['urut'] > $existingCapacity) {
+                                    $failedCount++;
+                                }
+                            }
+                            $warnings[] = "Baris {$rLabel} sisi {$sideLabel}: file butuh kapasitas {$maxUrut} tapi baris ini cuma punya kapasitas existing {$existingCapacity}. {$failedCount} wisudawan gagal di-assign kursi.";
+                        }
+                    }
+                }
+
+                // Insert data wisudawan
+                foreach ($rowsData as $rItem) {
+                    $rowNum = $rItem['rowNum'];
+                    $nrp = $rItem['nrp'];
+                    $nama = $rItem['nama'];
+                    $facultyId = $rItem['facultyId'];
+                    $studyProgramId = $rItem['studyProgramId'];
+                    $baris = $rItem['baris'];
+                    $sisi = $rItem['sisi'];
+                    $urut = $rItem['urut'];
+                    $kursiGlobal = $rItem['kursiGlobal'];
+
                     $seatId = null;
-                    if ($baris && $nomor) {
-                        $seatId = Graduate::findSeatByPosition($conn, $sessionId, $baris, $sisi, $nomor);
+                    if ($baris && $urut) {
+                        $seatId = Graduate::findSeatByPosition($conn, $sessionId, $baris, $sisi, $urut);
                         if (!$seatId) {
+                            // Jika kursi tidak ditemukan (melebihi kapasitas existing), $seatId tetap null
+                        } elseif (Graduate::seatIsTaken($conn, $seatId)) {
                             $sisiLabel = ($sisi === 'left') ? 'Kiri' : 'Kanan';
-                            $failed[] = "Baris $rowNum ($nama - $nrp): Kursi Baris $baris ($sisiLabel) No $nomor TIDAK DITEMUKAN di denah (kapasitas kurang).";
+                            $failed[] = "Baris $rowNum ($nama - $nrp): Kursi Baris $baris ($sisiLabel) No $urut SUDAH DIPAKAI wisudawan lain.";
                             continue;
                         }
-                        if (Graduate::seatIsTaken($conn, $seatId)) {
-                            $sisiLabel = ($sisi === 'left') ? 'Kiri' : 'Kanan';
-                            $failed[] = "Baris $rowNum ($nama - $nrp): Kursi Baris $baris ($sisiLabel) No $nomor SUDAH DIPAKAI wisudawan lain.";
-                            continue;
-                        }
+                    }
+
+                    if ($seatId !== null && $kursiGlobal !== null) {
+                        Graduate::setSeatGlobalNumber($conn, $seatId, $kursiGlobal);
                     }
 
                     Graduate::create($conn, $sessionId, $facultyId, $studyProgramId, $nrp, $nama, $seatId);
@@ -149,7 +227,7 @@ class ImportController extends BaseController {
         echo "\xEF\xBB\xBF";
         $output = fopen('php://output', 'w');
         fwrite($output, "sep=;\n");
-        fputcsv($output, ['FAKULTAS', 'PROGRAM STUDI', 'KURSI', 'SISI', 'NOMOR', 'NRP', 'NAMA'], ';');
+        fputcsv($output, ['FAKULTAS', 'PROGRAM STUDI', 'KURSI', 'SISI', 'NOMOR', 'URUT', 'NRP', 'NAMA'], ';');
         fclose($output);
         exit;
     }
