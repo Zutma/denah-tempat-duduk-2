@@ -11,31 +11,38 @@ class GraduateController extends BaseController {
 
         $session = GraduationSession::find($conn, $sessionId);
 
-        $perPage = 20;
+        $searchQuery = trim($_GET['q'] ?? $_GET['search'] ?? '');
+        $perPage = isset($_GET['per_page']) && in_array((int)$_GET['per_page'], [10, 25, 50, 100]) ? (int)$_GET['per_page'] : 20;
         $page = max(1, (int) ($_GET['page'] ?? 1));
         $offset = ($page - 1) * $perPage;
 
-        $graduates = Graduate::getBySession($conn, $sessionId, $perPage, $offset);
-        $total = Graduate::countBySession($conn, $sessionId);
+        $graduates = Graduate::getBySession($conn, $sessionId, $perPage, $offset, $searchQuery);
+        $total = Graduate::countBySession($conn, $sessionId, $searchQuery);
         $totalPages = (int) ceil($total / $perPage);
 
         $pageTitle = 'Data Wisudawan — ' . ($session['date'] ?? '');
 
         $this->renderAdmin('graduates/index', [
-            'sessionId' => $sessionId,
-            'session' => $session,
-            'graduates' => $graduates,
-            'page' => $page,
-            'totalPages' => $totalPages,
-            'pageTitle' => $pageTitle
+            'sessionId'   => $sessionId,
+            'session'     => $session,
+            'graduates'   => $graduates,
+            'total'       => $total,
+            'perPage'     => $perPage,
+            'page'        => $page,
+            'totalPages'  => $totalPages,
+            'searchQuery' => $searchQuery,
+            'pageTitle'   => $pageTitle
         ]);
     }
 
-    // form tambah wisudawan
+    // form tambah / edit wisudawan
     public function form($conn) {
         $this->checkAuth();
 
-        $sessionId = $_GET['session_id'] ?? $_POST['session_id'] ?? null;
+        $id = $_GET['id'] ?? $_POST['id'] ?? null;
+        $graduate = $id ? Graduate::find($conn, $id) : null;
+
+        $sessionId = $_GET['session_id'] ?? $_POST['session_id'] ?? ($graduate['graduation_session_id'] ?? null);
 
         if (!$sessionId) {
             $this->redirect('/graduation-events');
@@ -44,7 +51,7 @@ class GraduateController extends BaseController {
         $session = GraduationSession::find($conn, $sessionId);
         $faculties = Faculty::all($conn);
         $studyPrograms = StudyProgram::all($conn);
-        $seats = Graduate::getAvailableSeats($conn, $sessionId);
+        $seats = Graduate::getAvailableSeats($conn, $sessionId, $graduate['seat_id'] ?? null);
         $errors = [];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -60,14 +67,19 @@ class GraduateController extends BaseController {
             if ($facultyId === '') $errors[] = "Fakultas wajib dipilih.";
             if ($studyProgramId === '') $errors[] = "Prodi wajib dipilih.";
 
-            if (!empty($nrp) && Graduate::nrpExists($conn, $nrp)) {
+            if (!empty($nrp) && Graduate::nrpExists($conn, $nrp, $id)) {
                 $errors[] = "NRP '$nrp' sudah terdaftar di sistem! Gunakan NRP lain.";
             }
 
             if (empty($errors)) {
                 try {
-                    Graduate::create($conn, $sessionId, $facultyId, $studyProgramId, $nrp, $name, $seatId);
-                    $_SESSION['success'] = "Wisudawan ($name - $nrp) berhasil ditambahkan.";
+                    if ($id && $graduate) {
+                        Graduate::update($conn, $id, $facultyId, $studyProgramId, $nrp, $name, $seatId);
+                        $_SESSION['success'] = "Data wisudawan ($name - $nrp) berhasil diperbarui.";
+                    } else {
+                        Graduate::create($conn, $sessionId, $facultyId, $studyProgramId, $nrp, $name, $seatId);
+                        $_SESSION['success'] = "Wisudawan ($name - $nrp) berhasil ditambahkan.";
+                    }
                     $this->redirect("/graduates?session_id=" . $sessionId);
                 } catch (\mysqli_sql_exception $e) {
                     $errors[] = "Gagal menyimpan data. Silakan coba lagi.";
@@ -75,7 +87,7 @@ class GraduateController extends BaseController {
             }
         }
 
-        $pageTitle = 'Tambah Wisudawan';
+        $pageTitle = ($id && $graduate) ? 'Edit Wisudawan' : 'Tambah Wisudawan';
 
         $this->renderAdmin('graduates/form', [
             'sessionId'     => $sessionId,
@@ -83,6 +95,7 @@ class GraduateController extends BaseController {
             'faculties'     => $faculties,
             'studyPrograms' => $studyPrograms,
             'seats'         => $seats,
+            'graduate'      => $graduate,
             'errors'        => $errors,
             'pageTitle'     => $pageTitle
         ]);

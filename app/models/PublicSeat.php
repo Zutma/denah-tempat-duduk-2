@@ -31,8 +31,8 @@ class PublicSeat {
     public static function getSeatRowsWithSeats($conn, $sessionId, $side) {
         $stmt = $conn->prepare("
             SELECT 
-                sr.id AS row_id, sr.`row`, sr.side, sr.index, sr.capacity,
-                s.id AS seat_id, s.position, s.number, s.category,
+                sr.id AS row_id, sr.`row`, sr.side, sr.capacity,
+                s.id AS seat_id, s.local, s.global, s.category,
                 g.id AS graduate_id, g.name AS graduate_name, g.nrp,
                 g.faculty_id, f.code AS faculty_code, f.color AS faculty_color,
                 sp.name AS prodi_name
@@ -42,7 +42,7 @@ class PublicSeat {
             LEFT JOIN faculties f ON g.faculty_id = f.id
             LEFT JOIN study_programs sp ON g.study_program_id = sp.id
             WHERE sr.graduation_session_id = ? AND sr.side = ?
-            ORDER BY sr.`row`, s.position
+            ORDER BY sr.`row`, s.local
         ");
         $stmt->bind_param("is", $sessionId, $side);
         $stmt->execute();
@@ -56,7 +56,6 @@ class PublicSeat {
                     'id'       => $rowId,
                     'row'      => $row['row'],
                     'side'     => $row['side'],
-                    'index'    => $row['index'],
                     'capacity' => $row['capacity'],
                     'seats'    => []
                 ];
@@ -66,8 +65,8 @@ class PublicSeat {
                 $rowsMap[$rowId]['seats'][] = [
                     'id'            => (int)$row['seat_id'],
                     'seat_row_id'   => (int)$rowId,
-                    'position'      => (int)$row['position'],
-                    'number'        => (int)$row['number'],
+                    'local'         => (int)$row['local'],
+                    'global'        => $row['global'] !== null ? (int)$row['global'] : null,
                     'category'      => $row['category'],
                     'is_taken'      => !empty($row['graduate_id']),
                     'graduate_name' => $row['graduate_name'] ?? null,
@@ -87,7 +86,7 @@ class PublicSeat {
     public static function searchGraduates($conn, $sessionId, $keyword) {
         $searchTerm = '%' . $keyword . '%';
         $stmt = $conn->prepare("
-            SELECT g.name, g.nrp, sp.name AS prodi_name, s.id AS seat_id, sr.`row`, sr.`side`, s.number
+            SELECT g.name, g.nrp, sp.name AS prodi_name, s.id AS seat_id, sr.`row`, sr.`side`, s.global
             FROM graduates g
             JOIN study_programs sp ON g.study_program_id = sp.id
             LEFT JOIN seats s ON g.seat_id = s.id
@@ -125,7 +124,6 @@ class PublicSeat {
 
         $seatMapInfo = [];
         $allGraduatesList = [];
-        $globalCounter = 1;
         $rowLabels = [];
 
         foreach ($leftRows as $lr) { $rowLabels[$lr['row']] = true; }
@@ -140,19 +138,19 @@ class PublicSeat {
         foreach (array_keys($rowLabels) as $label) {
             if (!empty($leftByRow[$label]['seats'])) {
                 foreach ($leftByRow[$label]['seats'] as $s) {
-                    $num = $globalCounter++;
+                    $gNum = $s['global'];
                     $seatMapInfo[$s['id']] = [
-                        'code' => $label . sprintf('%03d', $num),
-                        'num'  => $num
+                        'code' => ($gNum !== null) ? $label . sprintf('%03d', $gNum) : '-',
+                        'num'  => $gNum
                     ];
                 }
             }
             if (!empty($rightByRow[$label]['seats'])) {
                 foreach ($rightByRow[$label]['seats'] as $s) {
-                    $num = $globalCounter++;
+                    $gNum = $s['global'];
                     $seatMapInfo[$s['id']] = [
-                        'code' => $label . sprintf('%03d', $num),
-                        'num'  => $num
+                        'code' => ($gNum !== null) ? $label . sprintf('%03d', $gNum) : '-',
+                        'num'  => $gNum
                     ];
                 }
             }

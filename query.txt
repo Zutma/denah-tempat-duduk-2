@@ -4,18 +4,17 @@ USE db_denah_duduk;
 CREATE TABLE users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE graduation_events (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE graduation_sessions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -26,7 +25,7 @@ CREATE TABLE graduation_sessions (
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_sessions_event FOREIGN KEY (graduation_event_id) REFERENCES graduation_events(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE faculties (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -35,7 +34,7 @@ CREATE TABLE faculties (
     color VARCHAR(255) NULL,
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE study_programs (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -45,30 +44,29 @@ CREATE TABLE study_programs (
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_study_programs_faculty FOREIGN KEY (faculty_id) REFERENCES faculties(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE seat_rows (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     graduation_session_id BIGINT NOT NULL,
     `row` CHAR(1) NOT NULL,
     side ENUM('left', 'right') NOT NULL,
-    `index` TINYINT NOT NULL,
     capacity TINYINT NOT NULL,
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_seat_rows_session FOREIGN KEY (graduation_session_id) REFERENCES graduation_sessions(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE seats (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     seat_row_id BIGINT NOT NULL,
-    position TINYINT NOT NULL,
-    number TINYINT NOT NULL,
+    local TINYINT NOT NULL,
+    global SMALLINT NULL,
     category VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_seats_row FOREIGN KEY (seat_row_id) REFERENCES seat_rows(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 CREATE TABLE graduates (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -84,10 +82,10 @@ CREATE TABLE graduates (
     CONSTRAINT fk_graduates_faculty FOREIGN KEY (faculty_id) REFERENCES faculties(id) ON DELETE CASCADE,
     CONSTRAINT fk_graduates_study_program FOREIGN KEY (study_program_id) REFERENCES study_programs(id) ON DELETE CASCADE,
     CONSTRAINT fk_graduates_seat FOREIGN KEY (seat_id) REFERENCES seats(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
-INSERT INTO users (id, name, email, password) VALUES
-(1, 'username', 'username', '$2y$10$qp.BDfZHsumUmTGtQzuJNOfHQ1kyLQXPJlhx0kVloSCOdBumGW1mO');
+INSERT INTO users (id, name, password) VALUES
+(1, 'username', '$2y$10$qp.BDfZHsumUmTGtQzuJNOfHQ1kyLQXPJlhx0kVloSCOdBumGW1mO');
 
 INSERT INTO faculties (id, code, name, color) VALUES
 (1, 'FSAD', 'Fakultas Sains dan Analitika Data', '#0F8140'),

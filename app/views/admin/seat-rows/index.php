@@ -43,11 +43,13 @@
     }
 ?>
 
-<div x-data='seatRowManager({
+<div x-data='{
+    ...seatRowManager({
         hasErrors: <?= !empty($errors) ? "true" : "false" ?>,
         allLetters: <?= htmlspecialchars(json_encode(array_values($allLetters ?? [])), ENT_QUOTES, "UTF-8") ?>,
         usedLetters: <?= htmlspecialchars(json_encode(array_values($usedLetters ?? [])), ENT_QUOTES, "UTF-8") ?>
-     })' class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+    })
+}' class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
     <div class="p-5 border-b border-slate-100 bg-white flex items-center justify-between gap-4">
         <div class="relative flex-1 max-w-md">
             <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">
@@ -72,73 +74,131 @@
         </div>
     </div>
 
-    <div x-show="showBulkForm" x-cloak class="m-5 p-5 bg-slate-50/80 rounded-2xl border border-slate-200/80">
-        <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-200/60">
-            <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Form Input Baris Baru</h4>
-            <span class="text-xs text-slate-500">Isi data baris lalu klik simpan</span>
-        </div>
+    <!-- INLINE FORM SECTION: Mode Tambah + Mode Edit -->
+    <div x-show="showBulkForm" x-cloak id="seatRowFormSection" class="m-5 p-5 bg-slate-50/80 rounded-2xl border border-slate-200/80">
 
-        <form method="POST" action="<?= url('seat-rows?session_id=' . $session['id']) ?>">
-            <?= Csrf::field() ?>
-            <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
-
-            <div class="overflow-x-auto mb-4 border border-slate-200 rounded-xl bg-white shadow-2xs">
-                <table class="w-full text-sm text-left border-collapse">
-                    <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 uppercase font-bold text-xs tracking-wider">
-                        <tr>
-                            <th class="px-5 py-3.5 w-56">BARIS</th>
-                            <th class="px-5 py-3.5">KAPASITAS KIRI</th>
-                            <th class="px-5 py-3.5">KAPASITAS KANAN</th>
-                            <th class="px-5 py-3.5 text-center w-24">AKSI</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <template x-for="(item, index) in rows" :key="index">
-                            <tr class="hover:bg-slate-50/50 transition-colors">
-                                <td class="p-3">
-                                    <select :name="`rows[${index}][row]`" x-model="item.row" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light outline-none cursor-pointer" required>
-                                        <option value="" disabled>Pilih Baris</option>
-                                        <?php foreach ($allLetters as $letter): ?>
-                                            <option value="<?= $letter ?>" :disabled="usedLetters.includes('<?= $letter ?>')">
-                                                Baris <?= $letter ?> <?= in_array($letter, $usedLetters ?? []) ? '(Sudah Ada)' : '' ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </td>
-                                <td class="p-3">
-                                    <input type="number" :name="`rows[${index}][left_capacity]`" x-model.number="item.left_capacity" placeholder="20" min="0" max="100" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light outline-none" required>
-                                </td>
-                                <td class="p-3">
-                                    <input type="number" :name="`rows[${index}][right_capacity]`" x-model.number="item.right_capacity" placeholder="20" min="0" max="100" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light outline-none" required>
-                                </td>
-                                <td class="p-3 text-center">
-                                    <button type="button" @click="removeRow(index)" class="w-9 h-9 inline-flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer" title="Hapus">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    </button>
-                                </td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="flex items-center justify-between gap-3 pt-2">
-                <button type="button" @click="addRow()" class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 border border-its-blue/15 rounded-xl transition-all cursor-pointer">
-                    + Tambah Form Baris Lagi
-                </button>
-
-                <div class="flex items-center gap-2">
-                    <button type="button" @click="cancelBulkForm()" class="px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer">
-                        Batal
-                    </button>
-                    <button type="submit" :disabled="rows.length === 0" class="inline-flex items-center gap-2 px-5 py-2.5 bg-its-blue-light hover:bg-its-blue disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer">
-                        Simpan Semua
-                    </button>
+        <!-- ===== MODE TAMBAH (default) ===== -->
+        <template x-if="!isEditMode">
+            <div>
+                <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-200/60">
+                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Form Input Baris Baru</h4>
+                    <span class="text-xs text-slate-500">Isi data baris lalu klik simpan</span>
                 </div>
+
+                <form method="POST" action="<?= url('seat-rows?session_id=' . $session['id']) ?>">
+                    <?= Csrf::field() ?>
+                    <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
+
+                    <div class="overflow-x-auto mb-4 border border-slate-200 rounded-xl bg-white shadow-2xs">
+                        <table class="w-full text-sm text-left border-collapse">
+                            <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 uppercase font-bold text-xs tracking-wider">
+                                <tr>
+                                    <th class="px-5 py-3.5 w-56">BARIS</th>
+                                    <th class="px-5 py-3.5">KAPASITAS KIRI</th>
+                                    <th class="px-5 py-3.5">KAPASITAS KANAN</th>
+                                    <th class="px-5 py-3.5 text-center w-24">AKSI</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <template x-for="(item, index) in rows" :key="index">
+                                    <tr class="hover:bg-slate-50/50 transition-colors">
+                                        <td class="p-3">
+                                            <select :name="`rows[${index}][row]`" x-model="item.row" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light outline-none cursor-pointer" required>
+                                                <option value="" disabled>Pilih Baris</option>
+                                                <?php foreach ($allLetters as $letter): ?>
+                                                    <option value="<?= $letter ?>" :disabled="usedLetters.includes('<?= $letter ?>')">
+                                                        Baris <?= $letter ?> <?= in_array($letter, $usedLetters ?? []) ? '(Sudah Ada)' : '' ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </td>
+                                        <td class="p-3">
+                                            <input type="number" :name="`rows[${index}][left_capacity]`" x-model.number="item.left_capacity" placeholder="20" min="0" max="100" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light outline-none" required>
+                                        </td>
+                                        <td class="p-3">
+                                            <input type="number" :name="`rows[${index}][right_capacity]`" x-model.number="item.right_capacity" placeholder="20" min="0" max="100" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light outline-none" required>
+                                        </td>
+                                        <td class="p-3 text-center">
+                                            <button type="button" @click="removeRow(index)" class="w-9 h-9 inline-flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer" title="Hapus">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-3 pt-2">
+                        <button type="button" @click="addRow()" class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 border border-its-blue/15 rounded-xl transition-all cursor-pointer">
+                            + Tambah Form Baris Lagi
+                        </button>
+
+                        <div class="flex items-center gap-2">
+                            <button type="button" @click="cancelBulkForm()" class="px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer">
+                                Batal
+                            </button>
+                            <button type="submit" :disabled="rows.length === 0" class="inline-flex items-center gap-2 px-5 py-2.5 bg-its-blue-light hover:bg-its-blue disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs transition-all cursor-pointer">
+                                Simpan Semua
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
-        </form>
+        </template>
+
+        <!-- ===== MODE EDIT (saat tombol Edit di tabel diklik) ===== -->
+        <template x-if="isEditMode">
+            <div>
+                <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-200/60">
+                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                        Edit Kapasitas Baris <span x-text="editRowLabel" class="text-its-blue font-extrabold"></span>
+                    </h4>
+                    <button type="button" @click="cancelEditMode()" class="text-xs text-slate-500 hover:text-slate-700 font-semibold cursor-pointer">&times; Batal</button>
+                </div>
+
+                <form method="POST" action="<?= url('seat-rows/update') ?>" class="space-y-4">
+                    <?= Csrf::field() ?>
+                    <input type="hidden" name="session_id" value="<?= $session['id'] ?>">
+                    <input type="hidden" name="row" :value="editRowLabel">
+                    <input type="hidden" name="left_id" :value="editLeftId">
+                    <input type="hidden" name="left_old_capacity" :value="editLeftOld">
+                    <input type="hidden" name="right_id" :value="editRightId">
+                    <input type="hidden" name="right_old_capacity" :value="editRightOld">
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Baris</label>
+                            <input type="text" :value="'Baris ' + editRowLabel" disabled class="w-full px-3.5 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm font-semibold text-slate-500 cursor-not-allowed">
+                        </div>
+                        <template x-if="editLeftId > 0">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Kapasitas Sisi Kiri (Kursi)</label>
+                                <input type="number" name="left_capacity" x-model.number="editLeftCap" min="0" max="200" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light" required>
+                            </div>
+                        </template>
+                        <template x-if="editRightId > 0">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Kapasitas Sisi Kanan (Kursi)</label>
+                                <input type="number" name="right_capacity" x-model.number="editRightCap" min="0" max="200" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light" required>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 mt-2">
+                        <button type="button" @click="cancelEditMode()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-its-blue-light hover:bg-its-blue rounded-xl shadow-xs transition-colors cursor-pointer">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </template>
     </div>
 
+    <!-- TABEL DATA BARIS KURSI -->
     <div class="overflow-x-auto">
         <table class="w-full text-sm text-left text-slate-800 border-collapse">
             <thead class="bg-slate-50 border-b border-slate-200/80 text-slate-500 uppercase font-bold text-xs tracking-wider">
@@ -163,6 +223,10 @@
                         <?php
                             $deleteIds = array_filter([$rData['left']['id'] ?? null, $rData['right']['id'] ?? null]);
                             $deleteParam = implode(',', $deleteIds);
+                            $leftCap = $rData['left']['capacity'] ?? 0;
+                            $leftId = $rData['left']['id'] ?? 0;
+                            $rightCap = $rData['right']['capacity'] ?? 0;
+                            $rightId = $rData['right']['id'] ?? 0;
                         ?>
                         <tr class="hover:bg-slate-50/80 transition-colors seat-row-item">
                             <td class="px-5 py-4 text-center"><input type="checkbox" class="rowCheckbox w-4 h-4 text-its-blue-light border-slate-300 rounded cursor-pointer" value="<?= $deleteParam ?>"></td>
@@ -186,6 +250,11 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <button type="button"
+                                    @click="startEditMode('<?= htmlspecialchars($rLabel) ?>', <?= $leftId ?>, <?= $leftCap ?>, <?= $rightId ?>, <?= $rightCap ?>)"
+                                    class="inline-flex items-center gap-1 px-3.5 py-2 text-xs font-bold text-its-blue-light bg-its-blue/5 hover:bg-its-blue/10 border border-its-blue/15 rounded-lg transition-colors cursor-pointer mr-1">
+                                    Edit
+                                </button>
                                 <form method="POST" action="<?= url('seat-rows/delete') ?>" class="inline" onsubmit="return confirm('Yakin menghapus Baris <?= htmlspecialchars($rLabel) ?>?')">
                                      <?= Csrf::field() ?>
                                      <input type="hidden" name="id" value="<?= $deleteParam ?>">

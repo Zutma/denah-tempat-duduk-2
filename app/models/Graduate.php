@@ -1,41 +1,127 @@
 <?php
 
 class Graduate {
-    public static function getBySession($conn, $sessionId, $limit = 20, $offset = 0) {
-        $stmt = $conn->prepare("
-            SELECT g.*, f.name AS faculty_name, sp.name AS prodi_name, sp.degree_level,
-                   sr.`row`, sr.side, s.position, s.number
+    public static function getBySession($conn, $sessionId, $limit = 20, $offset = 0, $searchQuery = '') {
+        $searchQuery = trim($searchQuery);
+        $whereSql = "WHERE g.graduation_session_id = ?";
+        $params = [$sessionId];
+        $types = "i";
+
+        if ($searchQuery !== '') {
+            $term = '%' . $searchQuery . '%';
+            $whereSql .= " AND (
+                g.name LIKE ? OR 
+                g.nrp LIKE ? OR 
+                f.name LIKE ? OR 
+                f.code LIKE ? OR 
+                sp.name LIKE ? OR 
+                sp.degree_level LIKE ? OR 
+                sr.`row` LIKE ? OR 
+                CONCAT('baris ', sr.`row`) LIKE ? OR
+                (CASE WHEN sr.side = 'left' THEN 'kiri' ELSE 'kanan' END) LIKE ? OR
+                CONCAT('baris ', sr.`row`, ' ', CASE WHEN sr.side = 'left' THEN 'kiri' ELSE 'kanan' END) LIKE ? OR
+                CAST(s.global AS CHAR) LIKE ? OR 
+                CAST(s.local AS CHAR) LIKE ? OR
+                CONCAT(sr.`row`, LPAD(s.global, 3, '0')) LIKE ?
+            )";
+            for ($i = 0; $i < 13; $i++) {
+                $params[] = $term;
+                $types .= "s";
+            }
+        }
+
+        // Pengurutan logis denah fisik: A Kiri, A Kanan, B Kiri, B Kanan, dst.
+        $sql = "
+            SELECT g.*, f.code AS faculty_code, f.name AS faculty_name, 
+                   sp.name AS prodi_name, sp.name AS study_program_name, sp.degree_level,
+                   sr.`row`, sr.side, s.local, s.global
             FROM graduates g
             JOIN faculties f ON g.faculty_id = f.id
             JOIN study_programs sp ON g.study_program_id = sp.id
             LEFT JOIN seats s ON g.seat_id = s.id
             LEFT JOIN seat_rows sr ON s.seat_row_id = sr.id
-            WHERE g.graduation_session_id = ?
-            ORDER BY g.id
+            $whereSql
+            ORDER BY 
+                CASE WHEN sr.`row` IS NULL THEN 1 ELSE 0 END,
+                sr.`row` ASC,
+                CASE WHEN sr.side = 'left' THEN 1 WHEN sr.side = 'right' THEN 2 ELSE 3 END,
+                s.local ASC,
+                g.id ASC
             LIMIT ? OFFSET ?
-        ");
-        $stmt->bind_param("iii", $sessionId, $limit, $offset);
+        ";
+
+        $params[] = $limit;
+        $params[] = $offset;
+        $types .= "ii";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
-    public static function countBySession($conn, $sessionId) {
-        $stmt = $conn->prepare("SELECT COUNT(*) AS total FROM graduates WHERE graduation_session_id = ?");
-        $stmt->bind_param("i", $sessionId);
+    public static function countBySession($conn, $sessionId, $searchQuery = '') {
+        $searchQuery = trim($searchQuery);
+        $whereSql = "WHERE g.graduation_session_id = ?";
+        $params = [$sessionId];
+        $types = "i";
+
+        if ($searchQuery !== '') {
+            $term = '%' . $searchQuery . '%';
+            $whereSql .= " AND (
+                g.name LIKE ? OR 
+                g.nrp LIKE ? OR 
+                f.name LIKE ? OR 
+                f.code LIKE ? OR 
+                sp.name LIKE ? OR 
+                sp.degree_level LIKE ? OR 
+                sr.`row` LIKE ? OR 
+                CONCAT('baris ', sr.`row`) LIKE ? OR
+                (CASE WHEN sr.side = 'left' THEN 'kiri' ELSE 'kanan' END) LIKE ? OR
+                CONCAT('baris ', sr.`row`, ' ', CASE WHEN sr.side = 'left' THEN 'kiri' ELSE 'kanan' END) LIKE ? OR
+                CAST(s.global AS CHAR) LIKE ? OR 
+                CAST(s.local AS CHAR) LIKE ? OR
+                CONCAT(sr.`row`, LPAD(s.global, 3, '0')) LIKE ?
+            )";
+            for ($i = 0; $i < 13; $i++) {
+                $params[] = $term;
+                $types .= "s";
+            }
+        }
+
+        $sql = "
+            SELECT COUNT(*) AS total 
+            FROM graduates g
+            JOIN faculties f ON g.faculty_id = f.id
+            JOIN study_programs sp ON g.study_program_id = sp.id
+            LEFT JOIN seats s ON g.seat_id = s.id
+            LEFT JOIN seat_rows sr ON s.seat_row_id = sr.id
+            $whereSql
+        ";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
         $stmt->execute();
-        return $stmt->get_result()->fetch_assoc()['total'];
+        return (int)$stmt->get_result()->fetch_assoc()['total'];
     }
 
-    public static function getAvailableSeats($conn, $sessionId) {
+    public static function find($conn, $id) {
+        $stmt = $conn->prepare("SELECT * FROM graduates WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
+    }
+
+    public static function getAvailableSeats($conn, $sessionId, $currentSeatId = null) {
         $stmt = $conn->prepare("
-            SELECT s.id, sr.`row`, sr.side, s.position
+            SELECT s.id, sr.`row`, sr.side, s.local, s.global
             FROM seats s
             JOIN seat_rows sr ON s.seat_row_id = sr.id
             LEFT JOIN graduates g ON g.seat_id = s.id
-            WHERE sr.graduation_session_id = ? AND g.id IS NULL
-            ORDER BY sr.`row`, sr.side, s.position
+            WHERE sr.graduation_session_id = ? AND (g.id IS NULL OR s.id = ?)
+            ORDER BY sr.`row`, sr.side, s.local
         ");
-        $stmt->bind_param("i", $sessionId);
+        $stmt->bind_param("ii", $sessionId, $currentSeatId);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
@@ -44,6 +130,25 @@ class Graduate {
         $stmt = $conn->prepare("INSERT INTO graduates (graduation_session_id, faculty_id, study_program_id, nrp, name, seat_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())");
         $stmt->bind_param("iiissi", $sessionId, $facultyId, $studyProgramId, $nrp, $name, $seatId);
         return $stmt->execute();
+    }
+
+    public static function update($conn, $id, $facultyId, $studyProgramId, $nrp, $name, $seatId) {
+        $stmt = $conn->prepare("UPDATE graduates SET faculty_id = ?, study_program_id = ?, nrp = ?, name = ?, seat_id = ?, updated_at = NOW() WHERE id = ?");
+        $stmt->bind_param("iissii", $facultyId, $studyProgramId, $nrp, $name, $seatId, $id);
+        return $stmt->execute();
+    }
+
+    public static function getBySeatRowBeyondPosition($conn, $seatRowId, $newCapacity) {
+        $stmt = $conn->prepare("
+            SELECT g.id, g.name, g.nrp, s.local
+            FROM graduates g
+            JOIN seats s ON g.seat_id = s.id
+            WHERE s.seat_row_id = ? AND s.local > ?
+            ORDER BY s.local ASC
+        ");
+        $stmt->bind_param("ii", $seatRowId, $newCapacity);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
     public static function delete($conn, $id) {
@@ -132,7 +237,7 @@ class Graduate {
         $stmt = $conn->prepare("
             SELECT s.id FROM seats s
             JOIN seat_rows sr ON s.seat_row_id = sr.id
-            WHERE sr.graduation_session_id = ? AND sr.`row` = ? AND sr.side = ? AND s.position = ?
+            WHERE sr.graduation_session_id = ? AND sr.`row` = ? AND sr.side = ? AND s.local = ?
         ");
         $stmt->bind_param("issi", $sessionId, $row, $side, $position);
         $stmt->execute();
@@ -156,10 +261,21 @@ class Graduate {
         return (int) ($result ? $result->fetch_assoc()['total'] : 0);
     }
 
-    public static function nrpExists($conn, $nrp): bool {
-        $stmt = $conn->prepare("SELECT id FROM graduates WHERE nrp = ?");
-        $stmt->bind_param("s", $nrp);
+    public static function nrpExists($conn, $nrp, $excludeId = null): bool {
+        if ($excludeId !== null) {
+            $stmt = $conn->prepare("SELECT id FROM graduates WHERE nrp = ? AND id != ?");
+            $stmt->bind_param("si", $nrp, $excludeId);
+        } else {
+            $stmt = $conn->prepare("SELECT id FROM graduates WHERE nrp = ?");
+            $stmt->bind_param("s", $nrp);
+        }
         $stmt->execute();
         return $stmt->get_result()->num_rows > 0;
+    }
+
+    public static function setSeatGlobalNumber($conn, $seatId, $globalNumber) {
+        $stmt = $conn->prepare("UPDATE seats SET global = ? WHERE id = ?");
+        $stmt->bind_param("ii", $globalNumber, $seatId);
+        return $stmt->execute();
     }
 }

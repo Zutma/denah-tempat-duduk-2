@@ -86,6 +86,9 @@ $routes = [
     'graduation-sessions/bulk-delete' => [GraduationSessionController::class, 'bulkDelete'],
 
     'seat-rows'                     => [SeatRowController::class, 'index'],
+    'seat-rows/update'              => [SeatRowController::class, 'updateCapacity'],
+    'seat-rows/extend'              => [SeatRowController::class, 'extend'],
+    'seat-rows/shrink'              => [SeatRowController::class, 'shrink'],
     'seat-rows/delete'              => [SeatRowController::class, 'delete'],
     'seat-rows/bulk-delete'         => [SeatRowController::class, 'bulkDelete'],
 

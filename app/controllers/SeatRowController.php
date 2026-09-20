@@ -128,4 +128,140 @@ class SeatRowController extends BaseController {
 
         $this->redirect('/graduation-events');
     }
+
+    public function updateCapacity($conn) {
+        $this->checkAuth();
+        $this->checkCsrf();
+
+        $sessionId = $_POST['session_id'] ?? null;
+        $rowLabel = $_POST['row'] ?? '';
+        $leftId = (int)($_POST['left_id'] ?? 0);
+        $leftNewCap = isset($_POST['left_capacity']) ? (int)$_POST['left_capacity'] : null;
+        $leftOldCap = (int)($_POST['left_old_capacity'] ?? 0);
+
+        $rightId = (int)($_POST['right_id'] ?? 0);
+        $rightNewCap = isset($_POST['right_capacity']) ? (int)$_POST['right_capacity'] : null;
+        $rightOldCap = (int)($_POST['right_old_capacity'] ?? 0);
+
+        $errors = [];
+        $updates = [];
+
+        // 1. Cek validasi untuk baris KIRI
+        if ($leftId > 0 && $leftNewCap !== null && $leftNewCap >= 0 && $leftNewCap !== $leftOldCap) {
+            if ($leftNewCap < $leftOldCap) {
+                $affected = Graduate::getBySeatRowBeyondPosition($conn, $leftId, $leftNewCap);
+                if (!empty($affected)) {
+                    $count = count($affected);
+                    $positions = array_map(function($g) { return $g['local']; }, $affected);
+                    $names = array_map(function($g) { return $g['name']; }, $affected);
+                    $posStr = implode(', ', array_unique($positions));
+                    $nameStr = implode(', ', array_map(function($n) { return "[$n]"; }, $names));
+                    $errors[] = "Sisi Kiri: Ada $count wisudawan di posisi $posStr: $nameStr. Hapus/pindahkan dulu.";
+                } else {
+                    $updates[] = ['type' => 'shrink', 'id' => $leftId, 'val' => $leftNewCap];
+                }
+            } else {
+                $updates[] = ['type' => 'extend', 'id' => $leftId, 'val' => $leftNewCap - $leftOldCap];
+            }
+        }
+
+        // 2. Cek validasi untuk baris KANAN
+        if ($rightId > 0 && $rightNewCap !== null && $rightNewCap >= 0 && $rightNewCap !== $rightOldCap) {
+            if ($rightNewCap < $rightOldCap) {
+                $affected = Graduate::getBySeatRowBeyondPosition($conn, $rightId, $rightNewCap);
+                if (!empty($affected)) {
+                    $count = count($affected);
+                    $positions = array_map(function($g) { return $g['local']; }, $affected);
+                    $names = array_map(function($g) { return $g['name']; }, $affected);
+                    $posStr = implode(', ', array_unique($positions));
+                    $nameStr = implode(', ', array_map(function($n) { return "[$n]"; }, $names));
+                    $errors[] = "Sisi Kanan: Ada $count wisudawan di posisi $posStr: $nameStr. Hapus/pindahkan dulu.";
+                } else {
+                    $updates[] = ['type' => 'shrink', 'id' => $rightId, 'val' => $rightNewCap];
+                }
+            } else {
+                $updates[] = ['type' => 'extend', 'id' => $rightId, 'val' => $rightNewCap - $rightOldCap];
+            }
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['error'] = "Tidak dapat mengecilkan kapasitas Baris $rowLabel — " . implode(' | ', $errors);
+        } else if (!empty($updates)) {
+            try {
+                foreach ($updates as $u) {
+                    if ($u['type'] === 'shrink') {
+                        SeatRow::shrinkSeats($conn, $u['id'], $u['val']);
+                    } else if ($u['type'] === 'extend') {
+                        SeatRow::addSeats($conn, $u['id'], $u['val']);
+                    }
+                }
+                $_SESSION['success'] = "Kapasitas Baris $rowLabel berhasil diperbarui.";
+            } catch (Throwable $e) {
+                $_SESSION['error'] = "Gagal memperbarui kapasitas Baris $rowLabel: " . $e->getMessage();
+            }
+        }
+
+        if ($sessionId) {
+            $this->redirect("/seat-rows?session_id=" . $sessionId);
+        }
+        $this->redirect('/graduation-events');
+    }
+
+    public function extend($conn) {
+        $this->checkAuth();
+        $this->checkCsrf();
+
+        $seatRowId = (int)($_POST['seat_row_id'] ?? 0);
+        $additionalCount = (int)($_POST['additional_count'] ?? 0);
+        $sessionId = $_POST['session_id'] ?? null;
+
+        if ($seatRowId > 0 && $additionalCount > 0) {
+            try {
+                SeatRow::addSeats($conn, $seatRowId, $additionalCount);
+                $_SESSION['success'] = "Kapasitas baris kursi berhasil ditambah ($additionalCount kursi).";
+            } catch (Throwable $e) {
+                $_SESSION['error'] = "Gagal menambah kapasitas kursi: " . $e->getMessage();
+            }
+        }
+
+        if ($sessionId) {
+            $this->redirect("/seat-rows?session_id=" . $sessionId);
+        }
+        $this->redirect('/graduation-events');
+    }
+
+    public function shrink($conn) {
+        $this->checkAuth();
+        $this->checkCsrf();
+
+        $seatRowId = (int)($_POST['seat_row_id'] ?? 0);
+        $newCapacity = (int)($_POST['new_capacity'] ?? 0);
+        $sessionId = $_POST['session_id'] ?? null;
+
+        if ($seatRowId > 0 && $newCapacity >= 0) {
+            $affectedGraduates = Graduate::getBySeatRowBeyondPosition($conn, $seatRowId, $newCapacity);
+
+            if (!empty($affectedGraduates)) {
+                $count = count($affectedGraduates);
+                $positions = array_map(function($g) { return $g['local']; }, $affectedGraduates);
+                $names = array_map(function($g) { return $g['name']; }, $affectedGraduates);
+                $posStr = implode(', ', array_unique($positions));
+                $nameStr = implode(', ', array_map(function($n) { return "[$n]"; }, $names));
+
+                $_SESSION['error'] = "Tidak bisa mengecilkan kapasitas — ada $count wisudawan di posisi $posStr: $nameStr. Hapus atau pindahkan wisudawan tersebut terlebih dahulu.";
+            } else {
+                try {
+                    SeatRow::shrinkSeats($conn, $seatRowId, $newCapacity);
+                    $_SESSION['success'] = "Kapasitas baris kursi berhasil dikurangi menjadi $newCapacity kursi.";
+                } catch (Throwable $e) {
+                    $_SESSION['error'] = "Gagal mengecilkan kapasitas kursi: " . $e->getMessage();
+                }
+            }
+        }
+
+        if ($sessionId) {
+            $this->redirect("/seat-rows?session_id=" . $sessionId);
+        }
+        $this->redirect('/graduation-events');
+    }
 }

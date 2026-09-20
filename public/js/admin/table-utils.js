@@ -9,8 +9,8 @@ function initBulkTable() {
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 const query = this.value.toLowerCase().trim();
-                document.querySelectorAll('tbody tr').forEach(row => {
-                    row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+                document.querySelectorAll('tbody tr, .event-card').forEach(item => {
+                    item.style.display = item.textContent.toLowerCase().includes(query) ? '' : 'none';
                 });
             });
         }
