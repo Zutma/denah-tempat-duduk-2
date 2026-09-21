@@ -324,6 +324,7 @@ main, footer {
     flex-wrap: nowrap !important; 
     align-items: flex-start;
     white-space: nowrap !important;
+    will-change: transform, zoom;
 }
 
 #lorongTengah {

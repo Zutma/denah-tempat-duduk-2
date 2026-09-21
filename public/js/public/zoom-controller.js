@@ -1,4 +1,4 @@
-/* ===== HYBRID ENGINE WITH STRICT MIN-BOUND LOCK ===== */
+/* ===== HIGH-PERFORMANCE GPU ANIMATED ZOOM ENGINE ===== */
 document.addEventListener("DOMContentLoaded", function() {
     const container = document.getElementById('denahContainer');
     const zoomContent = document.getElementById('zoomContent');
@@ -7,41 +7,72 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (!container || !zoomContent) return;
 
+    let targetScale = 1;
     let currentScale = 1;
-    let minScaleLocked = 0.5; // Kunci batas minimal
+    let baseScale = 1; // Skala CSS zoom dasar saat ini
+    let minScaleLocked = 0.5;
     const maxScale = 2.5;
     let holdInterval = null;
+    let isAnimating = false;
 
     let isMouseDown = false;
     let startX, startY, scrollLeft, scrollTop;
 
-    // Hitung Skala Fit Layar secara Presisi
+    // Hitung Skala Fit Layar
     function calculateFitScale() {
         zoomContent.style.zoom = '1';
-        const containerWidth = container.clientWidth - 40; // Kurangi padding 20px kiri-kanan
+        zoomContent.style.transform = 'none';
+        const containerWidth = container.clientWidth - 40;
         const contentWidth = zoomContent.offsetWidth;
 
         if (contentWidth > 0 && containerWidth > 0) {
             const fitRatio = containerWidth / contentWidth;
-            // Batas minimal KETAT: Denah TIDAK BISA mengecil melebihi ukuran pas layar
             return Math.min(Math.max(fitRatio, 0.1), 1.0);
         }
         return 0.5;
     }
 
-    function applyZoom() {
-        zoomContent.style.zoom = currentScale;
+    // Loop Animasi GPU (Menggunakan CSS Transform untuk 60 FPS)
+    function animateGPU() {
+        currentScale += (targetScale - currentScale) * 0.25; // Lerp halus
 
-        if (zoomIndicator) {
-            zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
+        if (Math.abs(targetScale - currentScale) > 0.005) {
+            // Gunakan transform: scale() selama animasi agar diproses GPU (Super Mulus)
+            const relativeScale = currentScale / baseScale;
+            zoomContent.style.transform = `scale(${relativeScale})`;
+            zoomContent.style.transformOrigin = 'top center';
+
+            if (zoomIndicator) {
+                zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
+            }
+            requestAnimationFrame(animateGPU);
+        } else {
+            // Animasi Selesai: Kunci nilai akhir ke CSS zoom agar scrollbar pas
+            currentScale = targetScale;
+            baseScale = currentScale;
+            
+            zoomContent.style.transform = 'none'; // Clear transform
+            zoomContent.style.zoom = currentScale; // Apply zoom fisik sekali saja
+
+            if (zoomIndicator) {
+                zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
+            }
+            isAnimating = false;
+        }
+    }
+
+    function triggerSmoothZoom() {
+        if (!isAnimating) {
+            isAnimating = true;
+            requestAnimationFrame(animateGPU);
         }
     }
 
     function centerToLorong() {
         if (container && lorong) {
             const containerWidth = container.clientWidth;
-            const lorongLeft = lorong.offsetLeft * currentScale;
-            const lorongWidth = lorong.offsetWidth * currentScale;
+            const lorongLeft = lorong.offsetLeft * targetScale;
+            const lorongWidth = lorong.offsetWidth * targetScale;
             
             const targetScroll = lorongLeft - (containerWidth / 2) + (lorongWidth / 2);
             container.scrollLeft = Math.max(0, targetScroll);
@@ -49,21 +80,18 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     window.adjustZoom = function(amount) {
-        let targetScale = currentScale + amount;
+        targetScale += amount;
         
-        // KUNCI MUTLAK: Jika zoom out mencoba melewati minScaleLocked, paksa berhenti di minScaleLocked
         if (targetScale < minScaleLocked) targetScale = minScaleLocked;
         if (targetScale > maxScale) targetScale = maxScale;
 
-        currentScale = targetScale;
-        applyZoom();
+        triggerSmoothZoom();
     };
 
     window.resetZoom = function() {
-        // Hitung ulang skala fit dan kunci minScaleLocked di nilai tersebut
         minScaleLocked = calculateFitScale();
-        currentScale = minScaleLocked;
-        applyZoom();
+        targetScale = minScaleLocked;
+        triggerSmoothZoom();
         centerToLorong();
     };
 
@@ -71,7 +99,7 @@ document.addEventListener("DOMContentLoaded", function() {
         window.adjustZoom(amount);
         holdInterval = setInterval(() => {
             window.adjustZoom(amount);
-        }, 80);
+        }, 60);
     };
 
     window.stopZoomHold = function() {
@@ -85,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function() {
     container.addEventListener('wheel', function(e) {
         if (e.ctrlKey) {
             e.preventDefault();
-            const zoomAmount = e.deltaY < 0 ? 0.08 : -0.08;
+            const zoomAmount = e.deltaY < 0 ? 0.12 : -0.12;
             window.adjustZoom(zoomAmount);
         }
     }, { passive: false });
@@ -119,32 +147,7 @@ document.addEventListener("DOMContentLoaded", function() {
         container.scrollTop = scrollTop - walkY;
     });
 
-    // 3. PINCH & TOUCH DRAG (MOBILE)
-    let touchStartDist = 0;
-
-    container.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 2) {
-            touchStartDist = Math.hypot(
-                e.touches[0].clientX - e.touches[1].clientX,
-                e.touches[0].clientY - e.touches[1].clientY
-            );
-        }
-    }, { passive: true });
-
-    container.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 2) {
-            e.preventDefault();
-            const dist = Math.hypot(
-                e.touches[0].clientX - e.touches[1].clientX,
-                e.touches[0].clientY - e.touches[1].clientY
-            );
-            const factor = (dist - touchStartDist) * 0.005;
-            window.adjustZoom(factor);
-            touchStartDist = dist;
-        }
-    }, { passive: false });
-
-    // Inisialisasi awal saat load
+    // Initial Load
     setTimeout(() => {
         window.resetZoom();
     }, 150);
