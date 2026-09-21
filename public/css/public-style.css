@@ -297,3 +297,30 @@ main, footer {
 @media (max-width: 768px) {
     #seno-bubble { width: min(70vw, 260px); }
 }
+
+/* ===== PERBAIKAN CSS TENTANG CENTERING & BOUNDS ===== */
+#denahContainer {
+    width: 100%;
+    max-height: calc(100vh - 180px);
+    overflow: auto !important;
+    position: relative;
+    padding: 20px;
+    box-sizing: border-box;
+    /* PENTING: Mengunci denah agar SELALU di tengah layar saat mengecil */
+    display: grid !important;
+    place-content: start center !important;
+    user-select: none;
+}
+
+#zoomWrapper {
+    display: inline-block;
+    margin: 0 auto;
+    position: relative;
+}
+
+#zoomContent {
+    display: inline-block;
+    white-space: nowrap;
+    margin: 0 auto;
+    padding-right: 15px;
+}
