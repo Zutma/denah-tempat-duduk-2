@@ -100,11 +100,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function centerToLorong() {
         if (container && lorong) {
+            // Gunakan skala target yang sedang diproses
+            const activeScale = targetScale || currentScale || 1;
             const containerWidth = container.clientWidth;
-            const lorongLeft = lorong.offsetLeft * targetScale;
-            const lorongWidth = lorong.offsetWidth * targetScale;
+            const lorongLeft = lorong.offsetLeft * activeScale;
+            const lorongWidth = lorong.offsetWidth * activeScale;
             
             const targetScroll = lorongLeft - (containerWidth / 2) + (lorongWidth / 2);
+            
+            // Terapkan scroll langsung (instant) tanpa jeda animasi browser
             container.scrollLeft = Math.max(0, targetScroll);
         }
     }
@@ -211,12 +215,23 @@ document.addEventListener("DOMContentLoaded", function() {
         const currentW = container.clientWidth;
         const currentH = container.clientHeight;
 
-        // Hanya reset zoom jika dimensi LAYAR LUAR benar-benar berubah (Resize asli),
-        // bukan karena perubahan zoom internal atau pergerakan sentuhan.
         if (currentW > 0 && currentH > 0 && (Math.abs(currentW - lastContainerWidth) > 10 || Math.abs(currentH - lastContainerHeight) > 10)) {
             lastContainerWidth = currentW;
             lastContainerHeight = currentH;
-            window.resetZoom();
+            
+            // 1. Hitung skala fit
+            minScaleLocked = calculateFitScale();
+            targetScale = minScaleLocked;
+            currentScale = minScaleLocked;
+            baseScale = minScaleLocked;
+
+            // 2. Terpakan zoom fisik instan tanpa animasi GPU di awal
+            zoomContent.style.transform = 'none';
+            zoomContent.style.zoom = currentScale;
+            if (zoomIndicator) zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
+
+            // 3. Kunci posisi lorong ke tengah SECARA INSTAN
+            centerToLorong();
         }
     }
 

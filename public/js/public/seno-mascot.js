@@ -253,6 +253,6 @@
 
         setTimeout(function() {
             startTour(false);
-        }, 700);
+        }, 2000);
     });
 })();
