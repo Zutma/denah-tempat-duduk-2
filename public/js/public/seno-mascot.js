@@ -1,7 +1,7 @@
-// tur interaktif maskot seno di denah publik
+/* ===== SENO MASCOT TOUR ENGINE (HIGH PERFORMANCE OPTIMIZED) ===== */
 (function () {
     'use strict';
-    // lokasi file gambar ekspresi seno
+
     var POSES = {
         wisuda:   (window.APP_BASE_URL || '') + '/images/SENO_POSE_1.png',
         wave:     (window.APP_BASE_URL || '') + '/images/SENO_POSE_3.png',
@@ -10,133 +10,123 @@
         normal:   (window.APP_BASE_URL || '') + '/images/SENO_POSE_1.png',
     };
 
-    // daftar dialog tur
     var steps = [
-        {
-            pose: 'wave',
-            text: '🎉 Halo Wisudawan ITS! Selamat atas pencapaianmu yang luar biasa! 🎓',
-            dur: 4000,
-        },
-        {
-            pose: 'shy',
-            text: 'Aku <b>SENO</b>, maskot ITS! Yuk kukenalkan cara pakai denah ini!!',
-            dur: 3800,
-        },
-        {
-            pose: 'wisuda',
-            text: '🎛️ Gunakan <b>dropdown sesi</b> di atas untuk memilih jadwal wisudamu.',
-            dur: 4000,
-        },
-        {
-            pose: 'normal',
-            text: '🔍 <b>Ketik nama/NRP</b> di kotak cari — kursimu akan <span style="color:#127BBE;font-weight:700">berkilau!</span> ✨',
-            dur: 4200,
-        },
-        {
-            pose: 'surprise',
-            text: '🔎 Pakai tombol <b>− / +</b> atau <b>Ctrl+Scroll</b> untuk zoom denah.',
-            dur: 3600,
-        },
-        {
-            pose: 'normal',
-            text: '🪑 Klik kursi mana saja untuk lihat <b>nama, NRP & prodi</b> wisudawan.',
-            dur: 3800,
-        },
-        {
-            pose: 'wave',
-            text: '🎊 Selamat menikmati hari wisudamu! Kalau perlu bantuan, panggil aku lagi ya! 👋',
-            dur: 0,
-            isLast: true,
-        },
+        { pose: 'wave', text: '🎉 Halo Wisudawan ITS! Selamat atas pencapaianmu yang luar biasa! 🎓', dur: 4000 },
+        { pose: 'shy', text: 'Aku <b>SENO</b>, maskot ITS! Yuk kukenalkan cara pakai denah ini!!', dur: 3800 },
+        { pose: 'wisuda', text: '🎛️ Gunakan <b>dropdown sesi</b> di atas untuk memilih jadwal wisudamu.', dur: 4000 },
+        { pose: 'normal', text: '🔍 <b>Ketik nama/NRP</b> di kotak cari — kursimu akan <span style="color:#127BBE;font-weight:700">berkilau!</span> ✨', dur: 4200 },
+        { pose: 'surprise', text: '🔎 Pakai tombol <b>− / +</b> atau <b>Ctrl+Scroll</b> untuk zoom denah.', dur: 3600 },
+        { pose: 'normal', text: '🪑 Klik kursi mana saja untuk lihat <b>nama, NRP & prodi</b> wisudawan.', dur: 3800 },
+        { pose: 'wave', text: '🎊 Selamat menikmati hari wisudamu! Kalau perlu bantuan, panggil aku lagi ya! 👋', dur: 0, isLast: true },
     ];
 
     var cur = 0;
     var autoMode = true;
     var autoTimer = null;
-    var twTimer = null;
+    var twRaf = null;
     var ENTRY_ANIMS = ['anim-right', 'anim-rise', 'anim-drop', 'anim-peek'];
 
-    function $id(id) { return document.getElementById(id); }
-    var elMascot    = function() { return $id('seno-mascot'); };
-    var elBubble    = function() { return $id('seno-bubble'); };
-    var elImg       = function() { return $id('seno-img'); };
-    var elText      = function() { return $id('seno-text'); };
-    var elNextBtn   = function() { return $id('seno-next-btn'); };
-    var elSkipBtn   = function() { return $id('seno-skip-btn'); };
-    var elProgWrap  = function() { return $id('seno-progress-wrap'); };
-    var elProgBar   = function() { return $id('seno-progress-bar'); };
-    var elReplay    = function() { return $id('seno-replay-btn'); };
+    // Cache DOM Elements (Hanya sekali query agar super kencang)
+    var dom = {};
 
-    // ganti ekspresi pose
+    function initDomCache() {
+        dom.mascot  = document.getElementById('seno-mascot');
+        dom.bubble  = document.getElementById('seno-bubble');
+        dom.img     = document.getElementById('seno-img');
+        dom.text    = document.getElementById('seno-text');
+        dom.nextBtn = document.getElementById('seno-next-btn');
+        dom.skipBtn = document.getElementById('seno-skip-btn');
+        dom.progWrap= document.getElementById('seno-progress-wrap');
+        dom.progBar = document.getElementById('seno-progress-bar');
+        dom.replay  = document.getElementById('seno-replay-btn');
+    }
+
+    // Preload semua gambar di background
+    function preloadPoses() {
+        Object.keys(POSES).forEach(function(key) {
+            var img = new Image();
+            img.src = POSES[key];
+        });
+    }
+
     function setPose(pose) {
-        var img = elImg();
-        if (img) img.src = POSES[pose] || POSES.wisuda;
+        if (dom.img) dom.img.src = POSES[pose] || POSES.wisuda;
     }
 
     function clearAutoTimer() {
         if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
     }
-    function clearTwTimer() {
-        if (twTimer) { clearInterval(twTimer); twTimer = null; }
+
+    function clearTwRaf() {
+        if (twRaf) { cancelAnimationFrame(twRaf); twRaf = null; }
     }
 
-    // efek ketik teks dialog
+    // Typewriter via requestAnimationFrame (GPU-friendly, 60fps mulus)
     function typewrite(text, onDone) {
-        clearTwTimer();
-        var el = elText();
-        if (!el) return;
+        clearTwRaf();
+        if (!dom.text) return;
+
         var plain = text.replace(/<[^>]+>/g, '');
+        var length = plain.length;
         var i = 0;
-        el.innerHTML = '';
-        twTimer = setInterval(function () {
-            i++;
-            el.textContent = plain.substring(0, i);
-            if (i >= plain.length) {
-                clearTwTimer();
-                el.innerHTML = text;
+        var lastTime = performance.now();
+        var speed = 20; // ms per karakter
+
+        dom.text.textContent = '';
+
+        function step(now) {
+            if (now - lastTime >= speed) {
+                i++;
+                dom.text.textContent = plain.substring(0, i);
+                lastTime = now;
+            }
+
+            if (i < length) {
+                twRaf = requestAnimationFrame(step);
+            } else {
+                clearTwRaf();
+                dom.text.innerHTML = text;
                 if (onDone) onDone();
             }
-        }, 20);
+        }
+
+        twRaf = requestAnimationFrame(step);
     }
 
     function animateBubble() {
-        var b = elBubble();
-        if (!b) return;
-        b.style.animation = 'none';
-        void b.offsetWidth;
-        b.style.animation = 'senoBounceIn .35s ease forwards';
-        b.style.display = 'block';
+        if (!dom.bubble) return;
+        dom.bubble.style.display = 'block';
+        dom.bubble.classList.remove('seno-bounce-anim');
+        // Trigger reflow ringan tanpa membaca offsetWidth
+        requestAnimationFrame(function() {
+            dom.bubble.classList.add('seno-bounce-anim');
+        });
     }
 
-    // bar durasi dialog
     function startProgressBar(dur) {
-        var wrap = elProgWrap();
-        var bar  = elProgBar();
-        if (!wrap || !bar) return;
+        if (!dom.progWrap || !dom.progBar) return;
         if (dur > 0) {
-            wrap.style.display = 'block';
-            bar.style.animation = 'none';
-            bar.style.width = '0%';
-            void bar.offsetWidth;
-            bar.style.setProperty('--seno-dur', (dur / 1000) + 's');
-            bar.classList.add('running');
+            dom.progWrap.style.display = 'block';
+            dom.progBar.classList.remove('running');
+            dom.progBar.style.width = '0%';
+            
+            requestAnimationFrame(function() {
+                dom.progBar.style.setProperty('--seno-dur', (dur / 1000) + 's');
+                dom.progBar.classList.add('running');
+            });
         } else {
-            wrap.style.display = 'none';
+            dom.progWrap.style.display = 'none';
         }
     }
 
     function stopProgressBar() {
-        var wrap = elProgWrap();
-        var bar  = elProgBar();
-        if (wrap) wrap.style.display = 'none';
-        if (bar) {
-            bar.classList.remove('running');
-            bar.style.width = '0%';
-            bar.style.animation = 'none';
+        if (dom.progWrap) dom.progWrap.style.display = 'none';
+        if (dom.progBar) {
+            dom.progBar.classList.remove('running');
+            dom.progBar.style.width = '0%';
         }
     }
 
-    // tampilkan dialog urutan ke-idx
     function showStep(idx) {
         var step = steps[idx];
         if (!step) return;
@@ -147,38 +137,31 @@
         setPose(step.pose);
         animateBubble();
 
-        var nextBtn = elNextBtn();
-        var skipBtn = elSkipBtn();
-
         if (step.isLast) {
-            if (nextBtn) { nextBtn.textContent = 'Siap! 🎓'; nextBtn.style.display = ''; }
-            if (skipBtn) skipBtn.style.display = 'none';
+            if (dom.nextBtn) { dom.nextBtn.textContent = 'Siap! 🎓'; dom.nextBtn.style.display = ''; }
+            if (dom.skipBtn) dom.skipBtn.style.display = 'none';
             stopProgressBar();
             typewrite(step.text, null);
         } else if (autoMode) {
-            if (nextBtn) { nextBtn.textContent = 'Lanjut →'; nextBtn.style.display = ''; }
-            if (skipBtn) { skipBtn.textContent = '⏩ Skip'; skipBtn.style.display = ''; }
+            if (dom.nextBtn) { dom.nextBtn.textContent = 'Lanjut →'; dom.nextBtn.style.display = ''; }
+            if (dom.skipBtn) { dom.skipBtn.textContent = '⏩ Skip'; dom.skipBtn.style.display = ''; }
             typewrite(step.text, function() {
                 startProgressBar(step.dur);
-                autoTimer = setTimeout(function() {
-                    advanceStep();
-                }, step.dur);
+                autoTimer = setTimeout(advanceStep, step.dur);
             });
         } else {
-            if (nextBtn) { nextBtn.textContent = 'Lanjut →'; nextBtn.style.display = ''; }
-            if (skipBtn) { skipBtn.textContent = '⏩ Skip'; skipBtn.style.display = ''; }
+            if (dom.nextBtn) { dom.nextBtn.textContent = 'Lanjut →'; dom.nextBtn.style.display = ''; }
+            if (dom.skipBtn) { dom.skipBtn.textContent = '⏩ Skip'; dom.skipBtn.style.display = ''; }
             typewrite(step.text, null);
             stopProgressBar();
         }
     }
 
-    // lanjut ke dialog berikutnya
     function advanceStep() {
-        if (twTimer) {
-            clearTwTimer();
+        if (twRaf) {
+            clearTwRaf();
             var step = steps[cur];
-            var el = elText();
-            if (el && step) el.innerHTML = step.text;
+            if (dom.text && step) dom.text.innerHTML = step.text;
 
             if (autoMode && step && step.dur > 0 && !step.isLast) {
                 stopProgressBar();
@@ -196,50 +179,47 @@
         showStep(cur);
     }
 
-    // sembunyikan maskot (exit animation)
     function exitSeno() {
         clearAutoTimer();
-        clearTwTimer();
+        clearTwRaf();
         stopProgressBar();
-        var mascot = elMascot();
-        if (!mascot) return;
+        if (!dom.mascot) return;
+
         setPose('wave');
-        elBubble() && (elBubble().style.display = 'none');
-        mascot.classList.remove('anim-float');
-        ENTRY_ANIMS.forEach(function(a) { mascot.classList.remove(a); });
-        mascot.classList.add('anim-exit');
+        if (dom.bubble) dom.bubble.style.display = 'none';
+
+        dom.mascot.classList.remove('anim-float');
+        ENTRY_ANIMS.forEach(function(a) { dom.mascot.classList.remove(a); });
+        dom.mascot.classList.add('anim-exit');
+
         setTimeout(function() {
-            mascot.classList.add('seno-hidden');
-            mascot.classList.remove('seno-visible', 'anim-exit');
-            var rb = elReplay();
-            if (rb) rb.classList.add('seno-rb-visible');
-        }, 600);
+            dom.mascot.classList.add('seno-hidden');
+            dom.mascot.classList.remove('seno-visible', 'anim-exit');
+            if (dom.replay) dom.replay.classList.add('seno-rb-visible');
+        }, 550);
     }
 
-    // jalankan tur dari awal
     function startTour(manual) {
         autoMode = !manual;
         cur = 0;
-        var mascot = elMascot();
-        if (!mascot) return;
+        if (!dom.mascot) return;
 
-        ENTRY_ANIMS.forEach(function(a) { mascot.classList.remove(a); });
-        mascot.classList.remove('anim-exit', 'anim-float', 'seno-hidden');
-        mascot.style.right = '';
-        mascot.style.left  = '';
-        mascot.classList.add('seno-visible');
+        ENTRY_ANIMS.forEach(function(a) { dom.mascot.classList.remove(a); });
+        dom.mascot.classList.remove('anim-exit', 'anim-float', 'seno-hidden');
+        dom.mascot.style.right = '';
+        dom.mascot.style.left  = '';
+        dom.mascot.classList.add('seno-visible');
 
-        var rb = elReplay();
-        if (rb) rb.classList.remove('seno-rb-visible');
+        if (dom.replay) dom.replay.classList.remove('seno-rb-visible');
 
         var pick = ENTRY_ANIMS[Math.floor(Math.random() * ENTRY_ANIMS.length)];
-        mascot.classList.add(pick);
+        dom.mascot.classList.add(pick);
 
         setTimeout(function() {
-            ENTRY_ANIMS.forEach(function(a) { mascot.classList.remove(a); });
-            mascot.classList.add('anim-float');
+            ENTRY_ANIMS.forEach(function(a) { dom.mascot.classList.remove(a); });
+            dom.mascot.classList.add('anim-float');
             showStep(0);
-        }, 950);
+        }, 850);
     }
 
     window.SenoTour = {
@@ -248,32 +228,31 @@
         replay: function() { startTour(true); },
     };
 
-    // bind event listener pas dom siap
     document.addEventListener('DOMContentLoaded', function() {
-        var nb = elNextBtn();
-        var sb = elSkipBtn();
-        var rb = elReplay();
-        if (nb) nb.addEventListener('click', function() { SenoTour.next(); });
-        if (sb) sb.addEventListener('click', function() { SenoTour.skip(); });
-        if (rb) rb.addEventListener('click', function() { SenoTour.replay(); });
+        initDomCache();
+        preloadPoses();
 
-        var img = elImg();
-        if (img) img.addEventListener('click', function() {
-            if (twTimer) {
-                clearTwTimer();
-                var step = steps[cur];
-                var tel = elText();
-                if (tel && step) tel.innerHTML = step.text;
-                if (autoMode && step && step.dur > 0 && !step.isLast) {
-                    stopProgressBar();
-                    startProgressBar(step.dur);
-                    autoTimer = setTimeout(advanceStep, step.dur);
+        if (dom.nextBtn) dom.nextBtn.addEventListener('click', SenoTour.next);
+        if (dom.skipBtn) dom.skipBtn.addEventListener('click', SenoTour.skip);
+        if (dom.replay) dom.replay.addEventListener('click', SenoTour.replay);
+
+        if (dom.img) {
+            dom.img.addEventListener('click', function() {
+                if (twRaf) {
+                    clearTwRaf();
+                    var step = steps[cur];
+                    if (dom.text && step) dom.text.innerHTML = step.text;
+                    if (autoMode && step && step.dur > 0 && !step.isLast) {
+                        stopProgressBar();
+                        startProgressBar(step.dur);
+                        autoTimer = setTimeout(advanceStep, step.dur);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         setTimeout(function() {
             startTour(false);
-        }, 900);
+        }, 2000);
     });
 })();

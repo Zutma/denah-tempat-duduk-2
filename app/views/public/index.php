@@ -1,3 +1,8 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 
@@ -141,6 +146,15 @@
                     <button type="button" onmousedown="window.startZoomHold(0.05)" onmouseup="window.stopZoomHold()" onmouseleave="window.stopZoomHold()" ontouchstart="window.startZoomHold(0.05)" ontouchend="window.stopZoomHold()" class="w-6 h-6 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-bold text-slate-700 flex items-center justify-center">+</button>
                     <button type="button" onclick="window.resetZoom()" class="px-1.5 text-its-blue-light font-bold text-[11px] hover:underline">Reset</button>
                 </div>
+
+                <?php if (!empty($_SESSION['user_id'])): ?>
+                    <!-- TOMBOL KEMBALI KE DASHBOARD UNTUK ADMIN -->
+                    <a href="<?= url('dashboard') ?>" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-its-blue hover:bg-its-blue-light text-white rounded-lg text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer border border-its-blue-light/30">
+                        <span class="hidden sm:inline">Dashboard Admin</span>
+                        <span class="sm:hidden">Dashboard</span>
+                    </a>
+                <?php endif; ?>
             </div>
 
         </div>
@@ -209,7 +223,7 @@
                             <!-- LORONG TENGAH -->
                             <div id="lorongTengah" class="flex items-stretch mx-1 md:mx-2 shrink-0">
                                 <div class="w-8 md:w-14 border-x-2 border-dashed border-slate-300 relative flex items-center justify-center">
-                                    <span class="absolute -rotate-90 text-slate-400 font-bold tracking-[0.25em] text-[10px] md:text-xs whitespace-nowrap">LORONG</span>
+                                    <span class="absolute -rotate-90 text-slate-400 font-bold tracking-[0.25em] text-[10px] md:text-xs whitespace-nowrap"> </span>
                                 </div>
                             </div>
 

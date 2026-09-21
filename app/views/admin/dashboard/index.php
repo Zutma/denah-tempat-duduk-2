@@ -115,7 +115,7 @@
                     <span class="text-slate-400 group-hover:text-its-blue text-sm font-bold transition-colors">→</span>
                 </a>
 
-                <a href="<?= url('') ?>" target="_blank" class="flex items-center justify-between p-4 rounded-xl bg-its-blue text-white group transition-all hover:bg-its-blue-light">
+                <a href="<?= url('') ?>" class="flex items-center justify-between p-4 rounded-xl bg-its-blue text-white group transition-all hover:bg-its-blue-light">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center text-base">
                             🌐

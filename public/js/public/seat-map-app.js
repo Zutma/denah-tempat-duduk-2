@@ -1,4 +1,3 @@
-// aplikasi alpine buat peta denah publik
 function seatMapApp() {
     return {
         selectedSeatId: null,
@@ -7,69 +6,81 @@ function seatMapApp() {
         graduatesList: (window.__seatMapData && Array.isArray(window.__seatMapData.graduatesList)) ? window.__seatMapData.graduatesList : [],
         searchedSeatIdClicked: null,
         filteredGraduates: [],
-        searchedSeatIds: [],
+        searchedSeatIds: new Set(), // Memakai Set untuk O(1) lookup di Alpine x-bind class
 
         gradMap: null,
+        debounceTimer: null,
 
         init() {
-            // rakit index wisudawan per seat_id biar gampang dicari
+            // 1. Build Index Map O(1) sekali di awal
             this.buildGradMap();
 
-            // pantau input pencarian biar realtime
+            // 2. Watcher dengan Debounce (Menunggu ketikan selesai 150ms agar tidak lag)
             this.$watch('searchQuery', (val) => {
+                clearTimeout(this.debounceTimer);
                 this.searchedSeatIdClicked = null;
-                const q = (val || '').toString().trim().toLowerCase();
 
-                if (!q || !Array.isArray(this.graduatesList)) {
-                    this.filteredGraduates = [];
-                    this.searchedSeatIds = [];
-                    return;
-                }
-
-                // saring wisudawan cocok
-                this.filteredGraduates = this.graduatesList.filter(g => {
-                    if (!g) return false;
-                    const nameMatch = g.name && g.name.toString().toLowerCase().includes(q);
-                    const nrpMatch = g.nrp && g.nrp.toString().toLowerCase().includes(q);
-                    const seatMatch = g.seat_code && g.seat_code.toString().toLowerCase().includes(q);
-                    return nameMatch || nrpMatch || seatMatch;
-                });
-
-                // kumpulin id kursi buat sorotan
-                this.searchedSeatIds = this.filteredGraduates.map(g => Number(g.seat_id)).filter(Boolean);
+                this.debounceTimer = setTimeout(() => {
+                    this.executeSearch(val);
+                }, 150); // Delay optimal agar pengetikan terasa sangat responsif
             });
 
-            // cek awal kalo ada keyword dari param url
+            // 3. Filter awal jika ada query bawaan dari URL/backend
             if (this.searchQuery.trim() !== '') {
                 this.$nextTick(() => {
-                    const q = this.searchQuery.trim().toLowerCase();
-                    this.filteredGraduates = this.graduatesList.filter(g => {
-                        return (g.name && g.name.toString().toLowerCase().includes(q))
-                            || (g.nrp && g.nrp.toString().toLowerCase().includes(q))
-                            || (g.seat_code && g.seat_code.toString().toLowerCase().includes(q));
-                    });
-                    this.searchedSeatIds = this.filteredGraduates.map(g => Number(g.seat_id)).filter(Boolean);
+                    this.executeSearch(this.searchQuery);
                 });
             }
         },
 
         buildGradMap() {
-            this.gradMap = {};
+            // Menggunakan Map native JS untuk alokasi memori dan lookup tercepat
+            this.gradMap = new Map();
             if (Array.isArray(this.graduatesList)) {
                 for (let i = 0; i < this.graduatesList.length; i++) {
                     const g = this.graduatesList[i];
                     if (g && g.seat_id) {
-                        this.gradMap[Number(g.seat_id)] = g;
+                        this.gradMap.set(Number(g.seat_id), g);
                     }
                 }
             }
         },
 
-        getGradBySeatId(seatId) {
-            if (!this.gradMap) {
-                this.buildGradMap();
+        executeSearch(query) {
+            const q = (query || '').toString().trim().toLowerCase();
+
+            if (!q || !Array.isArray(this.graduatesList)) {
+                this.filteredGraduates = [];
+                this.searchedSeatIds = new Set();
+                return;
             }
-            return this.gradMap[Number(seatId)] || null;
+
+            const matchedGrads = [];
+            const matchedSeatIds = new Set();
+
+            for (let i = 0; i < this.graduatesList.length; i++) {
+                const g = this.graduatesList[i];
+                if (!g) continue;
+
+                const nameMatch = g.name && g.name.toString().toLowerCase().includes(q);
+                const nrpMatch = g.nrp && g.nrp.toString().toLowerCase().includes(q);
+                const seatMatch = g.seat_code && g.seat_code.toString().toLowerCase().includes(q);
+
+                if (nameMatch || nrpMatch || seatMatch) {
+                    matchedGrads.push(g);
+                    if (g.seat_id) {
+                        matchedSeatIds.add(Number(g.seat_id));
+                    }
+                }
+            }
+
+            this.filteredGraduates = matchedGrads;
+            this.searchedSeatIds = matchedSeatIds;
+        },
+
+        getGradBySeatId(seatId) {
+            if (!this.gradMap) this.buildGradMap();
+            return this.gradMap.get(Number(seatId)) || null;
         },
 
         selectSeat(seatId) {
@@ -77,7 +88,7 @@ function seatMapApp() {
             if (!targetId) return;
 
             const gradData = this.getGradBySeatId(targetId);
-            if (!gradData) return; // skip kalo kursi tak terisi
+            if (!gradData) return; // Kursi kosong
 
             this.selectedSeatId = (this.selectedSeatId === targetId) ? null : targetId;
             this.activeModalData = this.selectedSeatId ? gradData : null;
@@ -91,9 +102,8 @@ function seatMapApp() {
             this.selectedSeatId = targetId;
             this.activeModalData = gradData;
             this.searchedSeatIdClicked = targetId;
-            this.searchedSeatIds = [targetId];
+            this.searchedSeatIds = new Set([targetId]);
 
-            // scroll smooth ke posisi kursi
             this.$nextTick(() => {
                 const el = document.getElementById(`seat-${targetId}`);
                 if (el) {
@@ -113,7 +123,12 @@ function seatMapApp() {
             this.searchQuery = '';
             this.searchedSeatIdClicked = null;
             this.filteredGraduates = [];
-            this.searchedSeatIds = [];
+            this.searchedSeatIds = new Set();
+        },
+
+        // Helper untuk Alpine.js template (O(1) Instant Check)
+        isSeatSearched(seatId) {
+            return this.searchedSeatIds.has(Number(seatId));
         }
     };
-}
+}
