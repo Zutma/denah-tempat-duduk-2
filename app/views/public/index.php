@@ -1,3 +1,8 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 
@@ -141,6 +146,18 @@
                     <button type="button" onmousedown="window.startZoomHold(0.05)" onmouseup="window.stopZoomHold()" onmouseleave="window.stopZoomHold()" ontouchstart="window.startZoomHold(0.05)" ontouchend="window.stopZoomHold()" class="w-6 h-6 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-bold text-slate-700 flex items-center justify-center">+</button>
                     <button type="button" onclick="window.resetZoom()" class="px-1.5 text-its-blue-light font-bold text-[11px] hover:underline">Reset</button>
                 </div>
+
+                <?php if (!empty($_SESSION['user_id'])): ?>
+                    <!-- TOMBOL KEMBALI KE DASHBOARD UNTUK ADMIN -->
+                    <a href="<?= url('dashboard') ?>" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-its-blue hover:bg-its-blue-light text-white rounded-lg text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer border border-its-blue-light/30">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        <span class="hidden sm:inline">Dashboard Admin</span>
+                        <span class="sm:hidden">Dashboard</span>
+                    </a>
+                <?php endif; ?>
             </div>
 
         </div>
