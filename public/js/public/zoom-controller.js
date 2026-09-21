@@ -1,4 +1,4 @@
-/* ===== HIGH-PERFORMANCE GPU ANIMATED ZOOM ENGINE ===== */
+/* ===== HIGH-PERFORMANCE GPU ANIMATED ZOOM ENGINE (ZOOM TO CENTER) ===== */
 document.addEventListener("DOMContentLoaded", function() {
     const container = document.getElementById('denahContainer');
     const zoomContent = document.getElementById('zoomContent');
@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let targetScale = 1;
     let currentScale = 1;
-    let baseScale = 1; // Skala CSS zoom dasar saat ini
+    let baseScale = 1;
     let minScaleLocked = 0.5;
     const maxScale = 2.5;
     let holdInterval = null;
@@ -18,41 +18,71 @@ document.addEventListener("DOMContentLoaded", function() {
     let isMouseDown = false;
     let startX, startY, scrollLeft, scrollTop;
 
-    // Hitung Skala Fit Layar
+    // Hitung Skala Fit Layar (Memperhitungkan Lebar DAN Tinggi)
     function calculateFitScale() {
         zoomContent.style.zoom = '1';
         zoomContent.style.transform = 'none';
-        const containerWidth = container.clientWidth - 40;
-        const contentWidth = zoomContent.offsetWidth;
 
-        if (contentWidth > 0 && containerWidth > 0) {
-            const fitRatio = containerWidth / contentWidth;
-            return Math.min(Math.max(fitRatio, 0.1), 1.0);
+        const containerWidth = container.clientWidth - 40;
+        const containerHeight = container.clientHeight - 40;
+
+        const contentWidth = zoomContent.offsetWidth;
+        const contentHeight = zoomContent.offsetHeight;
+
+        // PENGAMAN: Jika DOM belum selesai render atau ukuran 0, pakai skala default aman
+        if (!contentWidth || !contentHeight || containerWidth <= 0 || containerHeight <= 0) {
+            return 0.4; 
         }
-        return 0.5;
+
+        const fitWidthRatio = containerWidth / contentWidth;
+        const fitHeightRatio = containerHeight / contentHeight;
+
+        const bestFitRatio = Math.min(fitWidthRatio, fitHeightRatio);
+        return Math.min(Math.max(bestFitRatio, 0.15), 1.0);
     }
 
-    // Loop Animasi GPU (Menggunakan CSS Transform untuk 60 FPS)
+    // Fungsi Utama: Menjaga Titik Fokus Tampilan Saat Zoom Berubah
+    function updateScrollToCenter(oldScale, newScale) {
+        if (!container || oldScale === newScale) return;
+
+        const centerX = container.scrollLeft + (container.clientWidth / 2);
+        const centerY = container.scrollTop + (container.clientHeight / 2);
+
+        const ratioX = centerX / oldScale;
+        const ratioY = centerY / newScale;
+
+        const newCenterX = ratioX * newScale;
+        const newCenterY = ratioY * newScale;
+
+        container.scrollLeft = newCenterX - (container.clientWidth / 2);
+        container.scrollTop = newCenterY - (container.clientHeight / 2);
+    }
+
+    // Loop Animasi GPU
     function animateGPU() {
-        currentScale += (targetScale - currentScale) * 0.25; // Lerp halus
+        const oldScale = currentScale;
+        currentScale += (targetScale - currentScale) * 0.25;
 
         if (Math.abs(targetScale - currentScale) > 0.005) {
-            // Gunakan transform: scale() selama animasi agar diproses GPU (Super Mulus)
             const relativeScale = currentScale / baseScale;
             zoomContent.style.transform = `scale(${relativeScale})`;
             zoomContent.style.transformOrigin = 'top center';
+
+            updateScrollToCenter(oldScale, currentScale);
 
             if (zoomIndicator) {
                 zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
             }
             requestAnimationFrame(animateGPU);
         } else {
-            // Animasi Selesai: Kunci nilai akhir ke CSS zoom agar scrollbar pas
+            const finalOldScale = currentScale;
             currentScale = targetScale;
             baseScale = currentScale;
             
-            zoomContent.style.transform = 'none'; // Clear transform
-            zoomContent.style.zoom = currentScale; // Apply zoom fisik sekali saja
+            zoomContent.style.transform = 'none';
+            zoomContent.style.zoom = currentScale;
+
+            updateScrollToCenter(finalOldScale, currentScale);
 
             if (zoomIndicator) {
                 zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
@@ -147,12 +177,72 @@ document.addEventListener("DOMContentLoaded", function() {
         container.scrollTop = scrollTop - walkY;
     });
 
-    // Initial Load
-    setTimeout(() => {
-        window.resetZoom();
-    }, 150);
+    // ===== TOUCH PINCH & DRAG MULTI-TOUCH FIX =====
+    let touchStartDist = 0;
 
+    container.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+            touchStartDist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+        }
+    }, { passive: true });
+
+    container.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            const dist = Math.hypot(
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
+            );
+            const factor = (dist - touchStartDist) * 0.003; // Sensitivitas pinch
+            window.adjustZoom(factor);
+            touchStartDist = dist;
+        }
+    }, { passive: false });
+
+    // ===== INIT & RESIZE OBSERVER (TANPA RESET OTOMATIS SAAT ZOOM) =====
+    let lastContainerWidth = 0;
+    let lastContainerHeight = 0;
+
+    function safeInitZoom() {
+        if (!container) return;
+        const currentW = container.clientWidth;
+        const currentH = container.clientHeight;
+
+        // Hanya reset zoom jika dimensi LAYAR LUAR benar-benar berubah (Resize asli),
+        // bukan karena perubahan zoom internal atau pergerakan sentuhan.
+        if (currentW > 0 && currentH > 0 && (Math.abs(currentW - lastContainerWidth) > 10 || Math.abs(currentH - lastContainerHeight) > 10)) {
+            lastContainerWidth = currentW;
+            lastContainerHeight = currentH;
+            window.resetZoom();
+        }
+    }
+
+    // Hanya dengarkan event Resize resmi jendela browser, bukan per-frame observer
+    let resizeDebounce = null;
     window.addEventListener('resize', () => {
-        window.resetZoom();
+        clearTimeout(resizeDebounce);
+        resizeDebounce = setTimeout(safeInitZoom, 200);
     });
+
+    // Inisialisasi Pertama Kali Saja
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            if (container) {
+                lastContainerWidth = container.clientWidth;
+                lastContainerHeight = container.clientHeight;
+                window.resetZoom();
+            }
+        }, 100);
+    });
+
+    setTimeout(() => {
+        if (lastContainerWidth === 0 && container && container.clientWidth > 0) {
+            lastContainerWidth = container.clientWidth;
+            lastContainerHeight = container.clientHeight;
+            window.resetZoom();
+        }
+    }, 350);
 });
