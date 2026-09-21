@@ -223,7 +223,7 @@ if (session_status() === PHP_SESSION_NONE) {
                             <!-- LORONG TENGAH -->
                             <div id="lorongTengah" class="flex items-stretch mx-1 md:mx-2 shrink-0">
                                 <div class="w-8 md:w-14 border-x-2 border-dashed border-slate-300 relative flex items-center justify-center">
-                                    <span class="absolute -rotate-90 text-slate-400 font-bold tracking-[0.25em] text-[10px] md:text-xs whitespace-nowrap">LORONG</span>
+                                    <span class="absolute -rotate-90 text-slate-400 font-bold tracking-[0.25em] text-[10px] md:text-xs whitespace-nowrap"> </span>
                                 </div>
                             </div>
 

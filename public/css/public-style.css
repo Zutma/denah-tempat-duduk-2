@@ -319,8 +319,13 @@ main, footer {
 }
 
 #zoomContent {
-    display: inline-block;
-    white-space: nowrap;
-    margin: 0 auto;
-    padding-right: 15px;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important; 
+    align-items: flex-start;
+    white-space: nowrap !important;
+}
+
+#lorongTengah {
+    flex-shrink: 0 !important;
 }
