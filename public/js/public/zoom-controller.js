@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let isMouseDown = false;
     let startX, startY, scrollLeft, scrollTop;
 
-    // Hitung Skala Fit Layar (Memperhitungkan Lebar DAN Tinggi)
+    // Hitung Skala Fit Layar
     function calculateFitScale() {
         zoomContent.style.zoom = '1';
         zoomContent.style.transform = 'none';
@@ -29,7 +29,6 @@ document.addEventListener("DOMContentLoaded", function() {
         const contentWidth = zoomContent.offsetWidth;
         const contentHeight = zoomContent.offsetHeight;
 
-        // PENGAMAN: Jika DOM belum selesai render atau ukuran 0, pakai skala default aman
         if (!contentWidth || !contentHeight || containerWidth <= 0 || containerHeight <= 0) {
             return 0.4; 
         }
@@ -41,19 +40,21 @@ document.addEventListener("DOMContentLoaded", function() {
         return Math.min(Math.max(bestFitRatio, 0.15), 1.0);
     }
 
-    // Fungsi Utama: Menjaga Titik Fokus Tampilan Saat Zoom Berubah
+    // Google Maps Style: Zoom to Focal Point (Titik pandang visual pengguna dipertahankan 100%)
     function updateScrollToCenter(oldScale, newScale) {
-        if (!container || oldScale === newScale) return;
+        if (!container || oldScale === newScale || oldScale <= 0) return;
 
-        const centerX = container.scrollLeft + (container.clientWidth / 2);
-        const centerY = container.scrollTop + (container.clientHeight / 2);
+        // Ambil titik pusat visual viewport yang sedang dilihat pengguna
+        const currentCenterX = container.scrollLeft + (container.clientWidth / 2);
+        const currentCenterY = container.scrollTop + (container.clientHeight / 2);
 
-        const ratioX = centerX / oldScale;
-        const ratioY = centerY / newScale;
+        const ratioX = currentCenterX / oldScale;
+        const ratioY = currentCenterY / oldScale;
 
         const newCenterX = ratioX * newScale;
         const newCenterY = ratioY * newScale;
 
+        // Kunci koordinat viewport agar tidak ada hentakan/pergeseran paksa ke tengah
         container.scrollLeft = newCenterX - (container.clientWidth / 2);
         container.scrollTop = newCenterY - (container.clientHeight / 2);
     }
@@ -66,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function() {
         if (Math.abs(targetScale - currentScale) > 0.005) {
             const relativeScale = currentScale / baseScale;
             zoomContent.style.transform = `scale(${relativeScale})`;
-            zoomContent.style.transformOrigin = 'top center';
+            zoomContent.style.transformOrigin = '0 0';
 
             updateScrollToCenter(oldScale, currentScale);
 
@@ -99,24 +100,25 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function centerToLorong() {
-        if (container && lorong) {
-            // Gunakan skala target yang sedang diproses
-            const activeScale = targetScale || currentScale || 1;
-            const containerWidth = container.clientWidth;
-            const lorongLeft = lorong.offsetLeft * activeScale;
-            const lorongWidth = lorong.offsetWidth * activeScale;
-            
-            const targetScroll = lorongLeft - (containerWidth / 2) + (lorongWidth / 2);
-            
-            // Terapkan scroll langsung (instant) tanpa jeda animasi browser
-            container.scrollLeft = Math.max(0, targetScroll);
-        }
+        if (!container || !lorong) return;
+
+        // Dapatkan koordinat visual riil dari kontainer dan lorong tengah
+        const containerRect = container.getBoundingClientRect();
+        const lorongRect = lorong.getBoundingClientRect();
+
+        // Hitung jarak pergeseran scroll yang dibutuhkan agar titik pusat lorong berada tepat di tengah viewport
+        const currentScroll = container.scrollLeft;
+        const lorongCenterX = lorongRect.left + (lorongRect.width / 2);
+        const containerCenterX = containerRect.left + (containerRect.width / 2);
+
+        const diff = lorongCenterX - containerCenterX;
+        container.scrollLeft = Math.max(0, currentScroll + diff);
     }
 
     window.adjustZoom = function(amount) {
         targetScale += amount;
         
-        if (targetScale < minScaleLocked) targetScale = minScaleLocked;
+        if (targetScale < 0.15) targetScale = 0.15;
         if (targetScale > maxScale) targetScale = maxScale;
 
         triggerSmoothZoom();
@@ -124,9 +126,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     window.resetZoom = function() {
         minScaleLocked = calculateFitScale();
-        targetScale = minScaleLocked;
+        
+        // Khusus layar HP/Tablet (<= 1024px), inisialisasi awal berada di 100% (1.0), desktop menggunakan fit scale
+        const initialScale = (window.innerWidth <= 1024) ? 1.0 : minScaleLocked;
+        
+        targetScale = initialScale;
         triggerSmoothZoom();
-        centerToLorong();
+
+        // Eksekusi pengetengahan setelah render layout selesai presisi
+        requestAnimationFrame(() => {
+            setTimeout(centerToLorong, 100);
+        });
     };
 
     window.startZoomHold = function(amount) {
