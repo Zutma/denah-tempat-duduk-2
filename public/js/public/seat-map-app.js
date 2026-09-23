@@ -9,6 +9,9 @@ function seatMapApp() {
         searchedSeatIds: new Set(), // Memakai Set untuk O(1) lookup di Alpine x-bind class
         showDropdown: false,
 
+        // State Infinite Scroll langsung di Dropdown
+        dropdownLimit: 10,
+
         gradMap: null,
         debounceTimer: null,
 
@@ -50,7 +53,11 @@ function seatMapApp() {
         executeSearch(query) {
             const q = (query || '').toString().trim().toLowerCase();
 
-            if (!q || !Array.isArray(this.graduatesList)) {
+            // Reset limit dropdown ke 10 item awal untuk batch highlight pertama
+            this.dropdownLimit = 10;
+
+            // Batasi minimal 2 karakter agar tidak memuat ratusan data sampah saat baru mengetik 1 huruf
+            if (!q || q.length < 2 || !Array.isArray(this.graduatesList)) {
                 this.filteredGraduates = [];
                 this.searchedSeatIds = new Set();
                 this.showDropdown = false;
@@ -58,7 +65,6 @@ function seatMapApp() {
             }
 
             const matchedGrads = [];
-            const matchedSeatIds = new Set();
 
             for (let i = 0; i < this.graduatesList.length; i++) {
                 const g = this.graduatesList[i];
@@ -70,15 +76,35 @@ function seatMapApp() {
 
                 if (nameMatch || nrpMatch || seatMatch) {
                     matchedGrads.push(g);
-                    if (g.seat_id) {
-                        matchedSeatIds.add(Number(g.seat_id));
-                    }
                 }
             }
 
             this.filteredGraduates = matchedGrads;
-            this.searchedSeatIds = matchedSeatIds;
+            // Batch-first highlight: Hanya highlight seat yang tampil di batch awal dropdown
+            this.updateSearchedSeatIds();
             this.showDropdown = true;
+        },
+
+        updateSearchedSeatIds() {
+            const visibleGrads = this.filteredGraduates.slice(0, this.dropdownLimit);
+            const matchedSeatIds = new Set();
+            for (let i = 0; i < visibleGrads.length; i++) {
+                if (visibleGrads[i].seat_id) {
+                    matchedSeatIds.add(Number(visibleGrads[i].seat_id));
+                }
+            }
+            this.searchedSeatIds = matchedSeatIds;
+        },
+
+        handleDropdownScroll(e) {
+            const target = e.target;
+            // Jika scroll pengguna mendekati 30px dari bawah dropdown, muat 10 data & highlight tambahan (Lazy-load highlight)
+            if (target.scrollTop + target.clientHeight >= target.scrollHeight - 30) {
+                if (this.dropdownLimit < this.filteredGraduates.length) {
+                    this.dropdownLimit += 10;
+                    this.updateSearchedSeatIds();
+                }
+            }
         },
 
         getGradBySeatId(seatId) {
@@ -112,7 +138,7 @@ function seatMapApp() {
             this.searchedSeatIdClicked = targetId;
             this.searchedSeatIds = new Set([targetId]);
             
-            // SOLUSI: Tutup dropdown secara otomatis saat item diklik agar denah tempat duduk di belakangnya tidak pernah terhalang!
+            // SOLUSI: Tutup dropdown secara otomatis saat item diklik agar denah tempat duduk tidak pernah terhalang!
             this.showDropdown = false;
 
             this.$nextTick(() => {
