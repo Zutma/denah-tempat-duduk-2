@@ -101,6 +101,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </svg>
                         <input type="text" 
                             x-model="searchQuery" 
+                            @focus="handleFocus()"
                             <?= empty($activeSession) ? 'disabled' : '' ?>
                             placeholder="<?= empty($activeSession) ? 'Pilih acara dulu...' : 'Cari nama, NRP, kursi...' ?>"
                             class="w-full pl-7 pr-2 py-1.5 border border-slate-300 rounded-lg text-xs font-medium bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all shadow-2xs disabled:bg-slate-100">
@@ -108,7 +109,9 @@ if (session_status() === PHP_SESSION_NONE) {
 
                     <!-- DROPDOWN PENCARIAN HASIL -->
                     <?php if (!empty($activeSession)): ?>
-                    <div x-show="searchQuery.trim() !== ''" x-cloak 
+                    <div x-show="showDropdown && searchQuery.trim() !== ''" 
+                         @click.outside="showDropdown = false"
+                         x-cloak 
                          class="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-300 rounded-xl shadow-2xl p-2 text-left max-h-72 overflow-y-auto custom-scrollbar"
                          style="z-index: 99999 !important;">
                         <div class="flex items-center justify-between text-[10px] text-slate-500 px-1 pb-1 border-b border-slate-100">

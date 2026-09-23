@@ -7,6 +7,7 @@ function seatMapApp() {
         searchedSeatIdClicked: null,
         filteredGraduates: [],
         searchedSeatIds: new Set(), // Memakai Set untuk O(1) lookup di Alpine x-bind class
+        showDropdown: false,
 
         gradMap: null,
         debounceTimer: null,
@@ -52,6 +53,7 @@ function seatMapApp() {
             if (!q || !Array.isArray(this.graduatesList)) {
                 this.filteredGraduates = [];
                 this.searchedSeatIds = new Set();
+                this.showDropdown = false;
                 return;
             }
 
@@ -76,6 +78,7 @@ function seatMapApp() {
 
             this.filteredGraduates = matchedGrads;
             this.searchedSeatIds = matchedSeatIds;
+            this.showDropdown = true;
         },
 
         getGradBySeatId(seatId) {
@@ -108,13 +111,37 @@ function seatMapApp() {
             this.selectedSeatId = targetId;
             this.searchedSeatIdClicked = targetId;
             this.searchedSeatIds = new Set([targetId]);
+            
+            // SOLUSI: Tutup dropdown secara otomatis saat item diklik agar denah tempat duduk di belakangnya tidak pernah terhalang!
+            this.showDropdown = false;
 
             this.$nextTick(() => {
-                const el = document.getElementById(`seat-${targetId}`);
-                if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+                const container = document.getElementById('denahContainer');
+                const seat = document.getElementById(`seat-${targetId}`);
+
+                if (container && seat) {
+                    const containerRect = container.getBoundingClientRect();
+                    const seatRect = seat.getBoundingClientRect();
+
+                    // Header Offset aman (~120px) agar posisi kursi di-scroll persis di bawah header
+                    const headerOffset = 120;
+
+                    const newScrollTop = container.scrollTop + (seatRect.top - containerRect.top) - headerOffset;
+                    const newScrollLeft = container.scrollLeft + (seatRect.left - containerRect.left) - (containerRect.width / 2) + (seatRect.width / 2);
+
+                    container.scrollTo({
+                        top: Math.max(0, newScrollTop),
+                        left: Math.max(0, newScrollLeft),
+                        behavior: 'smooth'
+                    });
                 }
             });
+        },
+
+        handleFocus() {
+            if (this.searchQuery.trim() !== '') {
+                this.showDropdown = true;
+            }
         },
 
         closeModal() {
@@ -129,6 +156,7 @@ function seatMapApp() {
             this.searchedSeatIdClicked = null;
             this.filteredGraduates = [];
             this.searchedSeatIds = new Set();
+            this.showDropdown = false;
         },
 
         // Helper untuk Alpine.js template (O(1) Instant Check)
