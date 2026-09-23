@@ -94,7 +94,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
             <!-- SEARCH BAR RESPONSIF -->
             <div class="flex items-center gap-2 w-full md:w-auto flex-1 max-w-none md:max-w-md relative z-[101]">
-                <div class="relative flex-1 min-w-0">
+                <div class="relative flex-1 min-w-0" @click.outside="showDropdown = false">
                     <div class="relative flex items-center">
                         <svg class="absolute left-2.5 w-3.5 h-3.5 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -102,6 +102,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         <input type="text" 
                             x-model="searchQuery" 
                             @focus="handleFocus()"
+                            @click="handleFocus()"
                             <?= empty($activeSession) ? 'disabled' : '' ?>
                             placeholder="<?= empty($activeSession) ? 'Pilih acara dulu...' : 'Cari nama, NRP, kursi...' ?>"
                             class="w-full pl-7 pr-2 py-1.5 border border-slate-300 rounded-lg text-xs font-medium bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all shadow-2xs disabled:bg-slate-100">
@@ -110,7 +111,6 @@ if (session_status() === PHP_SESSION_NONE) {
                     <!-- DROPDOWN PENCARIAN HASIL -->
                     <?php if (!empty($activeSession)): ?>
                     <div x-show="showDropdown && searchQuery.trim() !== ''" 
-                         @click.outside="showDropdown = false"
                          x-cloak 
                          class="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-300 rounded-xl shadow-2xl p-2 text-left max-h-72 overflow-y-auto custom-scrollbar"
                          style="z-index: 99999 !important;">
