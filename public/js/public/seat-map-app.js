@@ -90,8 +90,15 @@ function seatMapApp() {
             const gradData = this.getGradBySeatId(targetId);
             if (!gradData) return; // Kursi kosong
 
-            this.selectedSeatId = (this.selectedSeatId === targetId) ? null : targetId;
-            this.activeModalData = this.selectedSeatId ? gradData : null;
+            // Jika mengeklik kursi baru / kursi hasil pencarian, langsung buka modalnya dalam 1x klik
+            if (this.selectedSeatId !== targetId || !this.activeModalData) {
+                this.selectedSeatId = targetId;
+                this.activeModalData = gradData;
+            } else {
+                // Jika mengeklik kursi yang sudah terbuka modalnya secara persis, baru lakukan toggle (tutup)
+                this.selectedSeatId = null;
+                this.activeModalData = null;
+            }
         },
 
         focusSeat(seatId, data) {

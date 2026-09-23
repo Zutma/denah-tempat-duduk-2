@@ -71,9 +71,9 @@ main, footer {
 
 .selected-seat-ring {
     box-shadow: 0 0 0 3px #127BBE, 0 4px 14px rgba(18, 123, 190, 0.4);
-    transform: scale(1.1);
+    transform: scale(1.08);
     position: relative;
-    z-index: 20 !important;
+    z-index: 10 !important;
 }
 
 @keyframes seatPulse {
@@ -82,8 +82,8 @@ main, footer {
         transform: scale(1.05);
     }
     50% {
-        box-shadow: 0 0 0 4px #FDBB16, 0 0 18px rgba(253, 187, 22, 0.85);
-        transform: scale(1.15);
+        box-shadow: 0 0 0 4px #127BBE, 0 0 14px rgba(18, 123, 190, 0.7);
+        transform: scale(1.08);
     }
     100% {
         box-shadow: 0 0 0 3px #127BBE, 0 0 8px rgba(18, 123, 190, 0.5);
@@ -94,7 +94,7 @@ main, footer {
 .search-highlight-seat {
     animation: seatPulse 1.4s infinite ease-in-out;
     position: relative;
-    z-index: 25 !important;
+    z-index: 10 !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar {

@@ -196,7 +196,7 @@ if (session_status() === PHP_SESSION_NONE) {
                                                         $hasGraduate = !empty($seat['graduate_name']);
                                                         $facultyColor = $hasGraduate && !empty($seat['faculty_color']) ? $seat['faculty_color'] : '#cbd5e1';
                                                     ?>
-                                                    <div class="flex flex-col items-center relative" :class="{ 'z-30': isSeatSearched(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
+                                                    <div class="flex flex-col items-center relative" :class="{ 'z-10': isSeatSearched(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
                                                         <button type="button" id="seat-<?= $seat['id'] ?>"
                                                             @click="selectSeat(<?= $seat['id'] ?>)"
                                                             :class="{ 'search-highlight-seat': isSeatSearched(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !isSeatSearched(<?= $seat['id'] ?>) }"
@@ -238,7 +238,7 @@ if (session_status() === PHP_SESSION_NONE) {
                                                         $hasGraduate = !empty($seat['graduate_name']);
                                                         $facultyColor = $hasGraduate && !empty($seat['faculty_color']) ? $seat['faculty_color'] : '#cbd5e1';
                                                     ?>
-                                                    <div class="flex flex-col items-center relative" :class="{ 'z-30': isSeatSearched(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
+                                                    <div class="flex flex-col items-center relative" :class="{ 'z-10': isSeatSearched(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
                                                         <button type="button" id="seat-<?= $seat['id'] ?>"
                                                             @click="selectSeat(<?= $seat['id'] ?>)"
                                                             :class="{ 'search-highlight-seat': isSeatSearched(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !isSeatSearched(<?= $seat['id'] ?>) }"
