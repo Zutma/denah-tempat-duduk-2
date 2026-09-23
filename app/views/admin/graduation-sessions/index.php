@@ -58,6 +58,7 @@
                     <th class="px-5 py-4 text-center w-12"><input type="checkbox" id="selectAll" class="w-4 h-4 text-its-blue-light border-slate-300 rounded cursor-pointer"></th>
                     <th class="px-6 py-4 text-left">Tanggal Pelaksanaan</th>
                     <th class="px-6 py-4 text-center">Sesi</th>
+                    <th class="px-6 py-4 text-center">Waktu</th>
                     <th class="px-6 py-4 text-center">Status</th>
                     <th class="px-6 py-4 text-right">Aksi</th>
                 </tr>
@@ -65,7 +66,7 @@
             <tbody class="divide-y divide-slate-100 bg-white">
                 <?php if (empty($sessions)): ?>
                     <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-sm text-slate-400 italic">Belum ada sesi untuk event ini.</td>
+                        <td colspan="6" class="px-6 py-12 text-center text-sm text-slate-400 italic">Belum ada sesi untuk event ini.</td>
                     </tr>
                 <?php else: ?>
                     <?php foreach ($sessions as $session): ?>
@@ -73,6 +74,13 @@
                             <td class="px-5 py-4 text-center"><input type="checkbox" class="rowCheckbox w-4 h-4 text-its-blue-light border-slate-300 rounded cursor-pointer" value="<?= $session['id'] ?>"></td>
                             <td class="px-6 py-4 font-bold text-slate-800"><?= date('d F Y', strtotime($session['date'])) ?></td>
                             <td class="px-6 py-4 text-center text-slate-700 font-bold">Sesi <?= htmlspecialchars($session['session'] ?? '-') ?></td>
+                            <td class="px-6 py-4 text-center text-slate-700 font-bold">
+                                <?php if (!empty($session['time'])): ?>
+                                    <?= htmlspecialchars(ucfirst($session['time'])) ?>
+                                <?php else: ?>
+                                    <span class="text-slate-400 font-normal italic">-</span>
+                                <?php endif; ?>
+                            </td>
                             <td class="px-6 py-4 text-center">
                                 <span class="inline-block px-3 py-1 text-xs font-bold rounded-md border capitalize <?= $session['status'] === 'published' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200' ?>">
                                     <?= htmlspecialchars($session['status']) ?>

@@ -65,7 +65,7 @@ if (session_status() === PHP_SESSION_NONE) {
                             <?php if (!empty($publishedSessions)): ?>
                                 <?php foreach ($publishedSessions as $session): ?>
                                     <option value="<?= $session['id'] ?>" <?= (!empty($activeSession) && $activeSession['id'] == $session['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($session['event_name'] ?? 'Event') ?> — Sesi <?= htmlspecialchars($session['session']) ?>
+                                        <?= htmlspecialchars($session['event_name'] ?? 'Event') ?> — Sesi <?= htmlspecialchars($session['session']) ?><?= !empty($session['time']) ? ' (' . htmlspecialchars(ucfirst($session['time'])) . ')' : '' ?>
                                     </option>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -84,7 +84,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         <?php if (!empty($publishedSessions)): ?>
                             <?php foreach ($publishedSessions as $session): ?>
                                 <option value="<?= $session['id'] ?>" <?= (!empty($activeSession) && $activeSession['id'] == $session['id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($session['event_name'] ?? 'Event') ?> — Sesi <?= htmlspecialchars($session['session']) ?> (<?= date('d M Y', strtotime($session['date'])) ?>)
+                                    <?= htmlspecialchars($session['event_name'] ?? 'Event') ?> — Sesi <?= htmlspecialchars($session['session']) ?><?= !empty($session['time']) ? ' ' . htmlspecialchars(ucfirst($session['time'])) : '' ?> (<?= date('d M Y', strtotime($session['date'])) ?>)
                                 </option>
                             <?php endforeach; ?>
                         <?php endif; ?>

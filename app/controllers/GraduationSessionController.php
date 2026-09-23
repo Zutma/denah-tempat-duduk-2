@@ -37,6 +37,7 @@ class GraduationSessionController extends BaseController {
             $this->checkCsrf();
             $date = trim($_POST['date'] ?? '');
             $sessionNumber = $_POST['session'] !== '' ? (int)$_POST['session'] : null;
+            $time = !empty($_POST['time']) ? trim($_POST['time']) : null;
             $status = $_POST['status'] ?? 'draft';
             $eventId = $_POST['event_id'] ?? $eventId;
 
@@ -44,16 +45,16 @@ class GraduationSessionController extends BaseController {
 
             if (empty($errors)) {
                 if (isset($_POST['id']) && $_POST['id'] !== '') {
-                    GraduationSession::update($conn, $_POST['id'], $date, $sessionNumber, $status);
+                    GraduationSession::update($conn, $_POST['id'], $date, $sessionNumber, $time, $status);
                     $_SESSION['success'] = "Sesi wisuda berhasil diperbarui.";
                 } else {
-                    GraduationSession::create($conn, $eventId, $date, $sessionNumber, $status);
+                    GraduationSession::create($conn, $eventId, $date, $sessionNumber, $time, $status);
                     $_SESSION['success'] = "Sesi wisuda baru berhasil ditambahkan.";
                 }
                 $this->redirect("/graduation-sessions?event_id=" . $eventId);
             }
 
-            $session = ['id' => $_POST['id'] ?? null, 'date' => $date, 'session' => $sessionNumber, 'status' => $status];
+            $session = ['id' => $_POST['id'] ?? null, 'date' => $date, 'session' => $sessionNumber, 'time' => $time, 'status' => $status];
         }
 
         $pageTitle = $session ? 'Edit Sesi' : 'Tambah Sesi';

@@ -18,15 +18,15 @@ class GraduationSession {
         return $stmt->get_result()->fetch_assoc();
     }
 
-    public static function create($conn, $eventId, $date, $sessionNumber, $status) {
-        $stmt = $conn->prepare("INSERT INTO graduation_sessions (graduation_event_id, date, session, status, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())");
-        $stmt->bind_param("isis", $eventId, $date, $sessionNumber, $status);
+    public static function create($conn, $eventId, $date, $sessionNumber, $time, $status) {
+        $stmt = $conn->prepare("INSERT INTO graduation_sessions (graduation_event_id, date, session, time, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())");
+        $stmt->bind_param("isiss", $eventId, $date, $sessionNumber, $time, $status);
         return $stmt->execute();
     }
 
-    public static function update($conn, $id, $date, $sessionNumber, $status) {
-        $stmt = $conn->prepare("UPDATE graduation_sessions SET date = ?, session = ?, status = ?, updated_at = NOW() WHERE id = ?");
-        $stmt->bind_param("sisi", $date, $sessionNumber, $status, $id);
+    public static function update($conn, $id, $date, $sessionNumber, $time, $status) {
+        $stmt = $conn->prepare("UPDATE graduation_sessions SET date = ?, session = ?, time = ?, status = ?, updated_at = NOW() WHERE id = ?");
+        $stmt->bind_param("sissi", $date, $sessionNumber, $time, $status, $id);
         return $stmt->execute();
     }
 
