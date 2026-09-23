@@ -300,25 +300,44 @@ if (session_status() === PHP_SESSION_NONE) {
             <div x-show="activeModalData" x-cloak
                 class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4"
                 @click.self="closeModal()">
-                <div class="bg-white rounded-2xl shadow-2xl border border-its-blue-sky/30 max-w-xs md:max-w-sm w-full p-5 text-left relative"
+                <div class="bg-white rounded-2xl shadow-2xl border border-its-blue-sky/30 max-w-sm md:max-w-md w-full p-6 text-left relative"
                     @keydown.escape.window="closeModal()">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full border border-white" :style="`background-color: ${activeModalData?.color || '#cbd5e1'}`"></span>
-                            <span class="text-[11px] font-extrabold uppercase text-its-blue-light">Detail Tempat Duduk</span>
+                    
+                    <!-- HEADER -->
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-3 h-3 rounded-full border border-slate-200 shrink-0 shadow-2xs" :style="`background-color: ${activeModalData?.color || '#cbd5e1'}`"></span>
+                            <span class="text-xs font-extrabold uppercase tracking-wider text-its-blue-light">Detail Tempat Duduk</span>
                         </div>
-                        <button @click="closeModal()" class="text-slate-400 hover:text-its-blue font-bold text-sm">✕</button>
+                        <button type="button" @click="closeModal()" class="text-slate-400 hover:text-its-blue font-bold text-base cursor-pointer p-1 leading-none transition-colors" title="Tutup">✕</button>
                     </div>
+
                     <template x-if="activeModalData">
-                        <div class="space-y-2 text-xs">
-                            <span class="inline-block px-2 py-0.5 bg-its-yellow/20 text-its-blue border border-its-yellow/60 font-extrabold rounded mb-1">
-                                Kursi <span x-text="activeModalData.seat_code"></span>
-                            </span>
-                            <h4 class="text-sm font-extrabold text-slate-800" x-text="activeModalData.name"></h4>
-                            <p class="font-semibold text-its-blue-light" x-text="`NRP: ${activeModalData.nrp}`"></p>
-                            <div class="pt-2 border-t border-slate-100 text-slate-600">
-                                <p><span class="font-bold">Prodi:</span> <span x-text="activeModalData.prodi"></span></p>
-                                <p><span class="font-bold">Fakultas:</span> <span x-text="activeModalData.faculty_name"></span></p>
+                        <div class="space-y-3">
+                            <!-- BADGE KURSI -->
+                            <div>
+                                <span class="inline-block px-3 py-1 bg-its-yellow/20 text-its-blue border border-its-yellow/60 text-xs md:text-sm font-extrabold rounded-lg shadow-2xs">
+                                    Kursi <span x-text="activeModalData.seat_code"></span>
+                                </span>
+                            </div>
+
+                            <!-- NAMA WISUDAWAN -->
+                            <h4 class="text-base md:text-lg font-extrabold text-slate-900 leading-snug tracking-tight" x-text="activeModalData.name"></h4>
+
+                            <!-- NRP -->
+                            <p class="text-xs md:text-sm font-semibold text-its-blue-light tracking-wide" x-text="`NRP: ${activeModalData.nrp}`"></p>
+
+                            <!-- CARD PROGRAM STUDI & FAKULTAS -->
+                            <div class="mt-4 p-3.5 bg-slate-50/90 rounded-xl border border-slate-200/60 space-y-3 text-slate-600">
+                                <div>
+                                    <span class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Program Studi</span>
+                                    <span class="font-semibold text-slate-800 text-xs md:text-sm leading-relaxed block" x-text="(activeModalData.degree ? activeModalData.degree + ' ' : '') + (activeModalData.prodi || activeModalData.prodi_name || '-')"></span>
+                                </div>
+                                <div class="h-px bg-slate-200/80 w-full"></div>
+                                <div>
+                                    <span class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Fakultas</span>
+                                    <span class="font-semibold text-slate-800 text-xs md:text-sm leading-relaxed block" x-text="activeModalData.faculty_name || '-'"></span>
+                                </div>
                             </div>
                         </div>
                     </template>
@@ -327,6 +346,54 @@ if (session_status() === PHP_SESSION_NONE) {
         <?php endif; ?>
 
     </main>
+
+    <div x-show="activeModalData" x-cloak
+        class="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4"
+        @click.self="closeModal()">
+        
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200/80 max-w-sm w-full p-5 md:p-6 text-left relative overflow-hidden font-sans"
+            @keydown.escape.window="closeModal()">
+            
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-its-blue via-its-blue-light to-its-yellow"></div>
+
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs" :style="`background-color: ${activeModalData?.color || '#cbd5e1'}`"></span>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Detail Wisudawan</span>
+                </div>
+                <button type="button" @click="closeModal()" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold text-xs flex items-center justify-center transition-colors cursor-pointer" title="Tutup">✕</button>
+            </div>
+
+            <template x-if="activeModalData">
+                <div class="space-y-3">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="inline-flex items-center px-3 py-1 bg-its-yellow text-its-blue font-extrabold rounded-lg text-xs tracking-wider shadow-2xs border border-amber-400/50" x-text="'Kursi ' + activeModalData.seat_code"></span>
+                            <span class="text-[10px] font-mono text-slate-400 font-medium" x-text="'ID: #' + activeModalData.seat_id"></span>
+                        </div>
+
+                        <h3 class="text-base md:text-lg font-bold text-slate-900 leading-snug tracking-tight" x-text="activeModalData.name"></h3>
+
+                        <p class="text-xs font-semibold text-slate-500 tracking-wide" x-text="'NRP ' + activeModalData.nrp"></p>
+                    </div>
+
+                    <div class="mt-4 p-3.5 bg-slate-50 rounded-xl border border-slate-100 space-y-2.5 text-xs">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Program Studi</span>
+                            <span class="font-semibold text-slate-800 leading-relaxed" x-text="(activeModalData.degree ? activeModalData.degree + ' ' : '') + (activeModalData.prodi || activeModalData.prodi_name || '-')"></span>
+                        </div>
+
+                        <div class="h-px bg-slate-200/60 w-full"></div>
+
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Fakultas</span>
+                            <span class="font-semibold text-slate-800 leading-relaxed" x-text="activeModalData.faculty_name || '-'"></span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
 
     <!-- SENO MASCOT HTML -->
     <?php if (!empty($activeSession) && !isset($message)): ?>

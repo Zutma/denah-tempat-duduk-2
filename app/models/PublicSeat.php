@@ -35,7 +35,7 @@ class PublicSeat {
                 s.id AS seat_id, s.local, s.global, s.category,
                 g.id AS graduate_id, g.name AS graduate_name, g.nrp,
                 g.faculty_id, f.code AS faculty_code, f.color AS faculty_color,
-                sp.name AS prodi_name
+                sp.name AS prodi_name, sp.degree_level AS degree
             FROM seat_rows sr
             LEFT JOIN seats s ON s.seat_row_id = sr.id
             LEFT JOIN graduates g ON g.seat_id = s.id
@@ -72,6 +72,7 @@ class PublicSeat {
                     'graduate_name' => $row['graduate_name'] ?? null,
                     'nrp'           => $row['nrp'] ?? null,
                     'prodi_name'    => $row['prodi_name'] ?? null,
+                    'degree'        => $row['degree'] ?? null,
                     'faculty_id'    => $row['faculty_id'] ? (int)$row['faculty_id'] : null,
                     'faculty_code'  => $row['faculty_code'] ?? null,
                     'faculty_color' => $row['faculty_color'] ?? '#cbd5e1'
@@ -106,7 +107,7 @@ class PublicSeat {
 
         $stmtGrads = $conn->prepare("
             SELECT g.seat_id, g.name, g.nrp, 
-                   sp.name AS prodi_name, 
+                   sp.name AS prodi_name, sp.degree_level,
                    f.name AS faculty_name, f.code AS faculty_code, f.color AS faculty_color
             FROM graduates g
             JOIN study_programs sp ON g.study_program_id = sp.id
@@ -164,6 +165,7 @@ class PublicSeat {
                 'name'         => $g['name'],
                 'nrp'          => $g['nrp'],
                 'prodi'        => $g['prodi_name'] ?? '-',
+                'degree'       => $g['degree_level'] ?? '',
                 'faculty'      => $facCode,
                 'faculty_name' => $g['faculty_name'] ?? '-',
                 'color'        => $g['faculty_color'] ?? '#cbd5e1'

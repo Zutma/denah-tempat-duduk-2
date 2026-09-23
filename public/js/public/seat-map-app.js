@@ -64,7 +64,8 @@ function seatMapApp() {
                 return;
             }
 
-            const matchedGrads = [];
+            const primaryMatches = [];   // Cocok Nama & NRP (Prioritas Utama Teratas)
+            const secondaryMatches = []; // Cocok Kode Kursi, Prodi, dan Fakultas
 
             for (let i = 0; i < this.graduatesList.length; i++) {
                 const g = this.graduatesList[i];
@@ -73,16 +74,29 @@ function seatMapApp() {
                 const nameMatch = g.name && g.name.toString().toLowerCase().includes(q);
                 const nrpMatch = g.nrp && g.nrp.toString().toLowerCase().includes(q);
                 const seatMatch = g.seat_code && g.seat_code.toString().toLowerCase().includes(q);
+                const prodiMatch = g.prodi && g.prodi.toString().toLowerCase().includes(q);
+                const facultyMatch = (g.faculty && g.faculty.toString().toLowerCase().includes(q)) ||
+                                     (g.faculty_name && g.faculty_name.toString().toLowerCase().includes(q));
 
-                if (nameMatch || nrpMatch || seatMatch) {
-                    matchedGrads.push(g);
+                if (nameMatch || nrpMatch) {
+                    primaryMatches.push(g);
+                } else if (seatMatch || prodiMatch || facultyMatch) {
+                    secondaryMatches.push(g);
                 }
             }
 
-            this.filteredGraduates = matchedGrads;
+            // Gabungkan dengan prioritas utama (Nama & NRP) di urutan paling atas
+            this.filteredGraduates = [...primaryMatches, ...secondaryMatches];
             // Batch-first highlight: Hanya highlight seat yang tampil di batch awal dropdown
             this.updateSearchedSeatIds();
             this.showDropdown = true;
+        },
+
+        toTitleCase(str) {
+            if (!str) return '';
+            return str.toString().toLowerCase().replace(/(?:^|\s|-|\/)\S/g, function(m) {
+                return m.toUpperCase();
+            });
         },
 
         updateSearchedSeatIds() {
