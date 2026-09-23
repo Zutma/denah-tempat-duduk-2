@@ -196,10 +196,10 @@ if (session_status() === PHP_SESSION_NONE) {
                                                         $hasGraduate = !empty($seat['graduate_name']);
                                                         $facultyColor = $hasGraduate && !empty($seat['faculty_color']) ? $seat['faculty_color'] : '#cbd5e1';
                                                     ?>
-                                                    <div class="flex flex-col items-center relative" :class="{ 'z-30': searchedSeatIds.includes(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
+                                                    <div class="flex flex-col items-center relative" :class="{ 'z-30': isSeatSearched(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
                                                         <button type="button" id="seat-<?= $seat['id'] ?>"
                                                             @click="selectSeat(<?= $seat['id'] ?>)"
-                                                            :class="{ 'search-highlight-seat': searchedSeatIds.includes(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !searchedSeatIds.includes(<?= $seat['id'] ?>) }"
+                                                            :class="{ 'search-highlight-seat': isSeatSearched(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !isSeatSearched(<?= $seat['id'] ?>) }"
                                                             class="w-10 h-10 md:w-13 md:h-13 rounded-lg flex items-center justify-center font-extrabold text-[11px] md:text-xs shadow-2xs transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
                                                             style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#f1f5f9' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>; border: <?= $hasGraduate ? 'none' : '1px solid #cbd5e1' ?>;">
                                                             <?= htmlspecialchars($seatMapInfo[$seat['id']]['code'] ?? '-') ?>
@@ -238,10 +238,10 @@ if (session_status() === PHP_SESSION_NONE) {
                                                         $hasGraduate = !empty($seat['graduate_name']);
                                                         $facultyColor = $hasGraduate && !empty($seat['faculty_color']) ? $seat['faculty_color'] : '#cbd5e1';
                                                     ?>
-                                                    <div class="flex flex-col items-center relative" :class="{ 'z-30': searchedSeatIds.includes(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
+                                                    <div class="flex flex-col items-center relative" :class="{ 'z-30': isSeatSearched(<?= $seat['id'] ?>) || selectedSeatId === <?= $seat['id'] ?> }">
                                                         <button type="button" id="seat-<?= $seat['id'] ?>"
                                                             @click="selectSeat(<?= $seat['id'] ?>)"
-                                                            :class="{ 'search-highlight-seat': searchedSeatIds.includes(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !searchedSeatIds.includes(<?= $seat['id'] ?>) }"
+                                                            :class="{ 'search-highlight-seat': isSeatSearched(<?= $seat['id'] ?>), 'selected-seat-ring': selectedSeatId === <?= $seat['id'] ?> && !isSeatSearched(<?= $seat['id'] ?>) }"
                                                             class="w-10 h-10 md:w-13 md:h-13 rounded-lg flex items-center justify-center font-extrabold text-[11px] md:text-xs shadow-2xs transition-all duration-150 hover:scale-105 cursor-pointer focus:outline-none"
                                                             style="background-color: <?= $hasGraduate ? htmlspecialchars($facultyColor) : '#f1f5f9' ?>; color: <?= $hasGraduate ? '#ffffff' : '#64748b' ?>; border: <?= $hasGraduate ? 'none' : '1px solid #cbd5e1' ?>;">
                                                             <?= htmlspecialchars($seatMapInfo[$seat['id']]['code'] ?? '-') ?>

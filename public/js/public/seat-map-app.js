@@ -97,10 +97,8 @@ function seatMapApp() {
         focusSeat(seatId, data) {
             if (!seatId) return;
             const targetId = Number(seatId);
-            const gradData = data || this.getGradBySeatId(targetId);
 
             this.selectedSeatId = targetId;
-            this.activeModalData = gradData;
             this.searchedSeatIdClicked = targetId;
             this.searchedSeatIds = new Set([targetId]);
 
