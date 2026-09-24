@@ -8,7 +8,7 @@ class PublicSeat {
             FROM graduation_sessions gs
             JOIN graduation_events ge ON gs.graduation_event_id = ge.id
             WHERE gs.status = 'published'
-            ORDER BY gs.date DESC
+            ORDER BY gs.date ASC, gs.time ASC
         ");
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
