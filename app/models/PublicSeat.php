@@ -34,7 +34,7 @@ class PublicSeat {
                 sr.id AS row_id, sr.`row`, sr.side, sr.capacity,
                 s.id AS seat_id, s.local, s.global, s.category,
                 g.id AS graduate_id, g.name AS graduate_name, g.nrp,
-                g.faculty_id, f.code AS faculty_code, f.color AS faculty_color,
+                g.faculty_id, f.name AS faculty_name, f.code AS faculty_code, f.color AS faculty_color,
                 sp.name AS prodi_name, sp.degree_level AS degree
             FROM seat_rows sr
             LEFT JOIN seats s ON s.seat_row_id = sr.id
@@ -75,6 +75,7 @@ class PublicSeat {
                     'degree'        => $row['degree'] ?? null,
                     'faculty_id'    => $row['faculty_id'] ? (int)$row['faculty_id'] : null,
                     'faculty_code'  => $row['faculty_code'] ?? null,
+                    'faculty_name'  => $row['faculty_name'] ?? null,
                     'faculty_color' => $row['faculty_color'] ?? '#cbd5e1'
                 ];
             }
@@ -104,24 +105,6 @@ class PublicSeat {
     public static function getProcessedSeatData($conn, $sessionId) {
         $leftRows = self::getSeatRowsWithSeats($conn, $sessionId, 'left');
         $rightRows = self::getSeatRowsWithSeats($conn, $sessionId, 'right');
-
-        $stmtGrads = $conn->prepare("
-            SELECT g.seat_id, g.name, g.nrp, 
-                   sp.name AS prodi_name, sp.degree_level,
-                   f.name AS faculty_name, f.code AS faculty_code, f.color AS faculty_color
-            FROM graduates g
-            JOIN study_programs sp ON g.study_program_id = sp.id
-            JOIN faculties f ON g.faculty_id = f.id
-            WHERE g.graduation_session_id = ? AND g.seat_id IS NOT NULL
-        ");
-        $stmtGrads->bind_param("i", $sessionId);
-        $stmtGrads->execute();
-        $rawGraduates = $stmtGrads->get_result()->fetch_all(MYSQLI_ASSOC);
-
-        $graduatesBySeat = [];
-        foreach ($rawGraduates as $rg) {
-            $graduatesBySeat[$rg['seat_id']] = $rg;
-        }
 
         $seatMapInfo = [];
         $allGraduatesList = [];
@@ -157,19 +140,29 @@ class PublicSeat {
             }
         }
 
-        foreach ($graduatesBySeat as $seatId => $g) {
-            $facCode = !empty($g['faculty_code']) ? $g['faculty_code'] : ($g['faculty_name'] ?? '-');
-            $allGraduatesList[] = [
-                'seat_id'      => (int)$seatId,
-                'seat_code'    => $seatMapInfo[$seatId]['code'] ?? '-',
-                'name'         => $g['name'],
-                'nrp'          => $g['nrp'],
-                'prodi'        => $g['prodi_name'] ?? '-',
-                'degree'       => $g['degree_level'] ?? '',
-                'faculty'      => $facCode,
-                'faculty_name' => $g['faculty_name'] ?? '-',
-                'color'        => $g['faculty_color'] ?? '#cbd5e1'
-            ];
+        $allWings = [$leftRows, $rightRows];
+        foreach ($allWings as $wing) {
+            foreach ($wing as $r) {
+                if (!empty($r['seats'])) {
+                    foreach ($r['seats'] as $s) {
+                        if (!empty($s['graduate_name'])) {
+                            $seatId = $s['id'];
+                            $facCode = !empty($s['faculty_code']) ? $s['faculty_code'] : ($s['faculty_name'] ?? '-');
+                            $allGraduatesList[] = [
+                                'seat_id'      => (int)$seatId,
+                                'seat_code'    => $seatMapInfo[$seatId]['code'] ?? '-',
+                                'name'         => $s['graduate_name'],
+                                'nrp'          => $s['nrp'],
+                                'prodi'        => $s['prodi_name'] ?? '-',
+                                'degree'       => $s['degree'] ?? '',
+                                'faculty'      => $facCode,
+                                'faculty_name' => $s['faculty_name'] ?? '-',
+                                'color'        => $s['faculty_color'] ?? '#cbd5e1'
+                            ];
+                        }
+                    }
+                }
+            }
         }
 
         return [
