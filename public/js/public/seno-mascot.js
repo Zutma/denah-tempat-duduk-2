@@ -200,7 +200,7 @@
             dom.mascot.classList.add('seno-hidden');
             dom.mascot.classList.remove('seno-visible', 'anim-exit');
             if (dom.replay) dom.replay.classList.add('seno-rb-visible');
-        }, 550);
+        }, 420);
     }
 
     function startTour(manual) {
@@ -223,7 +223,7 @@
             ENTRY_ANIMS.forEach(function(a) { dom.mascot.classList.remove(a); });
             dom.mascot.classList.add('anim-float');
             showStep(0);
-        }, 850);
+        }, 520);
     }
 
     window.SenoTour = {
