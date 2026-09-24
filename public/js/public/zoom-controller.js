@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const container = document.getElementById('denahContainer');
     const zoomContent = document.getElementById('zoomContent');
     const zoomIndicator = document.getElementById('zoomIndicator');
+    const zoomIndicatorMobile = document.getElementById('zoomIndicatorMobile');
     const lorong = document.getElementById('lorongTengah');
 
     if (!container || !zoomContent) return;
@@ -74,6 +75,9 @@ document.addEventListener("DOMContentLoaded", function() {
             if (zoomIndicator) {
                 zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
             }
+            if (zoomIndicatorMobile) {
+                zoomIndicatorMobile.innerText = Math.round(currentScale * 100) + '%';
+            }
             requestAnimationFrame(animateGPU);
         } else {
             const finalOldScale = currentScale;
@@ -87,6 +91,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
             if (zoomIndicator) {
                 zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
+            }
+            if (zoomIndicatorMobile) {
+                zoomIndicatorMobile.innerText = Math.round(currentScale * 100) + '%';
             }
             isAnimating = false;
         }
@@ -239,6 +246,7 @@ document.addEventListener("DOMContentLoaded", function() {
             zoomContent.style.transform = 'none';
             zoomContent.style.zoom = currentScale;
             if (zoomIndicator) zoomIndicator.innerText = Math.round(currentScale * 100) + '%';
+            if (zoomIndicatorMobile) zoomIndicatorMobile.innerText = Math.round(currentScale * 100) + '%';
 
             // 3. Kunci posisi lorong ke tengah SECARA INSTAN
             centerToLorong();

@@ -39,24 +39,25 @@ if (session_status() === PHP_SESSION_NONE) {
 
     <!-- HEADER UTAMA (Z-Index Tertinggi) -->
     <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-[100] shadow-xs overflow-visible">
-        <div class="max-w-[98vw] mx-auto px-3 md:px-4 py-2 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 md:gap-3">
+        <div class="max-w-[98vw] mx-auto px-3 md:px-4 py-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4">
             
+            <!-- BARIS 1 MOBILE / KIRI DESKTOP: Logo + Judul + Dropdown Mobile -->
             <div class="flex items-center justify-between gap-3 shrink-0">
-                <div class="flex items-center gap-2.5">
-                    <img src="<?= url('images/LOGO.png') ?>" alt="ITS Logo" class="w-8 h-8 md:w-9 md:h-9 object-contain">
-                    <div class="h-8 w-px bg-slate-200"></div>
-                    <div class="flex flex-col justify-center leading-none">
-                        <p class="font-friz text-[9px] md:text-[11px] font-bold uppercase tracking-wider text-its-blue-light mb-0.5">
+                <div class="flex items-center gap-2.5 shrink-0">
+                    <img src="<?= url('images/LOGO.png') ?>" alt="ITS Logo" class="w-8 h-8 md:w-9 md:h-9 object-contain shrink-0">
+                    <div class="h-8 w-px bg-slate-200 shrink-0"></div>
+                    <div class="flex flex-col justify-center leading-none whitespace-nowrap shrink-0">
+                        <p class="font-friz text-[9px] md:text-[11px] font-bold uppercase tracking-wider text-its-blue-light mb-0.5 whitespace-nowrap">
                             SISTEM INFORMASI WISUDA
                         </p>
-                        <h1 class="font-friz text-xs md:text-lg font-bold uppercase text-its-blue tracking-tight">
+                        <h1 class="font-friz text-xs md:text-lg font-bold uppercase text-its-blue tracking-tight whitespace-nowrap">
                             DENAH TEMPAT DUDUK
                         </h1>
                     </div>
                 </div>
 
                 <!-- Dropdown Mobile -->
-                <div class="md:hidden w-44">
+                <div class="mobile-only-header w-44 shrink-0">
                     <form method="GET" id="sessionFormMobile" class="m-0">
                         <select name="session_id" 
                             onchange="if(this.value === '') { window.location.href = window.location.pathname; } else { this.form.submit(); }"
@@ -65,7 +66,7 @@ if (session_status() === PHP_SESSION_NONE) {
                             <?php if (!empty($publishedSessions)): ?>
                                 <?php foreach ($publishedSessions as $session): ?>
                                     <option value="<?= $session['id'] ?>" <?= (!empty($activeSession) && $activeSession['id'] == $session['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($session['event_name'] ?? 'Event') ?> — Sesi <?= htmlspecialchars($session['session']) ?><?= !empty($session['time']) ? ' (' . htmlspecialchars(ucfirst($session['time'])) . ')' : '' ?>
+                                        <?= htmlspecialchars($session['event_name'] ?? 'Event') ?> — Sesi <?= htmlspecialchars($session['session']) ?><?= !empty($session['time']) ? ' (' . htmlspecialchars(ucfirst($session['time'])) . ')' : '' ?> (<?= date('d M Y', strtotime($session['date'])) ?>)
                                     </option>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -74,27 +75,28 @@ if (session_status() === PHP_SESSION_NONE) {
                 </div>
             </div>
 
-            <!-- Dropdown Desktop -->
-            <div class="hidden md:block shrink-0 w-64 md:w-72">
-                <form method="GET" id="sessionForm" class="m-0">
-                    <select name="session_id" id="session_id" 
-                        onchange="if(this.value === '') { window.location.href = window.location.pathname; } else { document.getElementById('sessionForm').submit(); }"
-                        class="w-full px-3.5 py-1.5 bg-slate-50 border border-slate-300 focus:border-its-blue-light focus:bg-white rounded-lg text-xs font-bold text-its-blue focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 transition-all cursor-pointer shadow-2xs">
-                        <option value="" <?= empty($activeSession) ? 'selected' : '' ?>>-- Pilih Acara Wisuda --</option>
-                        <?php if (!empty($publishedSessions)): ?>
-                            <?php foreach ($publishedSessions as $session): ?>
-                                <option value="<?= $session['id'] ?>" <?= (!empty($activeSession) && $activeSession['id'] == $session['id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($session['event_name'] ?? 'Event') ?> — Sesi <?= htmlspecialchars($session['session']) ?><?= !empty($session['time']) ? ' ' . htmlspecialchars(ucfirst($session['time'])) : '' ?> (<?= date('d M Y', strtotime($session['date'])) ?>)
-                                </option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </select>
-                </form>
-            </div>
+            <!-- TENGAH DESKTOP: Dropdown Sesi + Search Bar -->
+            <div class="flex-1 flex items-center justify-center gap-2.5 max-w-2xl px-2 z-[101]">
+                <!-- Dropdown Desktop -->
+                <div class="desktop-only-header shrink-0 w-72 md:w-80">
+                    <form method="GET" id="sessionForm" class="m-0">
+                        <select name="session_id" id="session_id" 
+                            onchange="if(this.value === '') { window.location.href = window.location.pathname; } else { document.getElementById('sessionForm').submit(); }"
+                            class="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 focus:border-its-blue-light focus:bg-white rounded-lg text-xs font-bold text-its-blue focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 transition-all cursor-pointer shadow-2xs truncate">
+                            <option value="" <?= empty($activeSession) ? 'selected' : '' ?>>-- Pilih Acara Wisuda --</option>
+                            <?php if (!empty($publishedSessions)): ?>
+                                <?php foreach ($publishedSessions as $session): ?>
+                                    <option value="<?= $session['id'] ?>" <?= (!empty($activeSession) && $activeSession['id'] == $session['id']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($session['event_name'] ?? 'Event') ?> — Sesi <?= htmlspecialchars($session['session']) ?><?= !empty($session['time']) ? ' ' . htmlspecialchars(ucfirst($session['time'])) : '' ?> (<?= date('d M Y', strtotime($session['date'])) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </form>
+                </div>
 
-            <!-- SEARCH BAR RESPONSIF -->
-            <div class="flex items-center gap-2 w-full md:w-auto flex-1 max-w-none md:max-w-md relative z-[101]">
-                <div class="relative flex-1 min-w-0" @click.outside="showDropdown = false">
+                <!-- SEARCH BAR (BARIS 2 MOBILE FULL WIDTH / FLEX-1 MAX-W-XS DI DESKTOP) -->
+                <div class="relative flex-1 min-w-0 max-w-xs w-full" @click.outside="showDropdown = false">
                     <div class="relative flex items-center">
                         <svg class="absolute left-2.5 w-3.5 h-3.5 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -108,25 +110,21 @@ if (session_status() === PHP_SESSION_NONE) {
                             class="w-full pl-7 pr-2 py-1.5 border border-slate-300 rounded-lg text-xs font-medium bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all shadow-2xs disabled:bg-slate-100">
                     </div>
 
-                    <!-- DROPDOWN PENCARIAN HASIL (HEADER TETAP + SCROLLABLE LIST) -->
+                    <!-- DROPDOWN PENCARIAN HASIL -->
                     <?php if (!empty($activeSession)): ?>
                     <div x-show="showDropdown && searchQuery.trim().length >= 2" 
                          x-cloak 
                          class="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-300 rounded-xl shadow-2xl text-left overflow-hidden"
                          style="z-index: 99999 !important;">
-                        <!-- HEADER FIX / TETAP (TIDAK AKAN IKUT SCROLL) -->
                         <div class="flex items-center justify-between text-[10px] text-slate-500 px-3 py-2 bg-slate-50 border-b border-slate-200">
                             <span>Ditemukan <strong class="text-its-blue font-bold" x-text="filteredGraduates.length"></strong> wisudawan</span>
                             <button type="button" @click="clearSelection()" class="text-its-blue-light font-bold hover:underline cursor-pointer">Reset</button>
                         </div>
-
-                        <!-- LIST HASIL PENCARIAN (SCROLLABLE) -->
                         <div @scroll="handleDropdownScroll($event)"
                              class="p-2 custom-scrollbar"
                              style="max-height: 220px !important; overflow-y: auto !important;">
                             <template x-if="filteredGraduates.length > 0">
                                 <div class="divide-y divide-slate-100">
-                                    <!-- Render berdasar dropdownLimit yang bertambah otomatis saat di-scroll ke bawah -->
                                     <template x-for="g in filteredGraduates.slice(0, dropdownLimit)" :key="g.seat_id">
                                         <button type="button" @click="focusSeat(g.seat_id, g)"
                                             class="w-full p-2 hover:bg-slate-100 rounded-lg flex items-center justify-between group text-left cursor-pointer transition-colors">
@@ -139,8 +137,6 @@ if (session_status() === PHP_SESSION_NONE) {
                                     </template>
                                 </div>
                             </template>
-
-                            <!-- Indikator Loading / Status Infinite Scroll di dalam Dropdown -->
                             <template x-if="dropdownLimit < filteredGraduates.length">
                                 <div class="py-2.5 mt-1 border-t border-slate-100 text-center text-[10px] text-slate-500 font-medium flex items-center justify-center gap-1.5 bg-slate-50 rounded-b-lg">
                                     <svg class="animate-spin h-3.5 w-3.5 text-its-blue-light" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -150,13 +146,11 @@ if (session_status() === PHP_SESSION_NONE) {
                                     <span>Memuat lebih banyak... (<span x-text="dropdownLimit"></span>/<span x-text="filteredGraduates.length"></span>)</span>
                                 </div>
                             </template>
-
                             <template x-if="filteredGraduates.length > 0 && dropdownLimit >= filteredGraduates.length">
                                 <div class="pt-2 mt-1 border-t border-slate-100 text-center text-[10px] text-slate-400 italic">
                                     Semua hasil (<span x-text="filteredGraduates.length"></span>) ditampilkan.
                                 </div>
                             </template>
-
                             <template x-if="filteredGraduates.length === 0">
                                 <div class="p-3 text-center text-xs text-slate-400 font-medium">
                                     Wisudawan atau kursi tidak ditemukan
@@ -167,7 +161,17 @@ if (session_status() === PHP_SESSION_NONE) {
                     <?php endif; ?>
                 </div>
 
-                <!-- CONTROLLER ZOOM -->
+                <!-- Zoom Controller Ringkas Mobile (Baris 2 Header Samping Search Bar) -->
+                <div class="mobile-only-header items-center gap-0.5 shrink-0 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs shadow-2xs <?= empty($activeSession) ? 'opacity-50 pointer-events-none' : '' ?>">
+                    <button type="button" onmousedown="window.startZoomHold(-0.05)" onmouseup="window.stopZoomHold()" onmouseleave="window.stopZoomHold()" ontouchstart="window.startZoomHold(-0.05)" ontouchend="window.stopZoomHold()" class="w-6 h-6 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-bold text-slate-700 flex items-center justify-center">-</button>
+                    <span id="zoomIndicatorMobile" class="w-9 text-center font-extrabold text-its-blue text-[11px]">100%</span>
+                    <button type="button" onmousedown="window.startZoomHold(0.05)" onmouseup="window.stopZoomHold()" onmouseleave="window.stopZoomHold()" ontouchstart="window.startZoomHold(0.05)" ontouchend="window.stopZoomHold()" class="w-6 h-6 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-bold text-slate-700 flex items-center justify-center">+</button>
+                    <button type="button" onclick="window.resetZoom()" class="px-1 text-its-blue-light font-bold text-[10px] hover:underline">Reset</button>
+                </div>
+            </div>
+
+            <!-- KANAN DESKTOP: Zoom Controller + Dashboard Admin -->
+            <div class="desktop-only-header items-center gap-2 shrink-0">
                 <div class="flex items-center gap-0.5 shrink-0 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs shadow-2xs <?= empty($activeSession) ? 'opacity-50 pointer-events-none' : '' ?>">
                     <button type="button" onmousedown="window.startZoomHold(-0.05)" onmouseup="window.stopZoomHold()" onmouseleave="window.stopZoomHold()" ontouchstart="window.startZoomHold(-0.05)" ontouchend="window.stopZoomHold()" class="w-6 h-6 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-bold text-slate-700 flex items-center justify-center">-</button>
                     <span id="zoomIndicator" class="w-10 text-center font-extrabold text-its-blue text-[11px]">100%</span>
@@ -176,11 +180,9 @@ if (session_status() === PHP_SESSION_NONE) {
                 </div>
 
                 <?php if (!empty($_SESSION['user_id'])): ?>
-                    <!-- TOMBOL KEMBALI KE DASHBOARD UNTUK ADMIN -->
                     <a href="<?= url('dashboard') ?>" 
                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-its-blue hover:bg-its-blue-light text-white rounded-lg text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer border border-its-blue-light/30">
-                        <span class="hidden sm:inline">Dashboard Admin</span>
-                        <span class="sm:hidden">Dashboard</span>
+                        Dashboard
                     </a>
                 <?php endif; ?>
             </div>
@@ -235,7 +237,7 @@ if (session_status() === PHP_SESSION_NONE) {
                                                         <?php if ($hasGraduate): ?>
                                                             <div class="mt-1 flex flex-col items-center leading-tight w-10 md:w-13 cursor-default">
                                                                 <span class="text-[9px] font-bold text-slate-800 truncate w-full text-center"><?= htmlspecialchars(!empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-')) ?></span>
-                                                                <span class="text-[8px] font-medium text-slate-500 truncate w-full text-center"><?= htmlspecialchars($seat['prodi_name'] ?? '-') ?></span>
+                                                                <span class="text-[8px] font-medium text-slate-500 truncate w-full text-center"><?= htmlspecialchars(!empty($seat['degree']) ? $seat['degree'] . ' ' . ($seat['prodi_name'] ?? '-') : ($seat['prodi_name'] ?? '-')) ?></span>
                                                             </div>
                                                         <?php else: ?>
                                                             <span class="text-[9px] mt-1 text-slate-400 font-medium text-center">-</span>
@@ -277,7 +279,7 @@ if (session_status() === PHP_SESSION_NONE) {
                                                         <?php if ($hasGraduate): ?>
                                                             <div class="mt-1 flex flex-col items-center leading-tight w-10 md:w-13 cursor-default">
                                                                 <span class="text-[9px] font-bold text-slate-800 truncate w-full text-center"><?= htmlspecialchars(!empty($seat['faculty_code']) ? $seat['faculty_code'] : ($seat['faculty_name'] ?? '-')) ?></span>
-                                                                <span class="text-[8px] font-medium text-slate-500 truncate w-full text-center"><?= htmlspecialchars($seat['prodi_name'] ?? '-') ?></span>
+                                                                <span class="text-[8px] font-medium text-slate-500 truncate w-full text-center"><?= htmlspecialchars(!empty($seat['degree']) ? $seat['degree'] . ' ' . ($seat['prodi_name'] ?? '-') : ($seat['prodi_name'] ?? '-')) ?></span>
                                                             </div>
                                                         <?php else: ?>
                                                             <span class="text-[9px] mt-1 text-slate-400 font-medium text-center">-</span>

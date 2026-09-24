@@ -14,6 +14,24 @@
   --color-its-yellow: #FDBB16;
 }
 
+/* Header Responsive Visibility Helpers */
+@media (max-width: 767px) {
+    .desktop-only-header {
+        display: none !important;
+    }
+    .mobile-only-header {
+        display: flex !important;
+    }
+}
+@media (min-width: 768px) {
+    .desktop-only-header {
+        display: flex !important;
+    }
+    .mobile-only-header {
+        display: none !important;
+    }
+}
+
 /* 2. Deklarasi Font Lokal */
 @font-face {
     font-family: 'Friz Quadrata Std';
