@@ -119,10 +119,10 @@ main, footer {
 /* SENO MASCOT STYLES */
 #seno-mascot {
     position: fixed;
-    bottom: 0;
+    bottom: 8px;
     right: clamp(12px, 3vw, 40px);
-    width: clamp(100px, 15vw, 160px);
-    z-index: 9999;
+    width: clamp(90px, 14vw, 150px);
+    z-index: 90;
     pointer-events: none;
     will-change: transform;
 }
@@ -182,38 +182,44 @@ main, footer {
     user-select: none;
     filter: drop-shadow(0 6px 20px rgba(18,123,190,.32));
     transition: transform .25s;
+    margin-bottom: 4px;
 }
 #seno-img:hover { transform: scale(1.04); }
 
 #seno-bubble {
     position: absolute;
-    bottom: calc(100% - 8px);
+    bottom: calc(100% + 8px);
     right: 0;
-    width: clamp(200px, 45vw, 270px);
+    width: clamp(190px, 40vw, 260px);
     background: #fff;
     border-radius: 16px 16px 4px 16px;
     box-shadow: 0 8px 28px rgba(35,63,124,.16), 0 0 0 1.5px rgba(18,123,190,.13);
-    padding: 13px 15px 11px;
+    padding: 12px 14px 10px;
     font-family: 'Work Sans', sans-serif;
     animation: senoBounceIn .35s ease forwards;
     display: none;
+    z-index: 1;
 }
 #seno-bubble::after {
     content: '';
     position: absolute;
-    bottom: -13px;
-    right: 18px;
-    border: 13px solid transparent;
+    bottom: -10px;
+    right: 22px;
+    border: 10px solid transparent;
     border-top-color: #fff;
     border-right: 0;
     filter: drop-shadow(0 2px 3px rgba(35,63,124,.1));
+    z-index: 1;
+    pointer-events: none;
 }
 
 .seno-text {
     font-size: clamp(11px, 1.5vw, 13px);
-    line-height: 1.55;
+    line-height: 1.5;
     color: #1e293b;
-    min-height: 36px;
+    min-height: 32px;
+    position: relative;
+    z-index: 2;
 }
 
 #seno-progress-wrap {
@@ -223,6 +229,8 @@ main, footer {
     margin-top: 8px;
     overflow: hidden;
     display: none;
+    position: relative;
+    z-index: 2;
 }
 #seno-progress-bar {
     height: 100%;
@@ -237,16 +245,18 @@ main, footer {
 .seno-btn-row {
     display: flex;
     gap: 6px;
-    margin-top: 9px;
+    margin-top: 8px;
     align-items: center;
+    position: relative;
+    z-index: 2;
 }
 .seno-btn {
     flex: 1;
     background: linear-gradient(135deg,#127BBE,#233F7C);
     color: #fff;
     border: none;
-    border-radius: 9px;
-    padding: 6px 10px;
+    border-radius: 8px;
+    padding: 5px 9px;
     font-size: clamp(10px,1.4vw,12px);
     font-weight: 600;
     cursor: pointer;
@@ -264,14 +274,14 @@ main, footer {
 
 #seno-replay-btn {
     position: fixed;
-    bottom: clamp(16px,2.5vw,24px);
-    right: clamp(14px,2.5vw,24px);
-    z-index: 9998;
+    bottom: clamp(12px, 2vw, 20px);
+    right: clamp(12px, 2vw, 20px);
+    z-index: 89;
     background: linear-gradient(135deg,#233F7C,#127BBE);
     border: none;
     border-radius: 50%;
-    width: clamp(42px,6vw,52px);
-    height: clamp(42px,6vw,52px);
+    width: clamp(40px, 5.5vw, 48px);
+    height: clamp(40px, 5.5vw, 48px);
     cursor: pointer;
     box-shadow: 0 4px 16px rgba(35,63,124,.32);
     display: none;
@@ -280,22 +290,31 @@ main, footer {
     transition: transform .2s, box-shadow .2s;
     padding: 4px;
 }
-#seno-replay-btn:hover { transform: scale(1.12); box-shadow: 0 6px 22px rgba(35,63,124,.42); }
+#seno-replay-btn:hover { transform: scale(1.1); box-shadow: 0 6px 22px rgba(35,63,124,.42); }
 #seno-replay-btn img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
 #seno-replay-btn.seno-rb-visible { display: flex; }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     #seno-mascot {
-        width: clamp(80px, 22vw, 110px);
-        right: 8px;
+        width: clamp(75px, 20vw, 105px);
+        right: 10px;
+        bottom: 10px;
     }
     #seno-bubble {
-        width: min(88vw, 260px);
-        right: -8px;
+        max-width: 220px;
+        width: calc(100vw - 32px);
+        right: 0;
+        padding: 10px 12px 8px;
     }
-}
-@media (max-width: 768px) {
-    #seno-bubble { width: min(70vw, 260px); }
+    .seno-text {
+        font-size: 11px;
+        line-height: 1.45;
+        min-height: 28px;
+    }
+    .seno-btn {
+        font-size: 10px;
+        padding: 4px 7px;
+    }
 }
 
 /* ===== PERBAIKAN CSS TENTANG CENTERING & BOUNDS ===== */

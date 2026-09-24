@@ -179,6 +179,10 @@
         showStep(cur);
     }
 
+    function isMobile() {
+        return window.innerWidth < 768;
+    }
+
     function exitSeno() {
         clearAutoTimer();
         clearTwRaf();
@@ -234,10 +238,40 @@
 
         if (dom.nextBtn) dom.nextBtn.addEventListener('click', SenoTour.next);
         if (dom.skipBtn) dom.skipBtn.addEventListener('click', SenoTour.skip);
-        if (dom.replay) dom.replay.addEventListener('click', SenoTour.replay);
+        if (dom.replay) {
+            dom.replay.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (isMobile()) {
+                    // Mobile: Jika mascot disembunyikan / hanya replay, tampilkan mascot + bubble
+                    if (dom.mascot && dom.mascot.classList.contains('seno-hidden')) {
+                        startTour(true);
+                    } else if (dom.bubble) {
+                        // Toggle atau buka bubble
+                        if (dom.bubble.style.display === 'none' || !dom.bubble.style.display) {
+                            showStep(cur);
+                        } else {
+                            if (dom.bubble) dom.bubble.style.display = 'none';
+                        }
+                    }
+                } else {
+                    SenoTour.replay();
+                }
+            });
+        }
 
         if (dom.img) {
-            dom.img.addEventListener('click', function() {
+            dom.img.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (isMobile()) {
+                    // Mobile click on mascot image toggles bubble or advances step
+                    if (dom.bubble && (dom.bubble.style.display === 'none' || !dom.bubble.style.display)) {
+                        showStep(cur);
+                    } else {
+                        advanceStep();
+                    }
+                    return;
+                }
+
                 if (twRaf) {
                     clearTwRaf();
                     var step = steps[cur];
@@ -251,8 +285,24 @@
             });
         }
 
+        // INITIAL LOAD LOGIC ACCORDING TO SCREEN SIZE
         setTimeout(function() {
-            startTour(false);
-        }, 2000);
+            if (isMobile()) {
+                // Di Mobile: Sembunyikan bubble chat & mascot penuh, HANYA tampilkan tombol/ikon panggil SENO (seno-replay-btn)
+                if (dom.mascot) {
+                    dom.mascot.classList.add('seno-hidden');
+                    dom.mascot.classList.remove('seno-visible');
+                }
+                if (dom.bubble) dom.bubble.style.display = 'none';
+                if (dom.replay) dom.replay.classList.add('seno-rb-visible');
+            } else {
+                // Di Desktop (>= 768px): Tampilkan SENO + Bubble onboarding otomatis, lalu auto collapse / exit setelah 6 detik
+                startTour(false);
+                clearAutoTimer();
+                autoTimer = setTimeout(function() {
+                    exitSeno();
+                }, 6000);
+            }
+        }, 1000);
     });
 })();
