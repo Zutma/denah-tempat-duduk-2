@@ -57,7 +57,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 </div>
 
                 <!-- Dropdown Mobile -->
-                <div class="mobile-only-header w-44 shrink-0">
+                <div class="mobile-only-header flex-1 min-w-0 max-w-[145px] sm:max-w-[200px]">
                     <form method="GET" id="sessionFormMobile" class="m-0">
                         <select name="session_id" 
                             onchange="if(this.value === '') { window.location.href = window.location.pathname; } else { this.form.submit(); }"
@@ -76,9 +76,9 @@ if (session_status() === PHP_SESSION_NONE) {
             </div>
 
             <!-- TENGAH DESKTOP: Dropdown Sesi + Search Bar -->
-            <div class="flex-1 flex items-center justify-center gap-2.5 max-w-2xl px-2 z-[101]">
+            <div class="desktop-only-header flex-1 items-center justify-center gap-2.5 max-w-2xl mx-auto px-2 z-[101]">
                 <!-- Dropdown Desktop -->
-                <div class="desktop-only-header shrink-0 w-72 md:w-80">
+                <div class="shrink-0 w-72 md:w-80">
                     <form method="GET" id="sessionForm" class="m-0">
                         <select name="session_id" id="session_id" 
                             onchange="if(this.value === '') { window.location.href = window.location.pathname; } else { document.getElementById('sessionForm').submit(); }"
@@ -95,7 +95,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     </form>
                 </div>
 
-                <!-- SEARCH BAR (BARIS 2 MOBILE FULL WIDTH / FLEX-1 MAX-W-XS DI DESKTOP) -->
+                <!-- SEARCH BAR DESKTOP -->
                 <div class="relative flex-1 min-w-0 max-w-xs w-full" @click.outside="showDropdown = false">
                     <div class="relative flex items-center">
                         <svg class="absolute left-2.5 w-3.5 h-3.5 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -110,7 +110,76 @@ if (session_status() === PHP_SESSION_NONE) {
                             class="w-full pl-7 pr-2 py-1.5 border border-slate-300 rounded-lg text-xs font-medium bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all shadow-2xs disabled:bg-slate-100">
                     </div>
 
-                    <!-- DROPDOWN PENCARIAN HASIL -->
+                    <!-- DROPDOWN PENCARIAN HASIL DESKTOP -->
+                    <?php if (!empty($activeSession)): ?>
+                    <div x-show="showDropdown && searchQuery.trim().length >= 2" 
+                         x-cloak 
+                         class="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-300 rounded-xl shadow-2xl text-left overflow-hidden"
+                         style="z-index: 99999 !important;">
+                        <div class="flex items-center justify-between text-[10px] text-slate-500 px-3 py-2 bg-slate-50 border-b border-slate-200">
+                            <span>Ditemukan <strong class="text-its-blue font-bold" x-text="filteredGraduates.length"></strong> wisudawan</span>
+                            <button type="button" @click="clearSelection()" class="text-its-blue-light font-bold hover:underline cursor-pointer">Reset</button>
+                        </div>
+                        <div @scroll="handleDropdownScroll($event)"
+                             class="p-2 custom-scrollbar"
+                             style="max-height: 220px !important; overflow-y: auto !important;">
+                            <template x-if="filteredGraduates.length > 0">
+                                <div class="divide-y divide-slate-100">
+                                    <template x-for="g in filteredGraduates.slice(0, dropdownLimit)" :key="g.seat_id">
+                                        <button type="button" @click="focusSeat(g.seat_id, g)"
+                                            class="w-full p-2 hover:bg-slate-100 rounded-lg flex items-center justify-between group text-left cursor-pointer transition-colors">
+                                            <div class="pr-2 truncate">
+                                                <p class="text-xs font-bold text-slate-800 group-hover:text-its-blue-light truncate" x-text="g.name"></p>
+                                                <p class="text-[10px] text-slate-500 truncate">NRP: <span x-text="g.nrp"></span> • <span x-text="g.faculty"></span></p>
+                                            </div>
+                                            <span class="px-2 py-0.5 bg-its-yellow/20 text-its-blue border border-its-yellow/60 text-[10px] font-extrabold rounded-md whitespace-nowrap" x-text="'Kursi ' + g.seat_code"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="dropdownLimit < filteredGraduates.length">
+                                <div class="py-2.5 mt-1 border-t border-slate-100 text-center text-[10px] text-slate-500 font-medium flex items-center justify-center gap-1.5 bg-slate-50 rounded-b-lg">
+                                    <svg class="animate-spin h-3.5 w-3.5 text-its-blue-light" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span>Memuat lebih banyak... (<span x-text="dropdownLimit"></span>/<span x-text="filteredGraduates.length"></span>)</span>
+                                </div>
+                            </template>
+                            <template x-if="filteredGraduates.length > 0 && dropdownLimit >= filteredGraduates.length">
+                                <div class="pt-2 mt-1 border-t border-slate-100 text-center text-[10px] text-slate-400 italic">
+                                    Semua hasil (<span x-text="filteredGraduates.length"></span>) ditampilkan.
+                                </div>
+                            </template>
+                            <template x-if="filteredGraduates.length === 0">
+                                <div class="p-3 text-center text-xs text-slate-400 font-medium">
+                                    Wisudawan atau kursi tidak ditemukan
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- BARIS 2 MOBILE CONTAINER: Search Bar Kiri + Zoom Kanan -->
+            <div class="mobile-only-header items-center justify-between w-full gap-2 shrink-0">
+                <!-- SEARCH BAR MOBILE -->
+                <div class="relative flex-1 min-w-0 w-full" @click.outside="showDropdown = false">
+                    <div class="relative flex items-center">
+                        <svg class="absolute left-2.5 w-3.5 h-3.5 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input type="text" 
+                            x-model="searchQuery" 
+                            @focus="handleFocus()"
+                            @click="handleFocus()"
+                            <?= empty($activeSession) ? 'disabled' : '' ?>
+                            placeholder="<?= empty($activeSession) ? 'Pilih acara dulu...' : 'Cari nama, NRP, kursi...' ?>"
+                            class="w-full pl-7 pr-2 py-1.5 border border-slate-300 rounded-lg text-xs font-medium bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light transition-all shadow-2xs disabled:bg-slate-100">
+                    </div>
+
+                    <!-- DROPDOWN PENCARIAN HASIL MOBILE -->
                     <?php if (!empty($activeSession)): ?>
                     <div x-show="showDropdown && searchQuery.trim().length >= 2" 
                          x-cloak 
@@ -161,12 +230,12 @@ if (session_status() === PHP_SESSION_NONE) {
                     <?php endif; ?>
                 </div>
 
-                <!-- Zoom Controller Ringkas Mobile (Baris 2 Header Samping Search Bar) -->
-                <div class="mobile-only-header items-center gap-0.5 shrink-0 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs shadow-2xs <?= empty($activeSession) ? 'opacity-50 pointer-events-none' : '' ?>">
-                    <button type="button" onmousedown="window.startZoomHold(-0.05)" onmouseup="window.stopZoomHold()" onmouseleave="window.stopZoomHold()" ontouchstart="window.startZoomHold(-0.05)" ontouchend="window.stopZoomHold()" class="w-6 h-6 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-bold text-slate-700 flex items-center justify-center">-</button>
-                    <span id="zoomIndicatorMobile" class="w-9 text-center font-extrabold text-its-blue text-[11px]">100%</span>
-                    <button type="button" onmousedown="window.startZoomHold(0.05)" onmouseup="window.stopZoomHold()" onmouseleave="window.stopZoomHold()" ontouchstart="window.startZoomHold(0.05)" ontouchend="window.stopZoomHold()" class="w-6 h-6 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-bold text-slate-700 flex items-center justify-center">+</button>
-                    <button type="button" onclick="window.resetZoom()" class="px-1 text-its-blue-light font-bold text-[10px] hover:underline">Reset</button>
+                <!-- Zoom Controller Ringkas Mobile -->
+                <div class="items-center gap-0.5 shrink-0 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs shadow-2xs flex <?= empty($activeSession) ? 'opacity-50 pointer-events-none' : '' ?>">
+                    <button type="button" onmousedown="window.startZoomHold(-0.05)" onmouseup="window.stopZoomHold()" onmouseleave="window.stopZoomHold()" ontouchstart="window.startZoomHold(-0.05)" ontouchend="window.stopZoomHold()" class="w-5 h-5 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-bold text-slate-700 flex items-center justify-center text-[10px]">-</button>
+                    <span id="zoomIndicatorMobile" class="w-8 text-center font-extrabold text-its-blue text-[10px]">100%</span>
+                    <button type="button" onmousedown="window.startZoomHold(0.05)" onmouseup="window.stopZoomHold()" onmouseleave="window.stopZoomHold()" ontouchstart="window.startZoomHold(0.05)" ontouchend="window.stopZoomHold()" class="w-5 h-5 bg-white hover:bg-its-blue hover:text-white border border-slate-200 rounded font-bold text-slate-700 flex items-center justify-center text-[10px]">+</button>
+                    <button type="button" onclick="window.resetZoom()" class="px-1 text-its-blue-light font-bold text-[9px] hover:underline">Reset</button>
                 </div>
             </div>
 
