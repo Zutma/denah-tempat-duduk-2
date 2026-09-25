@@ -161,7 +161,7 @@ if (session_status() === PHP_SESSION_NONE) {
         </div>
 
         <!-- ================= MOBILE HEADER (< 768px) ================= -->
-        <div class="mobile-only-header flex-col w-full px-3 py-2 gap-2 max-w-full overflow-hidden">
+        <div class="mobile-only-header flex-col w-full px-3 py-2 gap-2 max-w-full overflow-visible">
             <!-- BARIS 1 MOBILE: Logo + Judul (Kiri) | Dropdown Acara (Kanan) -->
             <div class="flex items-center justify-between w-full gap-2 min-w-0">
                 <div class="flex items-center gap-2 shrink-0 min-w-0">
@@ -177,7 +177,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     </div>
                 </div>
 
-                <div class="flex-1 min-w-0 flex justify-end shrink max-w-[45%]">
+                <div class="flex-1 min-w-0 flex justify-end shrink max-w-full">
                     <form method="GET" id="sessionFormMobile" class="m-0 w-full">
                         <select name="session_id" 
                             onchange="if(this.value === '') { window.location.href = window.location.pathname; } else { this.form.submit(); }"
