@@ -66,6 +66,13 @@
                 <span class="text-slate-600 font-semibold"><?= $totalSeatCountAll ?> Kursi</span>
             </span>
 
+            <a href="<?= url('seat-rows/export?session_id=' . $session['id']) ?>" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 rounded-xl shadow-2xs transition-all cursor-pointer select-none">
+                <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>Export Excell</span>
+            </a>
+
             <button type="button" @click="toggleBulkForm()" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-its-blue-light hover:bg-its-blue rounded-xl shadow-xs transition-all cursor-pointer select-none">
                 <svg x-show="!showBulkForm" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                 <svg x-show="showBulkForm" x-cloak class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>

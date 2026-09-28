@@ -72,6 +72,58 @@ class SeatRowController extends BaseController {
         ]);
     }
 
+    // ===== BARU: export Excel (rata tengah) =====
+    public function export($conn) {
+        $this->checkAuth();
+
+        $sessionId = (int)($_GET['session_id'] ?? 0);
+        if ($sessionId <= 0) {
+            $this->redirect('/graduation-events');
+        }
+
+        $seatRows = SeatRow::getBySession($conn, $sessionId);
+
+        // gabungkan kiri & kanan per baris, sama seperti tabel di halaman
+        $grouped = [];
+        foreach ($seatRows as $sr) {
+            $r = $sr['row'];
+            if (!isset($grouped[$r])) {
+                $grouped[$r] = ['left' => null, 'right' => null];
+            }
+            if ($sr['side'] === 'left') {
+                $grouped[$r]['left'] = (int)$sr['capacity'];
+            } elseif ($sr['side'] === 'right') {
+                $grouped[$r]['right'] = (int)$sr['capacity'];
+            }
+        }
+
+        header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+        header('Content-Disposition: attachment; filename="kursi-sesi-' . $sessionId . '.xls"');
+
+        echo '<html><head><meta charset="UTF-8"></head><body>';
+        echo '<table border="1" style="border-collapse:collapse;">';
+        echo '<tr style="background-color:#1e3a8a;color:#ffffff;font-weight:bold;">';
+        foreach (['Baris', 'Kapasitas Kiri', 'Kapasitas Kanan', 'Total Kursi'] as $h) {
+            echo '<th style="text-align:center;vertical-align:middle;width:130px;height:30px;">' . $h . '</th>';
+        }
+        echo '</tr>';
+
+        foreach ($grouped as $label => $d) {
+            $left  = $d['left'] ?? 0;
+            $right = $d['right'] ?? 0;
+            echo '<tr>';
+            echo '<td style="text-align:center;vertical-align:middle;height:24px;">' . htmlspecialchars($label) . '</td>';
+            echo '<td style="text-align:center;vertical-align:middle;">' . $left . '</td>';
+            echo '<td style="text-align:center;vertical-align:middle;">' . $right . '</td>';
+            echo '<td style="text-align:center;vertical-align:middle;">' . ($left + $right) . '</td>';
+            echo '</tr>';
+        }
+
+        echo '</table></body></html>';
+        exit;
+    }
+    // ===== AKHIR BARU =====
+
     public function delete($conn) {
         $this->checkAuth();
         $this->checkCsrf();
@@ -264,4 +316,4 @@ class SeatRowController extends BaseController {
         }
         $this->redirect('/graduation-events');
     }
-}
+}

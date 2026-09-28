@@ -86,6 +86,7 @@ $routes = [
 
     'seat-rows'                     => [SeatRowController::class, 'index'],
     'seat-rows/update'              => [SeatRowController::class, 'updateCapacity'],
+    'seat-rows/export'              => [SeatRowController::class, 'export'],
     'seat-rows/extend'              => [SeatRowController::class, 'extend'],
     'seat-rows/shrink'              => [SeatRowController::class, 'shrink'],
     'seat-rows/delete'              => [SeatRowController::class, 'delete'],
