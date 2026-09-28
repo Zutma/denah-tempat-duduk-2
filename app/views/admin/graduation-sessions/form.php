@@ -9,7 +9,7 @@
             <input type="hidden" name="event_id" value="<?= $eventId ?>">
         <?php endif; ?>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label for="date" class="block text-sm font-medium text-slate-700 mb-1">Tanggal Sesi</label>
                 <input type="date" id="date" name="date" value="<?= htmlspecialchars($session['date'] ?? '') ?>" required
@@ -20,6 +20,16 @@
                 <label for="session" class="block text-sm font-medium text-slate-700 mb-1">Sesi Ke-</label>
                 <input type="number" id="session" name="session" value="<?= htmlspecialchars($session['session'] ?? '') ?>" placeholder="Contoh: 1, 2, dst."
                     class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light">
+            </div>
+
+            <div>
+                <label for="time" class="block text-sm font-medium text-slate-700 mb-1">Waktu Sesi (Opsional)</label>
+                <select id="time" name="time"
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-its-blue-sky/50 focus:border-its-blue-light bg-white cursor-pointer">
+                    <option value="">-- Pilih Waktu (Opsional) --</option>
+                    <option value="pagi" <?= ($session['time'] ?? '') === 'pagi' ? 'selected' : '' ?>>Pagi</option>
+                    <option value="siang" <?= ($session['time'] ?? '') === 'siang' ? 'selected' : '' ?>>Siang</option>
+                </select>
             </div>
 
             <div>
