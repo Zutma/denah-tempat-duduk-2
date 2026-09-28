@@ -1,0 +1,267 @@
+@font-face {
+    font-family: 'Friz Quadrata Std';
+    src: url('https://www.its.ac.id/wp-content/uploads/2026/01/friz-quadrata-std-medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+body {
+    position: relative;
+    background-color: #f8fafc;
+    touch-action: manipulation;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('/images/Vector.svg'); 
+    background-repeat: repeat;
+    background-position: center top;
+    background-size: 280px auto;
+    opacity: 0.10;
+    pointer-events: none;
+    z-index: 1;
+}
+
+header, main, footer, div[x-data] {
+    position: relative;
+    z-index: 2;
+}
+
+.selected-seat-ring {
+    box-shadow: 0 0 0 3px #127BBE, 0 4px 14px rgba(18, 123, 190, 0.4);
+    transform: scale(1.1);
+    position: relative;
+    z-index: 20 !important;
+}
+
+@keyframes seatPulse {
+    0% {
+        box-shadow: 0 0 0 3px #127BBE, 0 0 8px rgba(18, 123, 190, 0.5);
+        transform: scale(1.05);
+    }
+    50% {
+        box-shadow: 0 0 0 4px #FDBB16, 0 0 18px rgba(253, 187, 22, 0.85);
+        transform: scale(1.15);
+    }
+    100% {
+        box-shadow: 0 0 0 3px #127BBE, 0 0 8px rgba(18, 123, 190, 0.5);
+        transform: scale(1.05);
+    }
+}
+
+.search-highlight-seat {
+    animation: seatPulse 1.4s infinite ease-in-out;
+    position: relative;
+    z-index: 25 !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #127BBE;
+}
+
+/* SENO MASCOT STYLES */
+#seno-mascot {
+    position: fixed;
+    bottom: 0;
+    right: clamp(12px, 3vw, 40px);
+    width: clamp(100px, 15vw, 160px);
+    z-index: 9999;
+    pointer-events: none;
+    will-change: transform;
+}
+#seno-mascot.seno-hidden { opacity: 0; pointer-events: none; }
+#seno-mascot.seno-visible { opacity: 1; pointer-events: auto; }
+
+@keyframes senoSlideInRight {
+    from { transform: translateX(220px); }
+    to   { transform: translateX(0); }
+}
+@keyframes senoRiseUp {
+    from { transform: translateY(260px); }
+    to   { transform: translateY(0); }
+}
+@keyframes senoDropDown {
+    0%   { transform: translateY(-280px) rotate(-12deg); }
+    65%  { transform: translateY(18px) rotate(4deg); }
+    82%  { transform: translateY(-8px) rotate(-2deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
+@keyframes senoPeekRight {
+    0%   { transform: translateX(150px); }
+    28%  { transform: translateX(55px); }
+    52%  { transform: translateX(55px); }
+    100% { transform: translateX(0); }
+}
+@keyframes senoExitRight {
+    from { transform: translateX(0); }
+    to   { transform: translateX(230px); }
+}
+@keyframes senoFloat {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-7px); }
+}
+@keyframes senoBounceIn {
+    0%   { transform: scale(0.65); opacity: 0; }
+    60%  { transform: scale(1.08); opacity: 1; }
+    80%  { transform: scale(0.96); }
+    100% { transform: scale(1); }
+}
+@keyframes senoProgress {
+    from { width: 0%; }
+    to   { width: 100%; }
+}
+
+#seno-mascot.anim-right  { animation: senoSlideInRight 0.75s cubic-bezier(.34,1.56,.64,1) forwards; }
+#seno-mascot.anim-rise   { animation: senoRiseUp       0.7s  cubic-bezier(.34,1.56,.64,1) forwards; }
+#seno-mascot.anim-drop   { animation: senoDropDown     0.85s ease-out forwards; }
+#seno-mascot.anim-peek   { animation: senoPeekRight    1.1s  ease forwards; }
+#seno-mascot.anim-exit   { animation: senoExitRight    0.55s ease-in forwards; }
+#seno-mascot.anim-float  { animation: senoFloat        3s    ease-in-out infinite; }
+
+#seno-img {
+    width: 100%;
+    cursor: pointer;
+    display: block;
+    user-select: none;
+    filter: drop-shadow(0 6px 20px rgba(18,123,190,.32));
+    transition: transform .25s;
+}
+#seno-img:hover { transform: scale(1.04); }
+
+#seno-bubble {
+    position: absolute;
+    bottom: calc(100% - 8px);
+    right: 0;
+    width: clamp(200px, 45vw, 270px);
+    background: #fff;
+    border-radius: 16px 16px 4px 16px;
+    box-shadow: 0 8px 28px rgba(35,63,124,.16), 0 0 0 1.5px rgba(18,123,190,.13);
+    padding: 13px 15px 11px;
+    font-family: 'Work Sans', sans-serif;
+    animation: senoBounceIn .35s ease forwards;
+    display: none;
+}
+#seno-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -13px;
+    right: 18px;
+    border: 13px solid transparent;
+    border-top-color: #fff;
+    border-right: 0;
+    filter: drop-shadow(0 2px 3px rgba(35,63,124,.1));
+}
+
+.seno-text {
+    font-size: clamp(11px, 1.5vw, 13px);
+    line-height: 1.55;
+    color: #1e293b;
+    min-height: 36px;
+}
+
+#seno-progress-wrap {
+    height: 3px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    margin-top: 8px;
+    overflow: hidden;
+    display: none;
+}
+#seno-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg,#127BBE,#FDBB16);
+    border-radius: 4px;
+    width: 0%;
+}
+#seno-progress-bar.running {
+    animation: senoProgress var(--seno-dur, 4s) linear forwards;
+}
+
+.seno-btn-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 9px;
+    align-items: center;
+}
+.seno-btn {
+    flex: 1;
+    background: linear-gradient(135deg,#127BBE,#233F7C);
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    padding: 6px 10px;
+    font-size: clamp(10px,1.4vw,12px);
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Work Sans', sans-serif;
+    transition: opacity .18s, transform .14s;
+    white-space: nowrap;
+}
+.seno-btn:hover { opacity: .86; transform: scale(1.03); }
+.seno-btn:active { transform: scale(.97); }
+.seno-btn.seno-skip {
+    background: #f1f5f9;
+    color: #64748b;
+}
+.seno-btn.seno-skip:hover { background: #e2e8f0; }
+
+#seno-replay-btn {
+    position: fixed;
+    bottom: clamp(16px,2.5vw,24px);
+    right: clamp(14px,2.5vw,24px);
+    z-index: 9998;
+    background: linear-gradient(135deg,#233F7C,#127BBE);
+    border: none;
+    border-radius: 50%;
+    width: clamp(42px,6vw,52px);
+    height: clamp(42px,6vw,52px);
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(35,63,124,.32);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: transform .2s, box-shadow .2s;
+    padding: 4px;
+}
+#seno-replay-btn:hover { transform: scale(1.12); box-shadow: 0 6px 22px rgba(35,63,124,.42); }
+#seno-replay-btn img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+#seno-replay-btn.seno-rb-visible { display: flex; }
+
+@media (max-width: 480px) {
+    #seno-mascot {
+        width: clamp(80px, 22vw, 110px);
+        right: 8px;
+    }
+    #seno-bubble {
+        width: min(88vw, 260px);
+        right: -8px;
+    }
+}
+@media (max-width: 768px) {
+    #seno-bubble { width: min(70vw, 260px); }
+}

@@ -1,0 +1,61 @@
+<?php
+
+class SeatRow {
+    public static function getBySession($conn, $sessionId) {
+        $stmt = $conn->prepare("
+            SELECT sr.*, COUNT(s.id) AS seat_count
+            FROM seat_rows sr
+            LEFT JOIN seats s ON s.seat_row_id = sr.id
+            WHERE sr.graduation_session_id = ?
+            GROUP BY sr.id
+            ORDER BY sr.`row`, sr.`side`
+        ");
+        $stmt->bind_param("i", $sessionId);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public static function exists($conn, $sessionId, $rowLabel, $side) {
+        $stmt = $conn->prepare("SELECT id FROM seat_rows WHERE graduation_session_id = ? AND `row` = ? AND `side` = ?");
+        $stmt->bind_param("iss", $sessionId, $rowLabel, $side);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc() !== null;
+    }
+
+    public static function createWithSeats($conn, $sessionId, $rowLabel, $side, $capacity) {
+        $stmt = $conn->prepare("INSERT INTO seat_rows (`graduation_session_id`, `row`, `side`, `index`, `capacity`, `created_at`, `updated_at`) VALUES (?, ?, ?, 0, ?, NOW(), NOW())");
+        $stmt->bind_param("issi", $sessionId, $rowLabel, $side, $capacity);
+        $stmt->execute();
+        $seatRowId = $conn->insert_id;
+
+        $seatStmt = $conn->prepare("INSERT INTO seats (seat_row_id, position, number, category, created_at, updated_at) VALUES (?, ?, ?, 'regular', NOW(), NOW())");
+        for ($i = 1; $i <= $capacity; $i++) {
+            $seatStmt->bind_param("iii", $seatRowId, $i, $i);
+            $seatStmt->execute();
+        }
+    }
+
+    public static function delete($conn, $id) {
+        $stmtSeats = $conn->prepare("DELETE FROM seats WHERE seat_row_id = ?");
+        $stmtSeats->bind_param("i", $id);
+        $stmtSeats->execute();
+
+        $stmt = $conn->prepare("DELETE FROM seat_rows WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        return $stmt->execute();
+    }
+
+    public static function bulkDelete($conn, array $ids) {
+        if (empty($ids)) return false;
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $types = str_repeat('i', count($ids));
+
+        $stmtSeats = $conn->prepare("DELETE FROM seats WHERE seat_row_id IN ($placeholders)");
+        $stmtSeats->bind_param($types, ...$ids);
+        $stmtSeats->execute();
+
+        $stmt = $conn->prepare("DELETE FROM seat_rows WHERE id IN ($placeholders)");
+        $stmt->bind_param($types, ...$ids);
+        return $stmt->execute();
+    }
+}
