@@ -155,7 +155,7 @@ function seatMapApp() {
             // SOLUSI: Tutup dropdown secara otomatis saat item diklik agar denah tempat duduk tidak pernah terhalang!
             this.showDropdown = false;
 
-            this.$nextTick(() => {
+            const centerSeat = () => {
                 const container = document.getElementById('denahContainer');
                 const seat = document.getElementById(`seat-${targetId}`);
 
@@ -163,17 +163,43 @@ function seatMapApp() {
                     const containerRect = container.getBoundingClientRect();
                     const seatRect = seat.getBoundingClientRect();
 
-                    // Header Offset aman (~120px) agar posisi kursi di-scroll persis di bawah header
-                    const headerOffset = 120;
+                    // Hitung pergeseran scroll yang tepat agar titik pusat kursi berada persis di pusat visual viewport
+                    const seatCenterX = seatRect.left + (seatRect.width / 2);
+                    const seatCenterY = seatRect.top + (seatRect.height / 2);
 
-                    const newScrollTop = container.scrollTop + (seatRect.top - containerRect.top) - headerOffset;
-                    const newScrollLeft = container.scrollLeft + (seatRect.left - containerRect.left) - (containerRect.width / 2) + (seatRect.width / 2);
+                    const containerCenterX = containerRect.left + (containerRect.width / 2);
+                    const containerCenterY = containerRect.top + (containerRect.height / 2);
+
+                    const diffX = seatCenterX - containerCenterX;
+                    const diffY = seatCenterY - containerCenterY;
+
+                    const newScrollLeft = container.scrollLeft + diffX;
+                    const newScrollTop = container.scrollTop + diffY;
 
                     container.scrollTo({
                         top: Math.max(0, newScrollTop),
                         left: Math.max(0, newScrollLeft),
                         behavior: 'smooth'
                     });
+                }
+            };
+
+            this.$nextTick(() => {
+                const currentZoom = (window.getZoomScale && typeof window.getZoomScale === 'function') 
+                    ? window.getZoomScale() 
+                    : 1.0;
+
+                // Batas Minimum Zoom (120% / 1.2)
+                const TARGET_MIN_ZOOM = 1.2;
+
+                if (currentZoom < TARGET_MIN_ZOOM && window.setZoomScale && typeof window.setZoomScale === 'function') {
+                    // Zoom-in otomatis ke 120% dengan callback smooth centering setelah zoom selesai
+                    window.setZoomScale(TARGET_MIN_ZOOM, () => {
+                        setTimeout(centerSeat, 50);
+                    });
+                } else {
+                    // Jika zoom sudah >= 120%, pertahankan zoom aktif dan langsung centering
+                    centerSeat();
                 }
             });
         },
