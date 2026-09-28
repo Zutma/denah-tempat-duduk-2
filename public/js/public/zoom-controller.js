@@ -122,26 +122,6 @@ document.addEventListener("DOMContentLoaded", function() {
         container.scrollLeft = Math.max(0, currentScroll + diff);
     }
 
-    window.getZoomScale = function() {
-        return currentScale;
-    };
-
-    window.setZoomScale = function(scale, callback) {
-        let newScale = Math.min(Math.max(scale, 0.15), maxScale);
-        targetScale = newScale;
-        triggerSmoothZoom();
-        if (callback && typeof callback === 'function') {
-            const checkDone = () => {
-                if (!isAnimating) {
-                    callback();
-                } else {
-                    requestAnimationFrame(checkDone);
-                }
-            };
-            requestAnimationFrame(checkDone);
-        }
-    };
-
     window.adjustZoom = function(amount) {
         targetScale += amount;
         
