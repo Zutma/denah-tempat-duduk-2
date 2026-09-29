@@ -192,11 +192,11 @@
 
         <div class="about-head">
             <span class="about-badge inline-block px-3.5 py-1 bg-its-yellow/20 text-its-blue border border-its-yellow/60 text-xs font-extrabold rounded-full uppercase tracking-widest shadow-2xs">
-                Project Credits
+                Credits
             </span>
-            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Behind The Scene</h2>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Sosok Dibalik Layar</h2>
             <p class="about-sub">
-                Aplikasi Denah Tempat Duduk Wisuda ITS dikembangkan secara kolaboratif oleh 2 developer hebat di bawah ini:
+                Website Denah Tempat Duduk Wisuda ITS dikembangkan secara kolaboratif oleh 2 developer hebat di bawah ini:
             </p>
         </div>
 
@@ -210,16 +210,16 @@
             <div class="dev-grid">
                 <!-- DEVELOPER 1 -->
                 <div class="dev-card dev-1">
-                    <h3 class="dev-name">MALIK</h3>
-                    <p class="dev-role text-its-blue-light">(Malik)</p>
-                    <div class="dev-quote">"MARI KITA BERMAIN"</div>
+                    <h3 class="dev-name">MAS'ATHA SETYA AL MALIK</h3>
+                    <p class="dev-role text-its-blue-light">MALIK</p>
+                    <div class="dev-quote">"WELCOME GAIS, SENANG MELIHAT KALIAN BISA MASUK SINI🫣"</div>
                 </div>
 
                 <!-- DEVELOPER 2 — SILAKAN EDIT NAMA, PERAN, DAN QUOTE -->
                 <div class="dev-card dev-2">
-                    <h3 class="dev-name">Rizviqar Fajar Aslam Utama</h3>
-                    <p class="dev-role text-amber-600">(ASLAM)</p>
-                    <div class="dev-quote">"[Isikan quote / pesan dari Developer 2]"</div>
+                    <h3 class="dev-name">RIZVIQAR FAJAR ASLAM UTAMA</h3>
+                    <p class="dev-role text-amber-600">ASLAM</p>
+                    <div class="dev-quote">"WELCOME GAIS, SENANG MELIHAT KALIAN BISA MASUK SINI🫣"</div>
                 </div>
             </div>
         </div>
@@ -268,14 +268,17 @@
         const QUOTE_INTERVAL = 8;   // detik per quote (mis. 6 atau 10)
         const QUOTES = {
             'dev-1': [                                   // Developer 1 (Malik)
-                'WELCOME GAIS, SENANG MELIHAT KALIAN BISA MASUK SINI🫣',
-                'ASIKINN AJA, dunia bukan tentang ngejar karier 😵‍💫',
                 'BTW SELAMAT JUGA YA BUAT PARA WISUDAA 👨‍🎓👩‍🎓🙌',
-                'Dia lebih baik daripada kamu. Baguslah gw mau ngoding dulu, uda DEADLINE soalnya'
+                'ASIKINN AJA, dunia bukan tentang ngejar karier 😵‍💫',
+                'kalo kamu selalu mengkhawatirkan orang lain, terus siapa yang khawatirin dirimu',
+                'Dia lebih baik daripada kamu. Baguslah gw mau ngoding dulu, uda DEADLINE soalnya',
+                'Katanya cari ilmu yang banyak biar jadi ORANG 🤓',
+                'Kita sering terlalu fokus hadir di hidup orang lain, jadi support system, jadi orang yang selalu bilang "aku ada"'
+
             ],
             'dev-2': [                                   // Developer 2 ()
-                '[Isikan quote / pesan dari Developer 2]',
-                // 'Quote kedua Developer 2'
+                'Tetap semangat.......',
+                'Baik bunda.'
             ]
         };
         // ---------------------------------------
@@ -427,11 +430,11 @@
         // ================================================================
         const SOCIALS = {
             //            Developer 1 (Malik)   Developer 2
-            github:    { malik: '', aslam: 'Zutma' },
-            instagram: { malik: '', aslam: '' },
-            tiktok:    { malik: '', aslam: '' },
+            github:    { malik: 'citelv', aslam: 'Zutma' },
+            instagram: { malik: 'pengenjadi.astronot', aslam: 'aslam_xiv' },
+            tiktok:    { malik: 'pengenjadi.astronot', aslam: 'masgodin' },
             youtube:   { malik: '', aslam: '' },
-            spotify:   { malik: '', aslam: '' },
+            spotify:   { malik: 'https://open.spotify.com/user/31qaqinlq4hfdn75tdpm4uvamppe?si=b3695006556f4a14', aslam: 'https://open.spotify.com/user/31ysbaf3ker4t62abnioyw3fjrym?si=473b816603e74111' },
             discord:   { malik: '', aslam: '' }
         };
         // ================================================================
@@ -592,6 +595,11 @@
         { url: "https://youtu.be/pyGU-UudvrM?si=RaxskFSA869lyHuI", title: "She & Him - I Thought I Saw Your Face Today" },
         { url: "https://youtu.be/cswfR85D7jM?si=FY3psGrc0k1wrqrc", title: "Ravyn Lenae - Love Me Not" },
         { url: "https://youtu.be/0Yi1ttjXQ6c?si=MitJSmjJtY8WkNFH", title: "The Greatest Techno Song That's Ever Lived" },
+        { url: "https://youtu.be/vx4kLgnFexo?si=dCd_DhmgEvCFv6lN", title: "Mitski - My Love Mine All Mine" },
+        { url: "https://youtu.be/bFq6aP0HQIU?si=yJIbTCFEKCWwY9Sd", title: "Merry christmas Please Don't Call & Merry Christmast I Miss You BLEACHERS & Alex crichton" },
+        { url: "https://youtu.be/OT5msu-dap8?si=rNriofGVp3XpsHMk", title: "Backstreet Boys - Shape Of My Heart" },
+        { url: "https://youtu.be/dstuitW8PWM?si=2gecoxy2vnXYJ6pQ", title: "Rex Orange County - Happiness" },
+        { url: " https://youtu.be/y_JsSOdFyNs?si=JCOgb2Ov-RKH43Tp", title: "Murphy Radio - Graduation Song" },
     ];
     // ================================================================
 
