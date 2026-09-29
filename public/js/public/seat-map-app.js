@@ -228,6 +228,17 @@ function seatMapApp() {
         // Helper untuk Alpine.js template (O(1) Instant Check)
         isSeatSearched(seatId) {
             return this.searchedSeatIds.has(Number(seatId));
+        },
+        
+        formatSeatDisplay(data) {
+            if (!data) return '-';
+            
+            // Jika data sudah berisi properti terpisah
+            const row = data.row || data.seat_code?.charAt(0) || '';
+            const side = data.side || (data.side_type === 'left' ? 'Kiri' : 'Kanan');
+            const number = data.seat_number || data.seat_code?.replace(/[^0-9]/g, '') || '';
+
+            return `${row} - ${side} - ${number}`;
         }
     };
 }
