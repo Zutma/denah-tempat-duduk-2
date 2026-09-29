@@ -210,9 +210,9 @@
             <div class="dev-grid">
                 <!-- DEVELOPER 1 -->
                 <div class="dev-card dev-1">
-                    <h3 class="dev-name">MALIK</h3>
-                    <p class="dev-role text-its-blue-light">TURU</p>
-                    <div class="dev-quote">"MARI KITA BERMAIN"</div>
+                    <h3 class="dev-name">MAS'ATHA SETYA AL MALIK</h3>
+                    <p class="dev-role text-its-blue-light">MALIK</p>
+                    <div class="dev-quote">"WELCOME GAIS, SENANG MELIHAT KALIAN BISA MASUK SINI🫣"</div>
                 </div>
 
                 <!-- DEVELOPER 2 — SILAKAN EDIT NAMA, PERAN, DAN QUOTE -->
@@ -268,10 +268,13 @@
         const QUOTE_INTERVAL = 8;   // detik per quote (mis. 6 atau 10)
         const QUOTES = {
             'dev-1': [                                   // Developer 1 (Malik)
-                'WELCOME GAIS, SENANG MELIHAT KALIAN BISA MASUK SINI🫣',
-                'ASIKINN AJA, dunia bukan tentang ngejar karier 😵‍💫',
                 'BTW SELAMAT JUGA YA BUAT PARA WISUDAA 👨‍🎓👩‍🎓🙌',
-                'Dia lebih baik daripada kamu. Baguslah gw mau ngoding dulu, uda DEADLINE soalnya'
+                'ASIKINN AJA, dunia bukan tentang ngejar karier 😵‍💫',
+                'kalo kamu selalu mengkhawatirkan orang lain, terus siapa yang khawatirin dirimu',
+                'Dia lebih baik daripada kamu. Baguslah gw mau ngoding dulu, uda DEADLINE soalnya',
+                'Katanya cari ilmu yang banyak biar jadi ORANG 🤓',
+                'Kita sering terlalu fokus hadir di hidup orang lain, jadi support system, jadi orang yang selalu bilang "aku ada"'
+
             ],
             'dev-2': [                                   // Developer 2 ()
                 '[Isikan quote / pesan dari Developer 2]',
@@ -427,11 +430,11 @@
         // ================================================================
         const SOCIALS = {
             //            Developer 1 (Malik)   Developer 2
-            github:    { malik: '', dev2: '' },
-            instagram: { malik: '', dev2: '' },
-            tiktok:    { malik: '', dev2: '' },
+            github:    { malik: 'citelv', dev2: '' },
+            instagram: { malik: 'pengenjadi.astronot', dev2: '' },
+            tiktok:    { malik: 'pengenjadi.astronot', dev2: '' },
             youtube:   { malik: '', dev2: '' },
-            spotify:   { malik: '', dev2: '' },
+            spotify:   { malik: 'https://open.spotify.com/user/31qaqinlq4hfdn75tdpm4uvamppe?si=b3695006556f4a14', dev2: '' },
             discord:   { malik: '', dev2: '' }
         };
         // ================================================================
@@ -592,6 +595,11 @@
         { url: "https://youtu.be/pyGU-UudvrM?si=RaxskFSA869lyHuI", title: "She & Him - I Thought I Saw Your Face Today" },
         { url: "https://youtu.be/cswfR85D7jM?si=FY3psGrc0k1wrqrc", title: "Ravyn Lenae - Love Me Not" },
         { url: "https://youtu.be/0Yi1ttjXQ6c?si=MitJSmjJtY8WkNFH", title: "The Greatest Techno Song That's Ever Lived" },
+        { url: "https://youtu.be/vx4kLgnFexo?si=dCd_DhmgEvCFv6lN", title: "Mitski - My Love Mine All Mine" },
+        { url: "https://youtu.be/bFq6aP0HQIU?si=yJIbTCFEKCWwY9Sd", title: "Merry christmas Please Don't Call & Merry Christmast I Miss You BLEACHERS & Alex crichton" },
+        { url: "https://youtu.be/OT5msu-dap8?si=rNriofGVp3XpsHMk", title: "Backstreet Boys - Shape Of My Heart" },
+        { url: "https://youtu.be/dstuitW8PWM?si=2gecoxy2vnXYJ6pQ", title: "Rex Orange County - Happiness" },
+        { url: " https://youtu.be/y_JsSOdFyNs?si=JCOgb2Ov-RKH43Tp", title: "Murphy Radio - Graduation Song" },
     ];
     // ================================================================
 
