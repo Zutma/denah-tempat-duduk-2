@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About & Developer Credits — Denah Tempat Duduk Wisuda ITS</title>
+    <title>About — Denah Tempat Duduk Wisuda ITS</title>
     <link rel="stylesheet" href="<?= url('css/tailwind-built.css') ?>">
     <!-- Ganti ke versi tetap (mis. ?v=1) saat production agar cache browser terpakai -->
     <link rel="stylesheet" href="<?= url('css/public-style.css?v=' . time()) ?>">
@@ -192,7 +192,7 @@
 
         <div class="about-head">
             <span class="about-badge inline-block px-3.5 py-1 bg-its-yellow/20 text-its-blue border border-its-yellow/60 text-xs font-extrabold rounded-full uppercase tracking-widest shadow-2xs">
-                🎉 Easter Egg — Project Credits
+                Project Credits
             </span>
             <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Behind The Scene</h2>
             <p class="about-sub">
@@ -211,21 +211,21 @@
                 <!-- DEVELOPER 1 -->
                 <div class="dev-card dev-1">
                     <h3 class="dev-name">MALIK</h3>
-                    <p class="dev-role text-its-blue-light">TURU</p>
+                    <p class="dev-role text-its-blue-light">(Malik)</p>
                     <div class="dev-quote">"MARI KITA BERMAIN"</div>
                 </div>
 
                 <!-- DEVELOPER 2 — SILAKAN EDIT NAMA, PERAN, DAN QUOTE -->
                 <div class="dev-card dev-2">
-                    <h3 class="dev-name">[Nama Developer 2]</h3>
-                    <p class="dev-role text-amber-600">[Peran Developer 2]</p>
+                    <h3 class="dev-name">Rizviqar Fajar Aslam Utama</h3>
+                    <p class="dev-role text-amber-600">(ASLAM)</p>
                     <div class="dev-quote">"[Isikan quote / pesan dari Developer 2]"</div>
                 </div>
             </div>
         </div>
 
         <div class="about-foot">
-            © <?= date('Y') ?> Sistem Informasi Wisuda ITS • Crafted with ❤️ by Student Developers.
+            © <?= date('Y') ?> Direktorat Pendidikan Sarjana dan Pascasarjana • Crafted with ❤️
         </div>
     </main>
 
@@ -427,19 +427,19 @@
         // ================================================================
         const SOCIALS = {
             //            Developer 1 (Malik)   Developer 2
-            github:    { malik: '', dev2: '' },
-            instagram: { malik: '', dev2: '' },
-            tiktok:    { malik: '', dev2: '' },
-            youtube:   { malik: '', dev2: '' },
-            spotify:   { malik: '', dev2: '' },
-            discord:   { malik: '', dev2: '' }
+            github:    { malik: '', aslam: 'Zutma' },
+            instagram: { malik: '', aslam: '' },
+            tiktok:    { malik: '', aslam: '' },
+            youtube:   { malik: '', aslam: '' },
+            spotify:   { malik: '', aslam: '' },
+            discord:   { malik: '', aslam: '' }
         };
         // ================================================================
         // C. DATA PLATFORM — bagian ini tidak perlu diubah
         // ================================================================
         const DEVS = [
             { id: 'malik', label: (document.querySelector('.dev-1 .dev-name') || {}).textContent || 'Developer 1' },
-            { id: 'dev2',  label: (document.querySelector('.dev-2 .dev-name') || {}).textContent || 'Developer 2' }
+            { id: 'aslam',  label: (document.querySelector('.dev-2 .dev-name') || {}).textContent || 'Developer 2' }
         ];
         const at = v => v.replace(/^@/, '');
         const PLATFORMS = {
