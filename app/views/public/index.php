@@ -186,7 +186,7 @@ if (session_status() === PHP_SESSION_NONE) {
                             <?php if (!empty($publishedSessions)): ?>
                                 <?php foreach ($publishedSessions as $session): ?>
                                     <option value="<?= $session['id'] ?>" <?= (!empty($activeSession) && $activeSession['id'] == $session['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($session['event_name'] ?? 'Event') ?> — Sesi <?= htmlspecialchars($session['session']) ?> (<?= date('d M', strtotime($session['date'])) ?>)
+                                        <?= htmlspecialchars($session['event_name'] ?? 'Event') ?> — Sesi <?= htmlspecialchars($session['session']) ?><?= !empty($session['time']) ? ' ' . htmlspecialchars(ucfirst($session['time'])) : '' ?> (<?= date('d M Y', strtotime($session['date'])) ?>)
                                     </option>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -278,7 +278,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <main class="w-full flex-grow px-2 md:px-6 pt-3 pb-8 flex flex-col items-center justify-start relative z-0">
 
         <?php if (empty($activeSession) || isset($message)): ?>
-            <div class="bg-white/95 backdrop-blur-md border border-its-blue-sky/40 text-slate-700 p-6 rounded-3xl max-w-sm mx-auto my-auto text-center shadow-xl">
+            <div class="bg-white/95 backdrop-blur-md border border-its-blue-sky/40 text-slate-700 p-6 rounded-3xl w-[calc(100%-2.5rem)] max-w-xs mx-auto my-auto text-center shadow-xl">
                 <div class="relative w-20 h-20 mx-auto mb-3 flex items-center justify-center bg-its-blue/5 rounded-full border border-its-blue-sky/30">
                     <img src="<?= url('images/LOGO.png') ?>" alt="ITS Logo" class="w-12 h-12 object-contain">
                 </div>
@@ -387,47 +387,53 @@ if (session_status() === PHP_SESSION_NONE) {
 
     <!-- detail kursi -->
     <div x-show="activeModalData" x-cloak
-        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4"
+        class="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-3.5"
         @click.self="closeModal()">
-        <div class="bg-white rounded-2xl shadow-2xl border border-its-blue-sky/30 max-w-sm md:max-w-md w-full p-6 text-left relative"
+        
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-xs md:max-w-sm w-full p-4 md:p-5 text-left relative overflow-hidden font-sans"
             @keydown.escape.window="closeModal()">
             
-            <!-- HEADER -->
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-                <div class="flex items-center gap-2.5">
-                    <span class="w-3 h-3 rounded-full border border-slate-200 shrink-0 shadow-2xs" :style="`background-color: ${activeModalData?.color || '#cbd5e1'}`"></span>
-                    <span class="text-xs font-extrabold uppercase tracking-wider text-its-blue-light">Detail Tempat Duduk</span>
+            <!-- HEADER MODAL -->
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs" :style="`background-color: ${activeModalData?.color || '#cbd5e1'}`"></span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Detail Tempat Duduk</span>
                 </div>
-                <button type="button" @click="closeModal()" class="text-slate-400 hover:text-its-blue font-bold text-base cursor-pointer p-1 leading-none transition-colors" title="Tutup">✕</button>
+                <button type="button" @click="closeModal()" class="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold text-xs flex items-center justify-center transition-colors cursor-pointer" title="Tutup">✕</button>
             </div>
 
             <template x-if="activeModalData">
-                <div class="space-y-3">
+                <div class="space-y-3 font-sans">
+                    
                     <!-- BADGE KURSI -->
                     <div>
-                        <span class="inline-block px-3 py-1 bg-its-yellow/20 text-its-blue border border-its-yellow/60 text-xs md:text-sm font-extrabold rounded-lg shadow-2xs">
-                            Kursi <span x-text="activeModalData.seat_code"></span>
+                        <span class="inline-block px-2.5 py-1 bg-its-yellow/20 text-its-blue border border-its-yellow/60 text-xs font-extrabold rounded-md shadow-2xs">
+                            Kursi <span x-text="formatSeatDisplay(activeModalData)"></span>
                         </span>
                     </div>
 
-                    <!-- NAMA WISUDAWAN -->
-                    <h4 class="text-base md:text-lg font-extrabold text-slate-900 leading-snug tracking-tight" x-text="activeModalData.name"></h4>
+                    <!-- GRUP NAMA & NRP (DAPAT MARGIN RAPAT) -->
+                    <div class="space-y-0.5">
+                        <h3 class="text-sm md:text-base font-extrabold text-slate-900 leading-snug tracking-tight" x-text="activeModalData.name"></h3>
+                        <p class="text-xs font-bold text-its-blue-light tracking-wide" x-text="`NRP: ${activeModalData.nrp}`"></p>
+                    </div>
 
-                    <!-- NRP -->
-                    <p class="text-base md:text-sm font-semibold text-its-blue-light tracking-wide" x-text="`NRP: ${activeModalData.nrp}`"></p>
+                    <!-- GARIS PEMISAH -->
+                    <div class="h-px bg-slate-100 w-full my-1"></div>
 
-                    <!-- CARD PROGRAM STUDI & FAKULTAS -->
-                    <div class="mt-4 p-3.5 bg-slate-50/90 rounded-xl border border-slate-200/60 space-y-3 text-slate-600">
+                    <!-- GRUP INFORMASI AKADEMIK (MARGINTOP TERKONTROL) -->
+                    <div class="space-y-2 text-slate-700">
                         <div>
-                            <span class="text-base md:text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Program Studi</span>
-                            <span class="font-semibold text-slate-800 text-base md:text-sm leading-relaxed block" x-text="(activeModalData.degree ? activeModalData.degree + ' ' : '') + (activeModalData.prodi || activeModalData.prodi_name || '-')"></span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Program Studi</span>
+                            <span class="font-semibold text-slate-800 text-xs leading-snug block" x-text="(activeModalData.degree ? activeModalData.degree + ' ' : '') + (activeModalData.prodi || activeModalData.prodi_name || '-')"></span>
                         </div>
-                        <div class="h-px bg-slate-200/80 w-full"></div>
+
                         <div>
-                            <span class="text-base md:text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Fakultas</span>
-                            <span class="font-semibold text-slate-800 text-base md:text-sm leading-relaxed block" x-text="activeModalData.faculty_name || '-'"></span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Fakultas</span>
+                            <span class="font-semibold text-slate-800 text-xs leading-snug block" x-text="activeModalData.faculty_name || '-'"></span>
                         </div>
                     </div>
+
                 </div>
             </template>
         </div>
