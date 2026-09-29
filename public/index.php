@@ -57,6 +57,8 @@ foreach ($prefixes as $prefix) {
 // daftar route clean
 $routes = [
     ''                              => [PublicController::class, 'denah'],
+    'about'                         => [PublicController::class, 'about'],
+    'denah/about'                   => [PublicController::class, 'about'],
     'login'                         => [AuthController::class, 'login'],
     'logout'                        => [AuthController::class, 'logout'],
     'dashboard'                     => [DashboardController::class, 'index'],
