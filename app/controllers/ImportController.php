@@ -97,7 +97,7 @@ class ImportController extends BaseController {
                         $kursiGlobal = (int)$cleanData[$headerMap['nomor']];
                     }
 
-                    $jenjang = 'S1';
+                    $jenjang = '';
                     $prodiNama = $prodiRaw;
 
                     if (isset($headerMap['jenjang']) && !empty($cleanData[$headerMap['jenjang']])) {

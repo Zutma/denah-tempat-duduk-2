@@ -187,49 +187,51 @@ class Graduate {
         $rawClean = trim($rawName);
         $degreeClean = strtoupper(trim($degreeLevel));
 
-        // Ambil semua prodi di fakultas ini (atau semua prodi jika fakultas baru)
-        $stmt = $conn->prepare("SELECT id, name, degree_level FROM study_programs WHERE faculty_id = ?");
-        $stmt->bind_param("i", $facultyId);
-        $stmt->execute();
-        $existingProdis = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-
-        // Fungsi normalisasi string untuk perbandingan cerdas (hilangkan titik, dash, spasi ganda)
+        // Normalize string helper
         $normalize = function($str) {
-            $str = preg_replace('/(TEK|REK|KIM|IND|MAN|MANAJ|TEKNO|TEKNOL|KOMP|PEND|ADM|INF|INFORM|SIST|AKUN|FIST|BIO|MAT|STAT)\b/i', '$1', $str);
             $str = preg_replace('/[^a-zA-Z0-9]/', ' ', $str);
             return strtolower(trim(preg_replace('/\s+/', ' ', $str)));
         };
 
         $targetNormalized = $normalize($rawClean);
 
-        // 1. Check Exact atau Smart Match
+        // 1. Cari yang persis cocok FAKULTAS + NAMA PRODI + JENJANG (degree_level) di database
+        $stmt = $conn->prepare("SELECT id, name, degree_level FROM study_programs WHERE faculty_id = ?");
+        $stmt->bind_param("i", $facultyId);
+        $stmt->execute();
+        $existingProdis = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
         foreach ($existingProdis as $p) {
             $pNameNormalized = $normalize($p['name']);
-            
-            // Periksa jika persis sama (setelah dinormalisasi) ATAU salah satu mengandung kata kunci yang persis sama
-            if ($targetNormalized === $pNameNormalized || 
-                (strlen($targetNormalized) > 4 && strpos($pNameNormalized, $targetNormalized) !== false) ||
-                (strlen($pNameNormalized) > 4 && strpos($targetNormalized, $pNameNormalized) !== false)) {
-                
-                return [
-                    'id' => $p['id'],
-                    'created' => false,
-                    'matched_name' => $p['name'],
-                    'degree_level' => $p['degree_level']
-                ];
+            $pDegree = strtoupper(trim($p['degree_level']));
+
+            // Jika degree match DAN nama match (baik exact maupun normalized match)
+            if ($targetNormalized === $pNameNormalized) {
+                // Jika degreeClean valid dan sama, atau jika degreeClean belum diketahui
+                if (!$degreeClean || $pDegree === $degreeClean) {
+                    return [
+                        'id' => $p['id'],
+                        'created' => false,
+                        'matched_name' => $p['name'],
+                        'degree_level' => $p['degree_level']
+                    ];
+                }
             }
         }
 
-        // 2. Jika tidak ditemukan yang cocok, buat baru dengan Source of Truth dari Excel
+        // 2. Jika tidak ada yang cocok presisi (Nama + Jenjang), buat record prodi baru persis sesuai Excel
+        // Jika jenjang dari Excel kosong, pakai 'S1' sebagai default buat record baru saja
+        $finalDegree = $degreeClean ?: '';
+
         $stmt = $conn->prepare("INSERT INTO study_programs (faculty_id, name, degree_level, created_at, updated_at) VALUES (?, ?, ?, NOW(), NOW())");
-        $stmt->bind_param("iss", $facultyId, $rawClean, $degreeClean);
+        $stmt->bind_param("iss", $facultyId, $rawClean, $finalDegree);
         $stmt->execute();
 
         return [
             'id' => $conn->insert_id,
             'created' => true,
             'matched_name' => $rawClean,
-            'degree_level' => $degreeClean
+            'degree_level' => $finalDegree
         ];
     }
 
