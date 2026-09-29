@@ -59,4 +59,10 @@ class PublicController extends BaseController {
             'pageTitle'         => 'Denah Kursi Wisuda'
         ]);
     }
-}
+
+    public function about($conn) {
+        $this->renderPublic('about', [
+            'pageTitle' => 'About & Developer Credits'
+        ]);
+    }
+}
