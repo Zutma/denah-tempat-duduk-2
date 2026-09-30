@@ -140,17 +140,27 @@ class PublicSeat {
             }
         }
 
-        $allWings = [$leftRows, $rightRows];
-        foreach ($allWings as $wing) {
+        $allWings = [
+            'left'  => $leftRows,
+            'right' => $rightRows
+        ];
+
+        foreach ($allWings as $sideKey => $wing) {
+            $sideName = ($sideKey === 'left') ? 'Kiri' : 'Kanan';
             foreach ($wing as $r) {
                 if (!empty($r['seats'])) {
                     foreach ($r['seats'] as $s) {
                         if (!empty($s['graduate_name'])) {
                             $seatId = $s['id'];
+                            $seatCode = $seatMapInfo[$seatId]['code'] ?? '-';
+                            $globalNum = $s['global'] !== null ? sprintf('%03d', $s['global']) : sprintf('%03d', $s['local']);
                             $facCode = !empty($s['faculty_code']) ? $s['faculty_code'] : ($s['faculty_name'] ?? '-');
                             $allGraduatesList[] = [
                                 'seat_id'      => (int)$seatId,
-                                'seat_code'    => $seatMapInfo[$seatId]['code'] ?? '-',
+                                'seat_code'    => $seatCode,
+                                'row'          => $r['row'],
+                                'side'         => $sideName,
+                                'seat_number'  => $globalNum,
                                 'name'         => $s['graduate_name'],
                                 'nrp'          => $s['nrp'],
                                 'prodi'        => $s['prodi_name'] ?? '-',

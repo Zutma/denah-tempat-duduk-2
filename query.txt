@@ -219,3 +219,8 @@ INSERT INTO study_programs (faculty_id, name, degree_level) VALUES
 (9, 'Manajemen Teknologi', 'S3'),
 (9, 'Inovasi Sistem dan Teknologi', 'S2'),
 (9, 'Insinyur', 'Profesi');
+
+USE db_denah_duduk;
+
+ALTER TABLE graduation_sessions 
+ADD COLUMN `time` ENUM('pagi','siang') NULL DEFAULT NULL AFTER `session`;

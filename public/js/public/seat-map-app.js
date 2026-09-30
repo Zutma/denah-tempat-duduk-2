@@ -130,8 +130,38 @@ function seatMapApp() {
             const targetId = Number(seatId);
             if (!targetId) return;
 
-            const gradData = this.getGradBySeatId(targetId);
+            let gradData = this.getGradBySeatId(targetId);
             if (!gradData) return; // Kursi kosong
+
+            // Pastikan data memiliki info tempat duduk lengkap
+            if (!gradData.side || !gradData.row) {
+                const seatBtn = document.getElementById(`seat-${targetId}`);
+                if (seatBtn) {
+                    const rowContainer = seatBtn.closest('[class*="bg-white"]');
+                    const wingContainer = seatBtn.closest('.shrink-0');
+                    
+                    let rowVal = '';
+                    if (rowContainer) {
+                        const rowBadge = rowContainer.querySelector('span');
+                        if (rowBadge) rowVal = rowBadge.innerText.trim();
+                    }
+
+                    // Tentukan sayap (kiri/kanan) berdasarkan letak DOM container atau data seatMap
+                    let sideVal = 'Kanan';
+                    if (wingContainer) {
+                        const isLeft = wingContainer.parentElement?.firstElementChild === wingContainer ||
+                                       wingContainer.className.includes('items-end');
+                        sideVal = isLeft ? 'Kiri' : 'Kanan';
+                    }
+
+                    gradData = {
+                        ...gradData,
+                        row: rowVal || gradData.row || '',
+                        side: gradData.side || sideVal,
+                        seat_number: gradData.seat_number || gradData.seat_code?.replace(/[^0-9]/g, '') || ''
+                    };
+                }
+            }
 
             // Jika mengeklik kursi baru / kursi hasil pencarian, langsung buka modalnya dalam 1x klik
             if (this.selectedSeatId !== targetId || !this.activeModalData) {
@@ -233,10 +263,16 @@ function seatMapApp() {
         formatSeatDisplay(data) {
             if (!data) return '-';
             
-            // Jika data sudah berisi properti terpisah
             const row = data.row || data.seat_code?.charAt(0) || '';
             const side = data.side || (data.side_type === 'left' ? 'Kiri' : 'Kanan');
-            const number = data.seat_number || data.seat_code?.replace(/[^0-9]/g, '') || '';
+            
+            let number = '';
+            if (data.seat_number) {
+                number = data.seat_number;
+            } else if (data.seat_code) {
+                const numMatch = data.seat_code.match(/\d+/);
+                number = numMatch ? numMatch[0] : '';
+            }
 
             return `${row} - ${side} - ${number}`;
         }
